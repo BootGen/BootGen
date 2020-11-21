@@ -25,6 +25,7 @@ namespace Generator
             controllerCollection.Add<Authentication>();
             controllerCollection.Add<Registration>();
             controllerCollection.Add<Profile>();
+            controllerCollection.Add<Generate>();
         }
 
         internal static void AddSeeds(SeedDataStore seedStore)

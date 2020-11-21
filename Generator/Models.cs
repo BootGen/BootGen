@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Generator
 {
     [Readonly]
@@ -67,5 +69,30 @@ namespace Generator
 
         [Post]
         bool ChangePassword(ChangePasswordData data);
+    }
+
+    class GenerateRequest
+    {
+        public string Data { get; set; }
+    }
+
+    class GeneratedFile
+    {
+        public string Name { get; set; }
+        public string Path { get; set; }
+        public string Content { get; set; }
+    }
+
+    class GenerateResponse
+    {
+        public bool Success { get; set; }
+        public string ErrorMessage { get; set; }
+        public List<GeneratedFile> GeneratedFiles { get; set; }
+    }
+
+    interface Generate
+    {
+        [Post]
+        GenerateResponse Generate(GenerateRequest request);
     }
 }
