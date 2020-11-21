@@ -1,0 +1,11 @@
+{{~ for refered in (referred_classes class) ~}}
+{{~ if refered != class.name.singular ~}}
+import { {{ refered }} } from './{{ refered }}';
+{{~ end ~}}
+{{~ end ~}}
+
+export interface {{ class.name }} {
+    {{~ for property in class.client_properties ~}}
+    {{ camel_case property.name }}{{ if !property.is_required}}?{{ end }}: {{ get_type property }};
+    {{~ end ~}}
+}

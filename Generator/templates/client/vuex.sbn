@@ -1,0 +1,316 @@
+import Vue from 'vue'
+import Vuex from 'vuex'
+import axios from 'axios'
+{{~ for class in classes ~}}
+import { {{class.name}} } from '@/models/{{class.name}}'
+{{~ end ~}}
+
+Vue.use(Vuex)
+
+axios.defaults.baseURL = "{{ base_url }}"
+
+const dateFormat = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/;
+
+function reviver(key: string, value: string) {
+  if (typeof value === "string" && dateFormat.test(value)) {
+    return new Date(value);
+  }
+  return value;
+}
+
+function transformResponse(response: string) {
+  if (response && response.trim()) {
+    return JSON.parse(response, reviver);
+  }
+  return null;
+}
+
+function config(context: any) {
+  return {headers: {'Authorization': 'Bearer ' + context.state.jwt}, transformResponse: transformResponse };
+}
+
+interface EntityWithId {
+  id: number;
+}
+
+function setItem<T extends EntityWithId>(array: Array<T>, item: T): T {
+  const oldItem = array.find(i => i.id == item.id);
+  if (oldItem) {
+    Object.assign(oldItem, item);
+    return oldItem;
+  } else {
+    array.push(item);
+    return item;
+  }
+}
+
+function setArray<T extends EntityWithId>(target: Array<T>, source: Array<T>): Array<T> {
+  const result = Array<T>();
+  source.forEach(item =>{
+    const oldItem = target.find(i => i.id == item.id);
+    if (oldItem) {
+      Object.assign(oldItem, item);
+      result.push(oldItem);
+    } else {
+      result.push(item);
+    }
+  });
+  return result;
+}
+
+function patchArray<T extends EntityWithId>(target: Array<T>, source: Array<T>) {
+  source.forEach(item =>{
+    setItem(target, item);
+  });
+}
+
+function findById<T extends EntityWithId>(array: Array<T>, id: number): T | undefined {
+  return array.find(i => i.id === id);
+}
+
+{{~ for resource in resources ~}}
+{{~ if !resource.parent_resource ~}}
+function {{ camel_case resource.class.name }}ToDto({{ camel_case resource.class.name }}: {{ resource.class.name }}): any {
+  return {
+    {{~ for property in resource.class.common_properties~}}
+    {{ camel_case property.name }}: {{ camel_case resource.class.name }}.{{ camel_case property.name }},
+    {{~ end ~}}
+  };
+}
+{{~ end ~}}
+{{~ end ~}}
+export default new Vuex.Store({
+  state: {
+    {{~ for resource in resources ~}}
+    {{~ if !resource.parent_resource ~}}
+    {{ camel_case resource.name.plural }}: Array<{{resource.class.name}}>(),
+    {{~ end ~}}
+    {{~ end ~}}
+    jwt: ""
+  },
+  mutations: {
+    {{~ for resource in resources ~}}
+    {{~ if !resource.parent_resource ~}}
+    set{{ resource.name.plural }}: function(state, {{ camel_case resource.name.plural }}) {
+      state.{{ camel_case resource.name.plural }} = setArray(state.{{ camel_case resource.name.plural }},{{ camel_case resource.name.plural }});
+    },
+    patch{{ resource.name.plural }}: function(state, {{ camel_case resource.name.plural }}) {
+      patchArray(state.{{ camel_case resource.name.plural }},{{ camel_case resource.name.plural }});
+    },
+    set{{ resource.name }}: function(state, {{ camel_case resource.name }}) {
+      setItem(state.{{ camel_case resource.name.plural }}, {{ camel_case resource.name }});
+    },
+    {{~ end ~}}
+    {{~ end ~}}
+    init: function(state) {
+      const jwt = localStorage.getItem("jwt")
+      if (jwt) {
+        state.jwt = jwt;
+      }
+    },
+    setJwt: function(state, jwt) {
+      state.jwt = jwt
+      try {
+        if (jwt) {
+          localStorage.setItem("jwt", jwt);
+        } else {
+          localStorage.removeItem("jwt");
+        } 
+      } catch {
+        console.log("Local storage is not available.")
+      }
+    }
+  },
+  actions: {
+    {{~ for resource in resources ~}}
+    {{~
+    parent = resource.parent_resource
+    root = resource.root_resource
+    ~}}
+    {{ get_list_function_name resource }}: function(context{{if parent}}, {{ camel_case parent.name}}{{end}}): Promise<Array<{{resource.class.name}}>> {
+      return new Promise((resolve, reject) => {
+        axios.get({{path_template resource}}, config(context)).then(response => {
+          {{~ if parent ~}}
+          context.commit("patch{{ root.name.plural }}", response.data);
+          const storedArray = Array<{{resource.class.name}}>();
+          response.data.forEach((item: {{resource.class.name}}) => {
+            const stored{{ root.name }} = findById(context.state.{{ camel_case root.name.plural }}, item.id);
+            if (stored{{ root.name }}) {
+              storedArray.push(stored{{ root.name }});
+            }
+          });
+          Vue.set({{ camel_case parent.name}}, "{{ camel_case resource.name.plural }}", storedArray);
+          context.commit("set{{parent.name}}",{{ camel_case parent.name}});
+          resolve(storedArray);
+          {{~ else ~}}
+          context.commit("set{{ resource.name.plural }}", response.data);
+          resolve(context.state.{{ camel_case resource.name.plural }});
+          {{~ end ~}}
+        }).catch(reason => {
+          reject(reason);
+        })
+      })
+    },
+    {{~ if resource.is_root_resource ~}}
+    {{ get_item_function_name resource }}: function(context, {{ if parent }}data{{else}}id{{end}}): Promise<{{resource.class.name}}> {
+      {{~ if parent ~}}
+      const id = data.id;
+      const {{ camel_case parent.name}}: {{ parent.class.name }} = data.{{ camel_case parent.name}};
+      
+      {{~ end ~}}
+      return new Promise((resolve, reject) => {
+        axios.get({{get_item_path_template resource}}, config(context)).then(response => {
+          context.commit("set{{root.name}}", response.data);
+          resolve(findById(context.state.{{camel_case root.name.plural}}, response.data.id));
+        }).catch(reason => {
+          reject(reason);
+        })
+      })
+    },
+    {{~ end ~}}
+    {{~ if !resource.is_readonly ~}}
+    {{ add_function_name resource }}: function(context, {{ if parent }}data{{else}}{{ camel_case resource.name}}{{end}}): Promise<{{resource.class.name}}> {
+      {{~ if parent ~}}
+      const {{ camel_case resource.name}}: {{ resource.class.name}} = data.{{ camel_case resource.name}};
+      const {{ camel_case parent.name}}: {{ parent.class.name}} = data.{{ camel_case parent.name}};
+      {{~ end ~}}
+
+      return new Promise((resolve, reject) => {
+        axios.post({{path_template resource}}, {{ camel_case resource.class.name}}ToDto({{ camel_case resource.name}}), config(context)).then(response => {
+          context.commit("set{{ root.name }}", response.data);
+          const savedItem = findById(context.state.{{ camel_case root.name.plural }}, response.data.id);
+          {{~ if parent ~}}
+          if (savedItem) {
+            if ({{ camel_case parent.name}}.{{ camel_case resource.name.plural}}) {
+              {{ camel_case parent.name}}.{{ camel_case resource.name.plural}}.push(savedItem);
+            } else {
+              Vue.set({{ camel_case parent.name}}, "{{ camel_case resource.name.plural}}", [ savedItem ]);
+            }
+            context.commit("set{{ parent.name }}", {{ camel_case parent.name}});
+            {{~ if resource.pivot ~}}
+            {{~ for property in resource.class.properties ~}}
+            {{~ if property.is_collection && property.is_many_to_many && property.class.id == parent.class.id ~}}
+            if (savedItem.{{ camel_case property.name}}) {
+              savedItem.{{ camel_case property.name}}.push({{ camel_case parent.name}});
+            } else {
+              Vue.set(savedItem, "{{ camel_case property.name}}", [ {{ camel_case parent.name}} ]);
+            }
+            context.commit("set{{ root.name }}", savedItem);
+            {{~ end ~}}
+            {{~ end ~}}
+            {{~ end ~}}
+            {{~ for property in resource.class.properties ~}}
+            {{~ if property.is_parent_reference ~}}
+            const {{ camel_case property.class.name }} = findById(context.state.{{ camel_case property.class.name.plural }}, {{ camel_case resource.name }}.{{ camel_case property.name }}Id);
+            if ({{ camel_case property.class.name }}) {
+              {{~ for prop in property.class.properties ~}}
+              {{~ if prop.class && prop.class.id == resource.class.id && prop.is_collection ~}}
+              {{ camel_case property.class.name }}.{{ camel_case prop.name }}.push({{ camel_case resource.name}});
+              {{~ end ~}}
+              {{~ end ~}}
+              context.commit("set{{ property.class.name }}", {{ camel_case property.class.name }});
+            }
+            {{~ end ~}}
+            {{~ end ~}}
+          }
+          {{~ end ~}}
+          resolve(savedItem);
+        }).catch(reason => {
+          reject(reason);
+        })
+      })
+    },
+    {{~ if resource.is_root_resource ~}}
+    {{ update_function_name resource }}: function(context, {{ if parent }}data{{else}}{{ camel_case resource.name}}{{end}}): Promise<{{resource.class.name}}> {
+      {{~ if parent ~}}
+      const {{ camel_case resource.name}}: {{ resource.class.name}} = data.{{ camel_case resource.name}};
+      const {{ camel_case parent.name}}: {{ parent.class.name}} = data.{{ camel_case parent.name}};
+      {{~ end ~}}
+
+      return new Promise((resolve, reject) => {
+        axios.put({{item_path_template resource}}, {{ camel_case resource.class.name}}ToDto({{ camel_case resource.name}}), config(context)).then(response => {
+          context.commit("set{{root.name}}", response.data);
+          resolve(findById(context.state.{{camel_case root.name.plural}}, response.data.id));
+        }).catch(reason => {
+          reject(reason);
+        })
+      })
+    },
+    {{~ end ~}}
+    {{ delete_function_name resource }}: function(context, {{ if parent }}data{{else}}{{ camel_case resource.name}}{{end}}): Promise<void> {
+      {{~ if resource.pivot ~}}
+      const {{ camel_case resource.name}}: {{ resource.class.name}} = data.{{ camel_case resource.name}};
+      const {{ camel_case parent.name}}: {{ parent.class.name}} = data.{{ camel_case parent.name}};
+      {{ camel_case parent.name}}.{{ camel_case resource.name.plural}} = {{ camel_case parent.name}}.{{ camel_case resource.name.plural}}.filter(i => i !== {{ camel_case resource.name}});
+      context.commit("set{{ parent.name }}", {{ camel_case parent.name}});
+      {{~ for property in resource.class.properties ~}}
+      {{~ if property.is_collection && property.is_many_to_many && property.class.id == parent.class.id ~}}
+      {{ camel_case resource.name}}.{{ camel_case property.name }} = {{ camel_case resource.name}}.{{ camel_case property.name }}.filter(i => i !== {{ camel_case parent.name}});
+      context.commit("set{{ resource.name }}", {{ camel_case resource.name}});
+      {{~ end ~}}
+      {{~ end ~}}
+      {{~ else ~}}
+      context.commit("set{{ root.name.plural }}", context.state.{{ camel_case root.name.plural }}.filter(i => i !== {{ camel_case resource.name}}));
+      {{~ for property in resource.class.properties ~}}
+      {{~ if property.is_parent_reference ~}}
+      const {{ camel_case property.class.name }} = findById(context.state.{{ camel_case property.class.name.plural }}, {{ camel_case resource.name }}.{{ camel_case property.name }}Id);
+      if ({{ camel_case property.class.name }}) {
+        {{~ for prop in property.class.properties ~}}
+        {{~ if prop.class && prop.class.id == resource.class.id && prop.is_collection ~}}
+        {{ camel_case property.class.name }}.{{ camel_case prop.name }} = {{ camel_case property.class.name }}.{{ camel_case prop.name }}.filter(item => item.id != {{ camel_case resource.name}}.id)
+        {{~ end ~}}
+        {{~ end ~}}
+        context.commit("set{{ property.class.name }}", {{ camel_case property.class.name }});
+      }
+      {{~ end ~}}
+      {{~ if property.is_many_to_many ~}}
+      for(const i in {{ camel_case resource.name }}.{{ camel_case property.name }}) {
+        const {{ camel_case property.class.name }}: {{ property.class.name }} = {{ camel_case resource.name }}.{{ camel_case property.name }}[i];
+        {{~ for prop in property.class.properties ~}}
+        {{~ if prop.class && prop.class.id == resource.class.id && prop.is_collection ~}}
+        {{ camel_case property.class.name }}.{{ camel_case prop.name }} = {{ camel_case property.class.name }}.{{ camel_case prop.name }}.filter(item => item.id != {{ camel_case resource.name}}.id)
+        {{~ end ~}}
+        {{~ end ~}}
+        context.commit("set{{ property.class.name }}", {{ camel_case property.class.name }});
+      }
+      {{~ end ~}}
+      {{~ end ~}}
+      {{~ end ~}}
+
+      return new Promise((resolve, reject) => {
+        axios.delete({{item_path_template resource}}, config(context)).then(() => {
+          resolve()
+        }).catch(reason => {
+          reject(reason);
+        })
+      })
+    },
+    {{~ end ~}}
+    {{~ end ~}}
+    {{~ for controller in controllers ~}}
+    {{~ for method in controller.methods~}}
+    {{ camel_case method.name}}: function(context{{ if method.parameter }}, {{ method.parameter.name }}{{ end }}): Promise<{{method.return_type.class.name}}> {
+      return new Promise((resolve, reject) => {
+        axios.{{ lower_case method.verb }}("{{ kebab_case controller.name }}/{{ kebab_case method.name }}"{{ if method.parameter }}{{ if method.parameter.class && method.parameter.class.is_resource }}, {{ camel_case method.parameter.class.name }}ToDto({{ method.parameter.name }}){{ else}}, {{ method.parameter.name }}{{ end }}{{else if (lower_case method.verb) != "get" }}, null{{ end }}{{ if controller.authenticate }}, config(context){{ end }}).then(response => {
+          {{~ if method.return_type.class && method.return_type.class.is_resource ~}}
+          {{~ class = method.return_type.class ~}}
+          context.commit("set{{class.name}}", response.data);
+          resolve(findById(context.state.{{camel_case class.name.plural}}, response.data.id));
+          {{~ else ~}}
+          resolve(response.data);
+          {{~ end ~}}
+        }).catch(reason => {
+          reject({
+            status: reason.response.status,
+            statusText: reason.response.statusText,
+            message: reason.message
+          });
+        })
+      });
+    },
+    {{~ end ~}}
+    {{~ end ~}}
+  },
+  modules: {
+  }
+})

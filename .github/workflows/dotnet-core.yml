@@ -1,0 +1,35 @@
+name: test
+
+on:
+  push:
+    branches: [ test ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 3.1.301
+    - name: Use Node.js 14.x
+      uses: actions/setup-node@v1
+      with:
+        node-version: 14.x
+    - name: Install dependencies
+      run: dotnet restore
+      working-directory: ./WebProject
+    - name: Install dependencies (Client)
+      run: npm install
+      working-directory: ./WebProject/ClientApp
+    - name: Build
+      run: dotnet build --configuration Release --no-restore
+      working-directory: ./WebProject
+    - name: Install Parallel
+      run: sudo apt install parallel
+    - name: Test
+      run: ./runtests.sh
+      working-directory: ./WebProject

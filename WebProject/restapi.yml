@@ -1,0 +1,211 @@
+openapi: '3.0.0'
+info:
+  version: 1.0.0
+  title: 'My Project'
+  license:
+    name: MIT
+servers:
+  - url: https://localhost:5001
+paths:
+  /users:
+    get:
+      security:
+      - bearerAuth: []
+      summary: retrieve list of users
+      operationId: getUsers
+      responses:
+        '200':
+          description: successful query
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+  /users/{userId}:
+    get:
+      security:
+      - bearerAuth: []
+      summary: retrieve users resource
+      operationId: getUser
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: successful query
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+  /authentication/login:
+    post:
+      summary: Login
+      operationId: login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+                $ref: '#/components/schemas/AuthenticationData'
+      responses:
+        '200':
+          description: Login success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+  /registration/register:
+    post:
+      summary: Register
+      operationId: register
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+                $ref: '#/components/schemas/RegistrationData'
+      responses:
+        '200':
+          description: Register success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProfileResponse'
+  /profile/profile:
+    get:
+      security:
+      - bearerAuth: []
+      summary: Profile
+      operationId: profile
+      responses:
+        '200':
+          description: Profile success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+  /profile/update-profile:
+    post:
+      security:
+      - bearerAuth: []
+      summary: UpdateProfile
+      operationId: updateProfile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+                $ref: '#/components/schemas/User'
+      responses:
+        '200':
+          description: UpdateProfile success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProfileResponse'
+  /profile/change-password:
+    post:
+      security:
+      - bearerAuth: []
+      summary: ChangePassword
+      operationId: changePassword
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+                $ref: '#/components/schemas/ChangePasswordData'
+      responses:
+        '200':
+          description: ChangePassword success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChangePasswordResponse'
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT 
+  schemas:
+    User:
+      type: object
+      required:
+        - id
+        - user_name
+        - email
+      properties:
+        id:
+          type: integer
+          format: int32
+          readOnly: true
+        user_name:
+          type: string
+        email:
+          type: string
+    AuthenticationData:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+    LoginResponse:
+      type: object
+      required:
+        - jwt
+      properties:
+        jwt:
+          type: string
+    RegistrationData:
+      type: object
+      required:
+        - user_name
+        - email
+        - password
+      properties:
+        user_name:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+    ProfileResponse:
+      type: object
+      required:
+        - success
+        - is_user_name_in_use
+        - is_email_in_use
+      properties:
+        success:
+          type: boolean
+        is_user_name_in_use:
+          type: boolean
+        is_email_in_use:
+          type: boolean
+    ChangePasswordData:
+      type: object
+      required:
+        - old_password
+        - new_password
+      properties:
+        old_password:
+          type: string
+        new_password:
+          type: string
+    ChangePasswordResponse:
+      type: object
+      required:
+        - value
+      properties:
+        value:
+          type: boolean
