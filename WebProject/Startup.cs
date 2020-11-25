@@ -68,6 +68,7 @@ namespace WebProject
             services.AddScoped<IAuthenticationService, AuthenticationService>();
             services.AddScoped<IRegistrationService, RegistrationService>();
             services.AddScoped<IProfileService, ProfileService>();
+            services.AddScoped<IGenerateService, GenerateService>();
             
             ServiceRegistrator.RegisterServices(services);
         }
