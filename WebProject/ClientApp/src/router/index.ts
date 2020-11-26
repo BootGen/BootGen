@@ -3,6 +3,7 @@ import VueRouter, { RouteConfig } from 'vue-router'
 import Login from '../views/Login.vue'
 import Logout from '../views/Logout.vue'
 import SignUp from '../views/SignUp.vue'
+import Generator from '../views/Generator.vue'
 import Profile from '../views/Profile.vue'
 import ChangePassword from '../views/ChangePassword.vue'
 import EditProfile from '../views/EditProfile.vue'
@@ -37,6 +38,11 @@ const loggedOutGuard = (to: any, from: any, next: any) => {
     name: 'Sign Up',
     beforeEnter: loggedOutGuard,
     component: SignUp
+  },
+  {
+    path: "/generator",
+    name: "Generator",
+    component: Generator
   },
   {
     path: "/profile",

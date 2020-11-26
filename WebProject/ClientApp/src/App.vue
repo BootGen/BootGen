@@ -44,6 +44,7 @@ export default {
     items: function () {
       if (this.$store.state.jwt) {
         return [
+          { title: "Generator", link: "/generator", icon: "mdi-cog-outline" },
           { title: "Profile", link: "/profile", icon: "mdi-account-outline" },
           {
             title: "Edit Profile",
@@ -65,6 +66,7 @@ export default {
             link: "sign-up",
             icon: "mdi-account-plus-outline",
           },
+          { title: "Generator", link: "/generator", icon: "mdi-cog-outline" },
         ];
       }
     },
