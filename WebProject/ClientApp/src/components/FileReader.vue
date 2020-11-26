@@ -2,6 +2,7 @@
   <v-container fluid>
     <v-row>
       <v-col cols="8">
+        <p v-if="activeFile && activeFile.content">{{ activeFile.content }}</p>
       </v-col>
       <v-col cols="4">
         <v-treeview :items="tree" @update:active="treeClick" return-object activatable hoverable dense open-on-click></v-treeview>
@@ -39,11 +40,14 @@ export default Vue.extend({
   },
   data: function () {
     return {
+      activeFile: null as (null | Element),
     };
   },
   methods: {
-    treeClick: function(data: Element){
-      console.log(data);
+    treeClick: function(data: Element[]){
+      if(data[0] && data[0].content){
+        this.activeFile = data[0];
+      }
     },
     placement: function(element: Element[], file: {name: string; path: string; content: string}, id: number): Element[]{
       let result = false;
