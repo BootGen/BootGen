@@ -4,11 +4,11 @@
       <v-col cols="5">
         <v-textarea 
           v-model="jsonText"
-          @change="setJson"
           placeholder="json"
           rows="10"
           required
         ></v-textarea>
+        <v-btn class="mr-4" large :disabled="jsonText == ''" @click="setJson(jsonText)">Generation</v-btn>
       </v-col>
       <v-col cols="7">
         <file-reader :files="generatedFiles"></file-reader>

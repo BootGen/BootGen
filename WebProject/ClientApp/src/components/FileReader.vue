@@ -15,6 +15,12 @@
 <script lang="ts">
 import Vue from "vue";
 
+interface File {
+  name: string;
+  path: string;
+  content: string;
+}
+
 interface Element {
   id: number;
   name: string;
@@ -28,6 +34,23 @@ export default Vue.extend({
   ],
   components: {
   },
+
+  watch: {
+    files: {
+      handler(files: File[]) {
+        if(this.activeFile){
+          const name: string = this.activeFile.name;
+          const result = files.find(file => file.name === name);
+          if(result){
+            this.activeFile.content = result.content;  
+          }else{
+            this.activeFile = null;
+          }
+        }
+      }
+    }
+  },
+
   computed: {
     tree: function(): Element[]{
       let data: Element[] = [];
@@ -50,7 +73,7 @@ export default Vue.extend({
         this.activeFile = data[0];
       }
     },
-    placement: function(element: Element[], file: {name: string; path: string; content: string}, id: number): Element[]{
+    placement: function(element: Element[], file: File, id: number): Element[]{
       let result = false;
       if(file.path === ""){
         element.push({id: id++, name: file.name, content: file.content, children: []});
