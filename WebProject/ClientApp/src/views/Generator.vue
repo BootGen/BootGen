@@ -1,9 +1,16 @@
 <template>
   <v-container fluid>
     <v-row>
-      <v-col cols="6">
+      <v-col cols="5">
+        <v-textarea 
+          v-model="jsonText"
+          @change="setJson"
+          placeholder="json"
+          rows="10"
+          required
+        ></v-textarea>
       </v-col>
-      <v-col cols="6">
+      <v-col cols="7">
         <file-reader :files="generatedFiles"></file-reader>
       </v-col>
     </v-row>
@@ -19,8 +26,7 @@ export default Vue.extend({
     FileReader
   },
   created: async function(){
-    const generate = await this.$store.dispatch("generate", {data: JSON.stringify(this.json)});
-    this.generatedFiles = generate.generatedFiles;
+    this.setJson(JSON.stringify(this.json));
   },
   data: function () {
     return {
@@ -28,12 +34,15 @@ export default Vue.extend({
       json: {
         users: [{'userName': 'Test User', 'email': 'aa@bb@cc'}],
         tasks: [{'title': 'Task Title', 'description': 'Task des'}]
-      }
+      },
+      jsonText: "",
     };
   },
   methods: {
-    onError() {
-      console.log('error');
+    setJson: async function(json: string) {
+      const generate = await this.$store.dispatch("generate", {data: json});
+      this.generatedFiles = generate.generatedFiles;
+      this.jsonText = json;
     }
   },
 });

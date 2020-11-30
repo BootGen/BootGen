@@ -60,12 +60,11 @@ export default Vue.extend({
             result = true;
             break;
           }else if(element[i].children.length > 0){
-            result = true
-            break;
+            this.placement(element[i].children, file, id);
           }
         }
         if(!result){
-          element.push({id: id++, name: file.path, children: [{id: id++, name: file.name, content: file.content, children: []}]})
+          element.push({id: id++, name: file.path, children: [{id: id++, name: file.name, content: file.content, children: []}]});
         }
       }
       return element;
