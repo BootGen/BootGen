@@ -1,17 +1,15 @@
 <template>
   <v-container fluid>
-    <v-row class="d-flex justify-end">
-      <v-btn class="mr-4" color="primary" small @click="download">download</v-btn>
-    </v-row>
+    <options :project="activeProject" @select-project="selectProject"></options>
     <v-row>
       <v-col cols="5">
         <v-textarea 
-          v-model="jsonText"
+          v-model="activeProject.json"
           placeholder="json"
           rows="10"
           required
         ></v-textarea>
-        <v-btn class="mr-4" large :disabled="jsonText == ''" @click="setJson(jsonText)">Generation</v-btn>
+        <v-btn class="mr-4" large :disabled="activeProject.json == ''" @click="setJson(activeProject.json)">Generation</v-btn>
       </v-col>
       <v-col cols="7">
         <file-reader :files="generatedFiles"></file-reader>
@@ -23,32 +21,33 @@
 <script lang="ts">
 import Vue from "vue";
 import FileReader from "@/components/FileReader.vue";
+import Options from "@/components/Options.vue";
+import { Project } from "../models/Project";
 
 export default Vue.extend({
   components: {
-    FileReader
+    FileReader,
+    Options,
   },
   created: async function(){
-    this.setJson(JSON.stringify(this.json));
+    this.setJson(this.activeProject.json);
   },
   data: function () {
     return {
       generatedFiles: [],
-      json: {
-        users: [{'userName': 'Test User', 'email': 'aa@bb@cc'}],
-        tasks: [{'title': 'Task Title', 'description': 'Task des'}]
-      },
-      jsonText: "",
+      activeProject: {json: "{ users: [{'userName': 'Test User', 'email': 'aa@bb@cc'}], tasks: [{'title': 'Task Title', 'description': 'Task des'}] }"} as Project,
     };
   },
   methods: {
     setJson: async function(json: string) {
       const generate = await this.$store.dispatch("generate", {data: json});
       this.generatedFiles = generate.generatedFiles;
-      this.jsonText = json;
+      this.activeProject.json = json;
     },
-    download: function() {
-      console.log("download");
+    selectProject: function(project: Project){
+      //TODO: save changes
+      this.activeProject = project;
+      this.setJson(this.activeProject.json);
     }
   },
 });
