@@ -1,5 +1,8 @@
 <template>
   <v-container fluid>
+    <v-row class="d-flex justify-end">
+      <v-btn class="mr-4" color="primary" small @click="download">download</v-btn>
+    </v-row>
     <v-row>
       <v-col cols="5">
         <v-textarea 
@@ -43,6 +46,9 @@ export default Vue.extend({
       const generate = await this.$store.dispatch("generate", {data: json});
       this.generatedFiles = generate.generatedFiles;
       this.jsonText = json;
+    },
+    download: function() {
+      console.log("download");
     }
   },
 });
