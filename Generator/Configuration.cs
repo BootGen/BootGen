@@ -34,7 +34,13 @@ namespace Generator
                 new User{
                     UserName = "Sample User",
                     Email = "example@email.com",
-                    PasswordHash = "AQAAAAEAACcQAAAAEL//UdrNeiFjd0hYeQEBOtAN+OXME8tu8kNMTg4wZUrBSt1/t0Okfs389I82ZaIU2Q==" //password123
+                    PasswordHash = "AQAAAAEAACcQAAAAEL//UdrNeiFjd0hYeQEBOtAN+OXME8tu8kNMTg4wZUrBSt1/t0Okfs389I82ZaIU2Q==", //password123
+                    Projects = new List<Project> {
+                        new Project {
+                            Name = "First Project",
+                            Json = "{users: [{'userName': 'Test User', 'email': 'aa@bb@cc'}]}"
+                        }
+                    }
                 },
                 new User{
                     UserName = "Sample User 2",

@@ -8,7 +8,7 @@ using WebProject;
 namespace WebProject.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20201202081113_InitialCreate")]
+    [Migration("20201202115556_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -16,6 +16,37 @@ namespace WebProject.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "3.1.7");
+
+            modelBuilder.Entity("WebProject.Project", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Json")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("OwnerId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OwnerId");
+
+                    b.ToTable("Projects");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Json = "{users: [{'userName': 'Test User', 'email': 'aa@bb@cc'}]}",
+                            Name = "First Project",
+                            OwnerId = 1
+                        });
+                });
 
             modelBuilder.Entity("WebProject.User", b =>
                 {
@@ -58,6 +89,15 @@ namespace WebProject.Migrations
                             PasswordHash = "AQAAAAEAACcQAAAAENffyhoiBzkUXycLNzvQOYJJGCXsXw+7U2ZL1ED+kCFCnDmL4yGGQT7Xkr4ZaNV8/A==",
                             UserName = "Sample User 3"
                         });
+                });
+
+            modelBuilder.Entity("WebProject.Project", b =>
+                {
+                    b.HasOne("WebProject.User", "Owner")
+                        .WithMany()
+                        .HasForeignKey("OwnerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

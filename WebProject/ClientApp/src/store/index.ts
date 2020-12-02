@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import axios from 'axios'
 import { User } from '@/models/User'
+import { Project } from '@/models/Project'
 import { AuthenticationData } from '@/models/AuthenticationData'
 import { LoginResponse } from '@/models/LoginResponse'
 import { RegistrationData } from '@/models/RegistrationData'
@@ -82,9 +83,18 @@ function userToDto(user: User): any {
     email: user.email,
   };
 }
+function projectToDto(project: Project): any {
+  return {
+    id: project.id,
+    name: project.name,
+    json: project.json,
+    ownerId: project.ownerId,
+  };
+}
 export default new Vuex.Store({
   state: {
     users: Array<User>(),
+    projects: Array<Project>(),
     jwt: ""
   },
   mutations: {
@@ -96,6 +106,15 @@ export default new Vuex.Store({
     },
     setUser: function(state, user) {
       setItem(state.users, user);
+    },
+    setProjects: function(state, projects) {
+      state.projects = setArray(state.projects,projects);
+    },
+    patchProjects: function(state, projects) {
+      patchArray(state.projects,projects);
+    },
+    setProject: function(state, project) {
+      setItem(state.projects, project);
     },
     init: function(state) {
       const jwt = localStorage.getItem("jwt")
@@ -132,6 +151,84 @@ export default new Vuex.Store({
         axios.get(`users/${id}`, config(context)).then(response => {
           context.commit("setUser", response.data);
           resolve(findById(context.state.users, response.data.id));
+        }).catch(reason => {
+          reject(reason);
+        })
+      })
+    },
+    getProjectsOfUser: function(context, user): Promise<Array<Project>> {
+      return new Promise((resolve, reject) => {
+        axios.get(`users/${user.id}/projects`, config(context)).then(response => {
+          context.commit("patchProjects", response.data);
+          const storedArray = Array<Project>();
+          response.data.forEach((item: Project) => {
+            const storedProject = findById(context.state.projects, item.id);
+            if (storedProject) {
+              storedArray.push(storedProject);
+            }
+          });
+          Vue.set(user, "projects", storedArray);
+          context.commit("setUser",user);
+          resolve(storedArray);
+        }).catch(reason => {
+          reject(reason);
+        })
+      })
+    },
+    getProjects: function(context): Promise<Array<Project>> {
+      return new Promise((resolve, reject) => {
+        axios.get(`projects`, config(context)).then(response => {
+          context.commit("setProjects", response.data);
+          resolve(context.state.projects);
+        }).catch(reason => {
+          reject(reason);
+        })
+      })
+    },
+    getProject: function(context, id): Promise<Project> {
+      return new Promise((resolve, reject) => {
+        axios.get(`projects/${id}`, config(context)).then(response => {
+          context.commit("setProject", response.data);
+          resolve(findById(context.state.projects, response.data.id));
+        }).catch(reason => {
+          reject(reason);
+        })
+      })
+    },
+    addProject: function(context, project): Promise<Project> {
+
+      return new Promise((resolve, reject) => {
+        axios.post(`projects`, projectToDto(project), config(context)).then(response => {
+          context.commit("setProject", response.data);
+          const savedItem = findById(context.state.projects, response.data.id);
+          resolve(savedItem);
+        }).catch(reason => {
+          reject(reason);
+        })
+      })
+    },
+    updateProject: function(context, project): Promise<Project> {
+
+      return new Promise((resolve, reject) => {
+        axios.put(`projects/${project.id}`, projectToDto(project), config(context)).then(response => {
+          context.commit("setProject", response.data);
+          resolve(findById(context.state.projects, response.data.id));
+        }).catch(reason => {
+          reject(reason);
+        })
+      })
+    },
+    deleteProject: function(context, project): Promise<void> {
+      context.commit("setProjects", context.state.projects.filter(i => i !== project));
+      const user = findById(context.state.users, project.ownerId);
+      if (user) {
+        user.projects = user.projects.filter(item => item.id != project.id)
+        context.commit("setUser", user);
+      }
+
+      return new Promise((resolve, reject) => {
+        axios.delete(`projects/${project.id}`, config(context)).then(() => {
+          resolve()
         }).catch(reason => {
           reject(reason);
         })

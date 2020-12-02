@@ -10,6 +10,8 @@ namespace Generator
         public string Email { get; set; }
         [ServerOnly]
         public string PasswordHash { get; set; }
+        [OneToMany(parentName: "Owner")]
+        public List<Project> Projects { get; set; }
     }
 
     //Authentication
@@ -94,5 +96,11 @@ namespace Generator
     {
         [Post]
         GenerateResponse Generate(GenerateRequest request);
+    }
+
+    public class Project
+    {
+        public string Name { get; set; }
+        public string Json { get; set; }
     }
 }

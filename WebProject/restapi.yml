@@ -42,6 +42,105 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/User'
+  /users/{userId}/projects:
+    get:
+      summary: retrieve list of projects
+      operationId: getProjectsOfUser
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: successful query
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Project'
+  /projects:
+    get:
+      summary: retrieve list of projects
+      operationId: getProjects
+      responses:
+        '200':
+          description: successful query
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Project'
+    post:
+      summary: add a new element to the collection
+      operationId: addProject
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+                $ref: '#/components/schemas/Project'
+      responses:
+        '200':
+          description: successful insertion
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+  /projects/{projectId}:
+    get:
+      summary: retrieve projects resource
+      operationId: getProject
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: successful query
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+    put:
+      summary: update projects resource
+      operationId: updateProject
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+                $ref: '#/components/schemas/Project'
+      responses:
+        '200':
+          description: successful update
+    delete:
+      summary: delete projects resource
+      operationId: deleteProject
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: successful deletion
   /authentication/login:
     post:
       summary: Login
@@ -166,6 +265,25 @@ components:
           type: string
         email:
           type: string
+    Project:
+      type: object
+      required:
+        - id
+        - name
+        - json
+        - owner_id
+      properties:
+        id:
+          type: integer
+          format: int32
+          readOnly: true
+        name:
+          type: string
+        json:
+          type: string
+        owner_id:
+          type: integer
+          format: int32
     AuthenticationData:
       type: object
       required:
