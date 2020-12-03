@@ -35,7 +35,7 @@ export default Vue.extend({
   data: function () {
     return {
       generatedFiles: [],
-      activeProject: {json: "{ users: [{'userName': 'Test User', 'email': 'aa@bb@cc'}], tasks: [{'title': 'Task Title', 'description': 'Task des'}] }"} as Project,
+      activeProject: {name: "New Project", json: "{ users: [{'userName': 'Test User', 'email': 'aa@bb@cc'}], tasks: [{'title': 'Task Title', 'description': 'Task des'}] }"},
     };
   },
   methods: {
