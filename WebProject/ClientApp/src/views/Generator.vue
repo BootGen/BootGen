@@ -35,7 +35,7 @@ export default Vue.extend({
   data: function () {
     return {
       generatedFiles: [],
-      activeProject: {name: "New Project", json: "{ users: [{'userName': 'Test User', 'email': 'aa@bb@cc'}], tasks: [{'title': 'Task Title', 'description': 'Task des'}] }"},
+      activeProject: {id: -1, name: "New Project", json: "{ users: [{'userName': 'Test User', 'email': 'aa@bb@cc'}], tasks: [{'title': 'Task Title', 'description': 'Task des'}] }"},
     };
   },
   methods: {
@@ -43,11 +43,19 @@ export default Vue.extend({
       const generate = await this.$store.dispatch("generate", {data: json});
       this.generatedFiles = generate.generatedFiles;
       this.activeProject.json = json;
+      if(this.$root.$data.user && this.activeProject.id >= 0){
+        await this.$store.dispatch("updateProject", this.activeProject);
+      }
     },
     selectProject: function(project: Project){
-      //TODO: save changes
-      this.activeProject = project;
-      this.setJson(this.activeProject.json);
+      let select = true
+      if(this.activeProject.id === -1){
+        select = confirm("changes will not be saved!");
+      }
+      if(select){
+        this.activeProject = project;
+        this.setJson(this.activeProject.json);
+      }
     }
   },
 });

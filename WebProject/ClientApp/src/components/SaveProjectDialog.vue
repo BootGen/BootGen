@@ -50,7 +50,7 @@ export default Vue.extend({
       this.dialog = false;
     },
     save: async function () {
-      if(!this.project.id){
+      if(this.project.id === -1){
         this.project.id = 0;
         this.project.name = this.form.model.name;
         this.project.ownerId = this.$root.$data.user.id;
