@@ -95,7 +95,7 @@ export default new Vuex.Store({
   state: {
     users: Array<User>(),
     projects: Array<Project>(),
-    jwt: ""
+    jwt: "",
   },
   mutations: {
     setUsers: function(state, users) {
