@@ -7,7 +7,7 @@ import Generator from '../views/Generator.vue'
 import Profile from '../views/Profile.vue'
 import ChangePassword from '../views/ChangePassword.vue'
 import EditProfile from '../views/EditProfile.vue'
-import store from "../store"
+import store from "../store/index"
 
 Vue.use(VueRouter)
 
