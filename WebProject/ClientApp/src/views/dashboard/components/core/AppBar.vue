@@ -1,11 +1,10 @@
 <template>
-  <v-app-bar
+  <v-container
     id="app-bar"
-    absolute
-    app
     color="transparent"
     flat
     height="75"
+    class="d-flex flex-row align-center"
   >
     <v-btn
       class="mr-3"
@@ -57,7 +56,7 @@
       class="ml-2"
       min-width="0"
       text
-      to="/"
+      to="/dashboard"
     >
       <v-icon>mdi-view-dashboard</v-icon>
     </v-btn>
@@ -110,11 +109,11 @@
       class="ml-2"
       min-width="0"
       text
-      to="/pages/user"
+      to="/user-profile"
     >
       <v-icon>mdi-account</v-icon>
     </v-btn>
-  </v-app-bar>
+  </v-container>
 </template>
 
 <script>

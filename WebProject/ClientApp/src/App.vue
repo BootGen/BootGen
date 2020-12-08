@@ -2,20 +2,31 @@
   <v-app id="inspire">
     <v-navigation-drawer v-model="drawer" app>
       <v-list dense nav>
-        <v-list-item
-          v-for="item in items"
-          :key="item.title"
-          :to="item.link"
-          link
-        >
-          <v-list-item-icon>
-            <v-icon>{{ item.icon }}</v-icon>
-          </v-list-item-icon>
+        <div v-for="item in items" :key="item.title" link>
+          <div v-if="item.children">
+            <v-list-group :value="true" :prepend-icon="item.icon">
+              <template v-slot:activator>
+                <v-list-item-content>
+                  <v-list-item-title>{{ item.title }}</v-list-item-title>
+                </v-list-item-content>
+              </template>
 
-          <v-list-item-content>
+              <v-list-item v-for="(child, i) in item.children" :key="i" :to="child.link" link class="ml-14">
+                <v-list-item-title>{{ child.title }}</v-list-item-title>
+                <v-list-item-icon>
+                  <v-icon>{{ child.icon }}</v-icon>
+                </v-list-item-icon>
+              </v-list-item>
+            </v-list-group>
+          </div>
+          
+          <v-list-item v-else :to="item.link" link>
+            <v-list-item-icon>
+              <v-icon>{{ item.icon }}</v-icon>
+            </v-list-item-icon>
             <v-list-item-title>{{ item.title }}</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
+          </v-list-item>
+        </div>
       </v-list>
     </v-navigation-drawer>
 
@@ -67,6 +78,16 @@ export default {
             icon: "mdi-account-plus-outline",
           },
           { title: "Generator", link: "/generator", icon: "mdi-cog-outline" },
+          { title: "Vuetify MD", link: "/index", icon: "mdi-vuetify", children: [
+            { title: "Dashboard", link: "/dashboard", icon: "mdi-view-dashboard-outline" },
+            { title: "User Profile", link: "/user-profile", icon: "mdi-account-outline" },
+            { title: "Regular Tables", link: "/regular-tables", icon: "mdi-clipboard-outline" },
+            { title: "Typography", link: "/typography", icon: "mdi-format-font" },
+            { title: "Icons", link: "/icons", icon: "mdi-chart-bubble" },
+            { title: "Google Maps", link: "/google-maps", icon: "mdi-map-marker" },
+            { title: "Notifications", link: "/notifications", icon: "mdi-bell-outline" },
+            { title: "Upgrade To PRO", link: "/upgrade", icon: "mdi-package-up" },
+          ]},
         ];
       }
     },

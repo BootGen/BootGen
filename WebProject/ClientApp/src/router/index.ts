@@ -7,6 +7,16 @@ import Generator from '../views/Generator.vue'
 import Profile from '../views/Profile.vue'
 import ChangePassword from '../views/ChangePassword.vue'
 import EditProfile from '../views/EditProfile.vue'
+import Index from '@/views/dashboard/Index.vue'
+import Dashboard from '@/views/dashboard/Dashboard.vue'
+import UserProfile from '@/views/dashboard/pages/UserProfile.vue'
+import Notifications from '@/views/dashboard/component/Notifications.vue'
+import Icons from '@/views/dashboard/component/Icons.vue'
+import Typography from '@/views/dashboard/component/Typography.vue'
+import RegularTables from '@/views/dashboard/tables/RegularTables.vue'
+import GoogleMaps from '@/views/dashboard/maps/GoogleMaps.vue'
+import Upgrade from '@/views/dashboard/Upgrade.vue'
+
 import store from "../store/index"
 
 Vue.use(VueRouter)
@@ -67,6 +77,53 @@ const loggedOutGuard = (to: any, from: any, next: any) => {
     name: "Logout",
     beforeEnter: loggedInGuard,
     component: Logout
+  },
+  {
+    path: "/index",
+    name: "Index",
+    component: Index,
+    children: [
+      {
+        path: "/dashboard",
+        name: "Dashboard",
+        component: Dashboard,
+      },
+      {
+        path: "/user-profile",
+        name: "User Profile",
+        component: UserProfile,
+      },
+      {
+        path: "/notifications",
+        name: "Notifications",
+        component: Notifications,
+      },
+      {
+        path: "/icons",
+        name: "Icons",
+        component: Icons,
+      },
+      {
+        path: "/typography",
+        name: "Typography",
+        component: Typography,
+      },
+      {
+        path: "/regular-tables",
+        name: "Regular Tables",
+        component: RegularTables,
+      },
+      {
+        path: "/google-maps",
+        name: "Google Maps",
+        component: GoogleMaps,
+      },
+      {
+        path: "/upgrade",
+        name: "Upgrade",
+        component: Upgrade,
+      },
+    ]
   }
 ]
 
