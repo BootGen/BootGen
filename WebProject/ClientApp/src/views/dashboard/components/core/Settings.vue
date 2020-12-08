@@ -11,7 +11,7 @@
       style="position: fixed; top: 115px; right: -35px; border-radius: 8px;"
     >
       <v-icon large>
-        mdi-settings
+        mdi-cog
       </v-icon>
     </v-card>
 
@@ -36,6 +36,7 @@
 
           <v-item-group v-model="color">
             <v-item
+              class="ma-1"
               v-for="color in colors"
               :key="color"
               :value="color"
@@ -195,7 +196,7 @@
     mixins: [Proxyable],
 
     data: () => ({
-      color: '#E91E63',
+      color: '#1976D2',
       colors: [
         '#9C27b0',
         '#00CAE3',
@@ -203,6 +204,7 @@
         '#ff9800',
         '#E91E63',
         '#FF5252',
+        '#1976D2'
       ],
       image: 'https://demos.creative-tim.com/material-dashboard/assets/img/sidebar-1.jpg',
       images: [
@@ -222,7 +224,10 @@
 
     watch: {
       color (val) {
-        this.$vuetify.theme.themes[this.isDark ? 'dark' : 'light'].primary = val
+        if(val){
+          this.$vuetify.theme.themes.dark.primary = val;
+          this.$vuetify.theme.themes.light.primary = val;
+        }
       },
       showImg (val) {
         if (!val) {
