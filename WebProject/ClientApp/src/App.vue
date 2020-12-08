@@ -1,6 +1,18 @@
 <template>
   <v-app id="inspire">
-    <v-navigation-drawer v-model="drawer" app>
+    <v-navigation-drawer 
+      v-model="drawer"
+      :dark="barColor !== 'rgba(228, 226, 226, 1), rgba(255, 255, 255, 0.7)'"
+      :src="barImage"
+      app>
+      <template v-slot:img="props">
+        <v-img
+          :gradient="`to bottom, ${barColor}`"
+          v-bind="props"
+        />
+      </template>
+      <v-divider class="mb-1" />
+    
       <v-list dense nav>
         <div v-for="item in items" :key="item.title" link>
           <div v-if="item.children">
@@ -47,11 +59,19 @@
 </template>
 
 <script>
+ import { mapState } from 'vuex'
+
 export default {
-  data: () => ({
-    drawer: null,
-  }),
   computed: {
+    ...mapState(['barColor', 'barImage']),
+    drawer: {
+      get () {
+        return this.$store.state.drawer
+      },
+      set (val) {
+        this.$store.commit('SET_DRAWER', val)
+      },
+    },
     items: function () {
       if (this.$store.state.jwt) {
         return [
