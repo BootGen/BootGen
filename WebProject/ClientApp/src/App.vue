@@ -11,7 +11,6 @@
           v-bind="props"
         />
       </template>
-      <v-divider class="mb-1" />
     
       <v-list dense nav>
         <div v-for="item in items" :key="item.title" link>
