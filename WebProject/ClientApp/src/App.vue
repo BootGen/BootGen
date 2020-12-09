@@ -31,7 +31,7 @@
             </v-list-group>
           </div>
           
-          <v-list-item v-else active-class="primary white--text" :to="item.link" link>
+          <v-list-item v-else active-class="primary white--text" class="mb-1" :to="item.link" link>
             <v-list-item-icon>
               <v-icon>{{ item.icon }}</v-icon>
             </v-list-item-icon>
