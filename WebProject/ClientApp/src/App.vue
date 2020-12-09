@@ -50,7 +50,7 @@
       
       <v-spacer></v-spacer>
       
-      <v-btn class="ml-2" min-width="0" text to="/user-profile">
+      <v-btn class="ml-2" v-if="this.$store.state.jwt" min-width="0" text to="/profile">
         <v-icon>mdi-account</v-icon>
       </v-btn>
     </v-app-bar>
@@ -74,18 +74,13 @@ export default {
     items: function () {
       if (this.$store.state.jwt) {
         return [
-          { title: "Generator", link: "/generator", icon: "mdi-cog-outline" },
           { title: "Profile", link: "/profile", icon: "mdi-account-outline" },
-          {
-            title: "Edit Profile",
-            link: "/edit-profile",
-            icon: "mdi-account-edit-outline",
-          },
           {
             title: "Change Password",
             link: "/change-password",
             icon: "mdi-form-textbox-password",
           },
+          { title: "Generator", link: "/generator", icon: "mdi-cog-outline" },
           { title: "Vuetify MD", link: "/index", icon: "mdi-vuetify", children: [
             { title: "Dashboard", link: "/dashboard", icon: "mdi-view-dashboard-outline" },
             { title: "User Profile", link: "/user-profile", icon: "mdi-account-outline" },

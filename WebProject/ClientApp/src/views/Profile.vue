@@ -1,9 +1,71 @@
 <template>
-  <v-container fluid>
-    <v-row>
-      <v-col cols="8" v-if="$root.$data.user">
-        <h2>{{ $root.$data.user.userName }}</h2>
-        <h3>{{ $root.$data.user.email }}</h3>
+  <v-container id="user-profile" fluid tag="section">
+    <v-row justify="center" v-if="$root.$data.user">
+      <v-col cols="12" md="8">
+        <base-material-card>
+          <template v-slot:heading>
+            <div class="display-2 font-weight-light">
+              Edit Profile
+            </div>
+
+            <div class="subtitle-1 font-weight-light">
+              Complete your profile
+            </div>
+          </template>
+
+          <v-form>
+            <v-container class="py-0">
+              <v-row>
+                <v-col cols="12">
+                  <ValidationObserver v-slot="{ invalid }">
+                    <ValidationProvider v-slot="{ errors }" name="user name" rules="required">
+                      <v-text-field
+                        label="User Name"
+                        v-model="$root.$data.user.userName"
+                        :error-messages="errors"
+                      ></v-text-field>
+                    </ValidationProvider>
+                    <ValidationProvider v-slot="{ errors }" name="email" rules="required|email">
+                      <v-text-field
+                        label="Email Address"
+                        v-model="$root.$data.user.email"
+                        :error-messages="errors"
+                      ></v-text-field>
+                    </ValidationProvider>
+                    <v-alert type="error" v-if="errorMsg">{{ errorMsg }}</v-alert>
+                    <v-alert type="success" v-if="successMsg">{{ successMsg }}</v-alert>
+                    <v-col cols="12" class="text-right">
+                      <v-btn color="success" class="mr-0"  @click="saveUser" :disabled="invalid">
+                        Update Profile
+                      </v-btn>
+                    </v-col>
+                  </ValidationObserver>
+                </v-col>
+              </v-row>
+            </v-container>
+          </v-form>
+        </base-material-card>
+      </v-col>
+
+      <v-col cols="12" md="4">
+        <base-material-card
+          class="v-card-profile"
+          avatar="https://demos.creative-tim.com/vue-material-dashboard/img/marc.aba54d65.jpg"
+        >
+          <v-card-text class="text-center">
+            <h4 class="display-2 font-weight-light mb-3 black--text">
+              {{ $root.$data.user.userName }}
+            </h4>
+
+            <p class="font-weight-light grey--text">
+              {{ $root.$data.user.email }}
+            </p>
+
+            <v-btn color="success" rounded class="mr-0" to="/change-password">
+              Change Password
+            </v-btn>
+          </v-card-text>
+        </base-material-card>
       </v-col>
     </v-row>
   </v-container>
@@ -11,10 +73,51 @@
 
 <script lang="ts">
 import Vue from "vue";
+import { required, min } from "vee-validate/dist/rules";
+import { extend, ValidationObserver, ValidationProvider } from "vee-validate";
+
+extend("required", {
+  ...required,
+  message: "{_field_} can not be empty",
+});
+
+extend("min", {
+  ...min,
+  message: "{_field_} may not be less than {length} characters",
+});
+
 export default Vue.extend({
-  data: function () {
-    return {};
+  components: {
+    ValidationProvider,
+    ValidationObserver,
   },
-  methods: {},
+  mounted: async function() {
+    if(this.$store.state.jwt){
+      this.$root.$data.user = await this.$store.dispatch("profile");
+    }
+  },
+  data: function () {
+    return {
+      dialog: false,
+      errorMsg: "",
+      successMsg: ""
+    };
+  },
+  methods: {
+    saveUser: async function () {
+      this.successMsg = "";
+      const response = await this.$store.dispatch("updateProfile", this.$root.$data.user);
+      if (response.isUserNameInUse) {
+        this.errorMsg = "This user name already exists!";
+      } else if (response.isEmailInUse) {
+        this.errorMsg = "This email already exists!";
+      } else {
+        this.errorMsg = "";
+      }
+      if (response.success) {
+        this.successMsg = "Your profile is successfuly updated."
+      }
+    }
+  },
 });
 </script>

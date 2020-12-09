@@ -6,7 +6,6 @@ import SignUp from '../views/SignUp.vue'
 import Generator from '../views/Generator.vue'
 import Profile from '../views/Profile.vue'
 import ChangePassword from '../views/ChangePassword.vue'
-import EditProfile from '../views/EditProfile.vue'
 import Index from '@/views/dashboard/Index.vue'
 import Dashboard from '@/views/dashboard/Dashboard.vue'
 import UserProfile from '@/views/dashboard/pages/UserProfile.vue'
@@ -65,12 +64,6 @@ const loggedOutGuard = (to: any, from: any, next: any) => {
     name: "Change Password",
     beforeEnter: loggedInGuard,
     component: ChangePassword
-  },
-  {
-    path: "/edit-profile",
-    name: "Edit Profile",
-    beforeEnter: loggedInGuard,
-    component: EditProfile
   },
   {
     path: "/logout",
