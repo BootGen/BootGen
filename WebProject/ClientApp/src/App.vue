@@ -41,10 +41,18 @@
       </v-list>
     </v-navigation-drawer>
 
-    <v-app-bar app>
-      <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
-
-      <v-toolbar-title>{{ $route.name }}</v-toolbar-title>
+    <v-app-bar app color="transparent" flat height="75">
+      <v-btn class="mr-3" @click="drawer = !drawer" elevation="1" fab small>
+        <v-icon v-if="drawer">mdi-dots-vertical</v-icon>
+        <v-icon v-else>mdi-view-quilt</v-icon>
+      </v-btn>
+      <v-toolbar-title class="hidden-sm-and-down font-weight-light">{{ $route.name }}</v-toolbar-title>
+      
+      <v-spacer></v-spacer>
+      
+      <v-btn class="ml-2" min-width="0" text to="/user-profile">
+        <v-icon>mdi-account</v-icon>
+      </v-btn>
     </v-app-bar>
 
     <v-main>
@@ -63,14 +71,6 @@
 export default {
   computed: {
     ...mapState(['barColor', 'barImage']),
-    drawer: {
-      get () {
-        return this.$store.state.drawer
-      },
-      set (val) {
-        this.$store.commit('SET_DRAWER', val)
-      },
-    },
     items: function () {
       if (this.$store.state.jwt) {
         return [
@@ -121,5 +121,8 @@ export default {
       }
     },
   },
+  data: () => ({
+    drawer: null,
+  }),
 };
 </script>
