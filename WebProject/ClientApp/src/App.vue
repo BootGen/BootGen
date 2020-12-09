@@ -15,7 +15,7 @@
       <v-list dense nav>
         <div v-for="item in items" :key="item.title" link>
           <div v-if="item.children">
-            <v-list-group :value="true" :prepend-icon="item.icon">
+            <v-list-group :prepend-icon="item.icon">
               <template v-slot:activator>
                 <v-list-item-content>
                   <v-list-item-title>{{ item.title }}</v-list-item-title>
@@ -86,6 +86,16 @@ export default {
             link: "/change-password",
             icon: "mdi-form-textbox-password",
           },
+          { title: "Vuetify MD", link: "/index", icon: "mdi-vuetify", children: [
+            { title: "Dashboard", link: "/dashboard", icon: "mdi-view-dashboard-outline" },
+            { title: "User Profile", link: "/user-profile", icon: "mdi-account-outline" },
+            { title: "Regular Tables", link: "/regular-tables", icon: "mdi-clipboard-outline" },
+            { title: "Typography", link: "/typography", icon: "mdi-format-font" },
+            { title: "Icons", link: "/icons", icon: "mdi-chart-bubble" },
+            { title: "Google Maps", link: "/google-maps", icon: "mdi-map-marker" },
+            { title: "Notifications", link: "/notifications", icon: "mdi-bell-outline" },
+            { title: "Upgrade To PRO", link: "/upgrade", icon: "mdi-package-up" },
+          ]},
           { title: "Logout", link: "/logout", icon: "mdi-account-arrow-right-outline" },
         ];
       } else {
