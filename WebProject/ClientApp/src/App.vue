@@ -12,17 +12,17 @@
         />
       </template>
     
-      <v-list dense nav>
+      <v-list nav>
         <div v-for="item in items" :key="item.title" link>
           <div v-if="item.children">
-            <v-list-group :prepend-icon="item.icon">
+            <v-list-group active-class="primary white--text" :prepend-icon="item.icon">
               <template v-slot:activator>
                 <v-list-item-content>
                   <v-list-item-title>{{ item.title }}</v-list-item-title>
                 </v-list-item-content>
               </template>
 
-              <v-list-item v-for="(child, i) in item.children" :key="i" :to="child.link" link class="ml-14">
+              <v-list-item active-class="primary white--text" v-for="child in item.children" :key="child.title" :to="child.link" link class="ml-14">
                 <v-list-item-title>{{ child.title }}</v-list-item-title>
                 <v-list-item-icon>
                   <v-icon>{{ child.icon }}</v-icon>
@@ -31,7 +31,7 @@
             </v-list-group>
           </div>
           
-          <v-list-item v-else :to="item.link" link>
+          <v-list-item v-else active-class="primary white--text" :to="item.link" link>
             <v-list-item-icon>
               <v-icon>{{ item.icon }}</v-icon>
             </v-list-item-icon>
