@@ -20,8 +20,8 @@
 
 <script lang="ts">
 import Vue from "vue";
-import FileReader from "@/components/FileReader.vue";
-import Options from "@/components/Options.vue";
+import FileReader from "../components/FileReader.vue";
+import Options from "../components/Options.vue";
 import { Project } from "../models/Project";
 
 export default Vue.extend({
