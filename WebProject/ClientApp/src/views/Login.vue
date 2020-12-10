@@ -21,6 +21,7 @@
                         label="E-mail"
                         v-model="email"
                         :error-messages="errors"
+                        prepend-icon="mdi-email-outline"
                       ></v-text-field>
                       </ValidationProvider>
                       <ValidationProvider v-slot="{ errors }" name="password" rules="required">
@@ -29,6 +30,7 @@
                           v-model="password"
                           :error-messages="errors"
                           type="password" 
+                          prepend-icon="mdi-form-textbox-password"
                         ></v-text-field>
                       </ValidationProvider> 
                       <p>email: example@email.com | pass: password123</p>

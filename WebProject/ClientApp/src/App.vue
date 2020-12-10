@@ -74,42 +74,42 @@ export default {
     items: function () {
       if (this.$store.state.jwt) {
         return [
-          { title: "Profile", link: "/profile", icon: "mdi-account-outline" },
+          { title: "Profile", link: "/profile", icon: "mdi-account" },
           {
             title: "Change Password",
             link: "/change-password",
             icon: "mdi-form-textbox-password",
           },
-          { title: "Generator", link: "/generator", icon: "mdi-cog-outline" },
+          { title: "Generator", link: "/generator", icon: "mdi-cog" },
+          { title: "Logout", link: "/logout", icon: "mdi-account-arrow-right" },
           { title: "Vuetify MD", link: "/index", icon: "mdi-vuetify", children: [
-            { title: "Dashboard", link: "/dashboard", icon: "mdi-view-dashboard-outline" },
-            { title: "User Profile", link: "/user-profile", icon: "mdi-account-outline" },
+            { title: "Dashboard", link: "/dashboard", icon: "mdi-view-dashboard" },
+            { title: "User Profile", link: "/user-profile", icon: "mdi-account" },
             { title: "Regular Tables", link: "/regular-tables", icon: "mdi-clipboard-outline" },
             { title: "Typography", link: "/typography", icon: "mdi-format-font" },
             { title: "Icons", link: "/icons", icon: "mdi-chart-bubble" },
             { title: "Google Maps", link: "/google-maps", icon: "mdi-map-marker" },
-            { title: "Notifications", link: "/notifications", icon: "mdi-bell-outline" },
+            { title: "Notifications", link: "/notifications", icon: "mdi-bell" },
             { title: "Upgrade To PRO", link: "/upgrade", icon: "mdi-package-up" },
           ]},
-          { title: "Logout", link: "/logout", icon: "mdi-account-arrow-right-outline" },
         ];
       } else {
         return [
-          { title: "Login", link: "/", icon: "mdi-account-arrow-left-outline" },
+          { title: "Login", link: "/", icon: "mdi-account-arrow-left" },
           {
             title: "Sign Up",
             link: "sign-up",
-            icon: "mdi-account-plus-outline",
+            icon: "mdi-account-plus",
           },
-          { title: "Generator", link: "/generator", icon: "mdi-cog-outline" },
+          { title: "Generator", link: "/generator", icon: "mdi-cog" },
           { title: "Vuetify MD", link: "/index", icon: "mdi-vuetify", children: [
-            { title: "Dashboard", link: "/dashboard", icon: "mdi-view-dashboard-outline" },
-            { title: "User Profile", link: "/user-profile", icon: "mdi-account-outline" },
+            { title: "Dashboard", link: "/dashboard", icon: "mdi-view-dashboard" },
+            { title: "User Profile", link: "/user-profile", icon: "mdi-account" },
             { title: "Regular Tables", link: "/regular-tables", icon: "mdi-clipboard-outline" },
             { title: "Typography", link: "/typography", icon: "mdi-format-font" },
             { title: "Icons", link: "/icons", icon: "mdi-chart-bubble" },
             { title: "Google Maps", link: "/google-maps", icon: "mdi-map-marker" },
-            { title: "Notifications", link: "/notifications", icon: "mdi-bell-outline" },
+            { title: "Notifications", link: "/notifications", icon: "mdi-bell" },
             { title: "Upgrade To PRO", link: "/upgrade", icon: "mdi-package-up" },
           ]},
         ];

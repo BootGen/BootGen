@@ -21,6 +21,7 @@
                           v-model="userName"
                           :error-messages="errors"
                           placeholder="User Name"
+                        prepend-icon="mdi-face-outline"
                         ></v-text-field>
                       </ValidationProvider>
                       <ValidationProvider v-slot="{ errors }" name="email" rules="required|email">
@@ -28,6 +29,7 @@
                           v-model="email"
                           :error-messages="errors"
                           placeholder="E-mail"
+                        prepend-icon="mdi-email-outline"
                         ></v-text-field>
                       </ValidationProvider>
                       <ValidationProvider v-slot="{ errors }" name="password" rules="required|min:8|password:@confirmation">
@@ -36,6 +38,7 @@
                           :error-messages="errors"
                           placeholder="Password"
                           type="password" 
+                          prepend-icon="mdi-form-textbox-password"
                         ></v-text-field>
                       </ValidationProvider>
                       <ValidationProvider v-slot="{ errors }" name="confirmation" rules='required|min:8'>
@@ -44,6 +47,7 @@
                           :error-messages="errors"
                           placeholder="Confirm Password"
                           type="password" 
+                          prepend-icon="mdi-form-textbox-password"
                         ></v-text-field>
                       </ValidationProvider>
                       <v-alert class="text-left" type="error" v-if="errorMsg">{{ errorMsg }}</v-alert>
