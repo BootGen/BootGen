@@ -2,16 +2,31 @@
   <v-container fluid>
     <options :project="activeProject" @select-project="selectProject"></options>
     <v-row>
-      <v-col cols="5">
-        <v-textarea 
+      <v-col class="d-flex pa-0">
+        <v-btn class="mr-4" color="primary" :disabled="activeProject.json == ''">Pretty Print</v-btn>
+        <v-btn class="mr-4" color="primary" :disabled="activeProject.json == ''" @click="setJson(activeProject.json)">Generation</v-btn>
+      </v-col>
+    </v-row>
+    <v-row>
+      <v-col cols="12" md="4" class="pr-0 pl-0">
+        <base-material-generator-card>
+          <template v-slot:heading>
+            <div class="display-1 font-weight-light pa-2">
+              JSON
+            </div>
+          </template>
+          <v-textarea 
+          class="d-flex"
+          style="overflow: auto; height:  calc(100% - 21px);"
+          rows="1"
+          auto-grow
           v-model="activeProject.json"
           placeholder="json"
-          rows="10"
           required
         ></v-textarea>
-        <v-btn class="mr-4" large :disabled="activeProject.json == ''" @click="setJson(activeProject.json)">Generation</v-btn>
+        </base-material-generator-card>
       </v-col>
-      <v-col cols="7">
+      <v-col cols="12" md="8" class="pr-0 pl-0 pt-0">
         <file-reader :files="generatedFiles"></file-reader>
       </v-col>
     </v-row>
