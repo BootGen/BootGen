@@ -3,7 +3,7 @@
     <options :project="activeProject" @select-project="selectProject"></options>
     <v-row>
       <v-col class="d-flex pa-0">
-        <v-btn class="mr-4" color="primary" :disabled="activeProject.json == ''">Pretty Print</v-btn>
+        <v-btn class="mr-4" color="primary" :disabled="activeProject.json == ''" @click="prettyPrint(activeProject.json)">Pretty Print</v-btn>
         <v-btn class="mr-4" color="primary" :disabled="activeProject.json == ''" @click="setJson(activeProject.json)">Generation</v-btn>
       </v-col>
     </v-row>
@@ -50,7 +50,7 @@ export default Vue.extend({
   data: function () {
     return {
       generatedFiles: [],
-      activeProject: {id: -1, name: "New Project", json: "{ users: [{'userName': 'Test User', 'email': 'aa@bb@cc'}], tasks: [{'title': 'Task Title', 'description': 'Task des'}] }"},
+      activeProject: {id: -1, name: "New Project", json: '{ "users": [{"userName": "Test User", "email": "aa@bb@cc"}], "tasks": [{"title": "Task Title", "description": "Task des"}] }'},
     };
   },
   methods: {
@@ -61,6 +61,9 @@ export default Vue.extend({
       if(this.$root.$data.user && this.activeProject.id >= 0){
         await this.$store.dispatch("updateProject", this.activeProject);
       }
+    },
+    prettyPrint: function(json: string){
+      this.activeProject.json = JSON.stringify(JSON.parse(json),null,'\t');
     },
     selectProject: function(project: Project){
       let select = true
