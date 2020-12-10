@@ -20,7 +20,7 @@
             </ValidationProvider>
             <p>email: example@email.com | pass: password123</p>
             <v-alert type="error" v-if="errorMsg">{{ errorMsg }}</v-alert>
-            <v-btn large @click="tryLogin" :disabled="invalid">Sign in</v-btn>
+            <v-btn color="primary" large @click="tryLogin" :disabled="invalid">Sign in</v-btn>
         </ValidationObserver>
       </v-col>
       </v-row>

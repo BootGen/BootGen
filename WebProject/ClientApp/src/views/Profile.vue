@@ -35,7 +35,7 @@
                     <v-alert type="error" v-if="errorMsg">{{ errorMsg }}</v-alert>
                     <v-alert type="success" v-if="successMsg">{{ successMsg }}</v-alert>
                     <v-col cols="12" class="text-right">
-                      <v-btn color="success" class="mr-0"  @click="saveUser" :disabled="invalid">
+                      <v-btn color="primary" class="mr-0"  @click="saveUser" :disabled="invalid">
                         Update Profile
                       </v-btn>
                     </v-col>
@@ -61,7 +61,7 @@
               {{ $root.$data.user.email }}
             </p>
 
-            <v-btn color="success" rounded class="mr-0" to="/change-password">
+            <v-btn color="primary" rounded class="mr-0" to="/change-password">
               Change Password
             </v-btn>
           </v-card-text>

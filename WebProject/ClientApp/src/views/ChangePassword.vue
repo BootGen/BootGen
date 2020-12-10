@@ -57,8 +57,8 @@
                     <v-alert type="error" v-if="errorMsg">{{ errorMsg }}</v-alert>
                     <v-alert type="success" v-if="successMsg">{{ successMsg }}</v-alert>
                     <v-col cols="12" class="text-right">
-                      <v-btn color="success" class="mr-0"  @click="savePassword" :disabled="invalid">
-                        Update Profile
+                      <v-btn color="primary" class="mr-0"  @click="savePassword" :disabled="invalid">
+                        Change Password
                       </v-btn>
                     </v-col>
                   </ValidationObserver>
@@ -83,8 +83,8 @@
               {{ $root.$data.user.email }}
             </p>
 
-            <v-btn color="success" rounded class="mr-0" to="/profile">
-              Change Profile Data
+            <v-btn color="primary" rounded class="mr-0" to="/profile">
+              Edit Profile
             </v-btn>
           </v-card-text>
         </base-material-card>
