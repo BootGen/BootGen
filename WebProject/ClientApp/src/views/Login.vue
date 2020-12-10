@@ -32,7 +32,7 @@
                         ></v-text-field>
                       </ValidationProvider> 
                       <p>email: example@email.com | pass: password123</p>
-                      <v-alert type="error" v-if="errorMsg">{{ errorMsg }}</v-alert>
+                      <v-alert class="text-left" type="error" v-if="errorMsg">{{ errorMsg }}</v-alert>
                       <v-btn color="primary" large @click="tryLogin" :disabled="invalid">Sign in</v-btn>
                     </v-col>
                 </ValidationObserver>
@@ -42,7 +42,7 @@
           </v-form>
         </base-material-card>
       </v-col>
-      </v-row>
+    </v-row>
   </v-container>
 </template>
 
