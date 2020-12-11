@@ -15,15 +15,7 @@
               JSON
             </div>
           </template>
-          <v-textarea 
-          class="d-flex"
-          style="overflow: auto; height:  calc(100% - 21px);"
-          rows="1"
-          auto-grow
-          v-model="activeProject.json"
-          placeholder="json"
-          required
-        ></v-textarea>
+          <codemirror v-model="activeProject.json" :options="cmOptions" />
         </base-material-generator-card>
       </v-col>
       <v-col cols="12" md="8" class="pr-0 pl-0 pt-0">
@@ -38,11 +30,17 @@ import Vue from "vue";
 import FileReader from "../components/FileReader.vue";
 import Options from "../components/Options.vue";
 import { Project } from "../models/Project";
+import { codemirror } from 'vue-codemirror'
+
+// import base style
+import 'codemirror/lib/codemirror.css'
+import "codemirror/mode/javascript/javascript.js";
 
 export default Vue.extend({
   components: {
     FileReader,
     Options,
+    codemirror
   },
   created: async function(){
     this.setJson(this.activeProject.json);
@@ -51,6 +49,12 @@ export default Vue.extend({
     return {
       generatedFiles: [],
       activeProject: {id: -1, name: "New Project", json: '{ "users": [{"userName": "Test User", "email": "aa@bb@cc"}], "tasks": [{"title": "Task Title", "description": "Task des"}] }'},
+      cmOptions: {
+        tabSize: 4,
+        mode: 'text/javascript',
+        lineNumbers: true,
+        line: true,
+      }
     };
   },
   methods: {
