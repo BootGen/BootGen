@@ -16,7 +16,7 @@
 import Vue from "vue";
 import { Project } from "../models/Project";
 import { User } from "../models/User";
-import SaveProjectDialog from "@/components/SaveProjectDialog.vue";
+import SaveProjectDialog from "../components/SaveProjectDialog.vue";
 
 export default Vue.extend({
 	props:[

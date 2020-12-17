@@ -87,7 +87,6 @@ export default Vue.extend({
   },
   methods: {
     selectFile: function(data: Element[]){
-      console.log(data)
       if(data[0] && data[0].content){
         this.activeFile = data[0];
       }
