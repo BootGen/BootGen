@@ -10,12 +10,22 @@
                 JSON
               </div>
               <div>
-              <v-btn color="white" elevation="1" fab small>
-                <v-icon color="primary" :disabled="activeProject.json == ''" @click="prettyPrint(activeProject.json)">mdi-format-align-left</v-icon>
-              </v-btn>
-              <v-btn class="ml-2" color="white" elevation="1" fab small>
-                <v-icon color="primary" :disabled="activeProject.json == ''" @click="setJson(activeProject.json)">mdi-arrow-right-bold</v-icon>
-              </v-btn>
+                <v-tooltip bottom>
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-btn color="white" elevation="1" fab small :disabled="activeProject.json == ''" @click="prettyPrint(activeProject.json)" v-bind="attrs" v-on="on">
+                      <v-icon color="primary">mdi-format-align-left</v-icon>
+                    </v-btn>
+                  </template>
+                  <span>Formatting</span>
+                </v-tooltip>
+                <v-tooltip bottom>
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-btn class="ml-2" color="white" elevation="1" fab small :disabled="activeProject.json == ''" @click="setJson(activeProject.json)" v-bind="attrs" v-on="on">
+                      <v-icon color="primary">mdi-arrow-right-bold</v-icon>
+                    </v-btn>
+                    </template>
+                  <span>Generation</span>
+                </v-tooltip>
               </div>
             </div>
           </template>
@@ -94,6 +104,7 @@ export default Vue.extend({
   }
   .CodeMirror-scroll{
     margin: 0!important;
+    overflow: auto!important;
   }
   .CodeMirror{
     height: 100%;

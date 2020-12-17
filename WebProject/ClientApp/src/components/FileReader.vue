@@ -8,13 +8,18 @@
               <span class="text-break" v-if="activeFile && activeFile.name">{{ activeFile.name }}</span>
               <span v-else>Select a file</span>
               <div class="d-flex">
-                <v-btn color="white" @click="drawer = !drawer" elevation="1" fab small>
-                  <v-icon color="primary" v-if="drawer">mdi-folder-open</v-icon>
-                  <v-icon color="primary" v-else>mdi-folder</v-icon>
-                </v-btn>
+                <v-tooltip bottom>
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-btn color="white" @click="drawer = !drawer" elevation="1" fab small v-bind="attrs" v-on="on">
+                      <v-icon color="primary" v-if="drawer">mdi-folder-open</v-icon>
+                      <v-icon color="primary" v-else>mdi-folder</v-icon>
+                    </v-btn>
+                  </template>
+                  <span>Files</span>
+                </v-tooltip>
                 <settings-dialog></settings-dialog>
                 <v-col class="d-flex fileSelector" v-if="drawer">
-                  <v-treeview class="text-break" active-class="primary--text" :items="tree" @update:active="selectFile" return-object activatable hoverable dense open-on-click></v-treeview>
+                  <v-treeview class="text-break" active-class="info--text" :items="tree" @update:active="selectFile" return-object activatable hoverable dense open-on-click></v-treeview>
                 </v-col>
               </div>
             </div>
@@ -126,7 +131,7 @@ export default Vue.extend({
   }
   .fileSelector {
     position: absolute;
-    background: #bbb;
+    background:#412fb3;
     top: 55px;
     right: 0px;
     width: fit-content;

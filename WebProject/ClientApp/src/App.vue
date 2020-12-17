@@ -121,3 +121,16 @@ export default {
   }),
 };
 </script>
+
+<style lang="css">
+  .v-application--wrap{
+    background-color: #ededed;
+  }
+  header{
+    position: inherit!important;
+  }
+  main{
+    padding-top: unset!important;
+  }
+
+</style>
