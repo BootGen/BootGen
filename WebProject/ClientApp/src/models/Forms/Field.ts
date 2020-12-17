@@ -4,6 +4,7 @@ export enum FieldType{
     Checkbox,
     Password,
     ColorPicker,
+    Radio,
 }
 
 export interface Field {
@@ -11,4 +12,5 @@ export interface Field {
     placeholder: string;
     type: FieldType;
     validation: string;
+    data?: any;
 }

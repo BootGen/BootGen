@@ -5,7 +5,7 @@
         <!-- Text -->
         <v-text-field v-if="field.type === FieldType.Text"
           v-model="form.model[field.property]"
-          :placeholder="field.placeholder"
+          :label="field.placeholder"
           :error-messages="errors"
           type="text"
           required
@@ -13,7 +13,7 @@
         <!-- Textarea -->
         <v-textarea v-if="field.type === FieldType.Textarea"
           v-model="form.model[field.property]"
-          :placeholder="field.placeholder"
+          :label="field.placeholder"
           rows="2"
           :error-messages="errors"
           required
@@ -26,7 +26,7 @@
         <!-- Password -->
         <v-text-field v-if="field.type === FieldType.Password"
           v-model="form.model[field.property]"
-          :placeholder="field.placeholder"
+          :label="field.placeholder"
           :error-messages="errors"
           type="password"
           required
@@ -46,6 +46,11 @@
             </v-menu>
           </template>
         </v-text-field>
+        <!--Radio-->
+        <v-radio-group v-if="field.type === FieldType.Radio" v-model="form.model[field.property]">
+          <label>{{ field.placeholder }}</label>
+          <v-radio v-for="n in field.data" :key="n" :label="n" :value="n"></v-radio>
+        </v-radio-group>
       </ValidationProvider>
       <!-- Buttons -->
       <div class="d-flex">

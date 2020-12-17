@@ -1,24 +1,28 @@
 <template>
   <v-container fluid>
     <options :project="activeProject" @select-project="selectProject"></options>
-    <v-row>
-      <v-col class="d-flex pa-0">
-        <v-btn class="mr-4" color="primary" :disabled="activeProject.json == ''" @click="prettyPrint(activeProject.json)">Pretty Print</v-btn>
-        <v-btn class="mr-4" color="primary" :disabled="activeProject.json == ''" @click="setJson(activeProject.json)">Generation</v-btn>
-      </v-col>
-    </v-row>
-    <v-row>
-      <v-col cols="12" md="4" class="pr-0 pl-0">
+    <v-row class="d-flex align-center">
+      <v-col cols="12" md="6" class="pr-0 pl-0">
         <base-material-generator-card>
           <template v-slot:heading>
-            <div class="display-1 font-weight-light pa-2">
-              JSON
+            <div class="d-flex align-center justify-space-between pa-2">
+              <div class="display-1 font-weight-light pa-2">
+                JSON
+              </div>
+              <div>
+              <v-btn color="white" elevation="1" fab small>
+                <v-icon color="primary" :disabled="activeProject.json == ''" @click="prettyPrint(activeProject.json)">mdi-format-align-left</v-icon>
+              </v-btn>
+              <v-btn class="ml-2" color="white" elevation="1" fab small>
+                <v-icon color="primary" :disabled="activeProject.json == ''" @click="setJson(activeProject.json)">mdi-arrow-right-bold</v-icon>
+              </v-btn>
+              </div>
             </div>
           </template>
           <codemirror v-model="activeProject.json" :options="cmOptions" />
         </base-material-generator-card>
       </v-col>
-      <v-col cols="12" md="8" class="pr-0 pl-0 pt-0">
+      <v-col cols="12" md="6" class="pr-0 pl-0">
         <file-reader :files="generatedFiles"></file-reader>
       </v-col>
     </v-row>
@@ -82,3 +86,16 @@ export default Vue.extend({
   },
 });
 </script>
+
+<style lang="css">
+  .vue-codemirror{
+    width: 100%;
+    height: calc(100% - 41px);
+  }
+  .CodeMirror-scroll{
+    margin: 0!important;
+  }
+  .CodeMirror{
+    height: 100%;
+  }
+</style>
