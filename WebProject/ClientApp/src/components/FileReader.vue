@@ -39,7 +39,7 @@ import SettingsDialog from "../components/SettingsDialog.vue";
 import { codemirror } from 'vue-codemirror'
 
 import 'codemirror/lib/codemirror.css'
-import "codemirror/mode/javascript/javascript.js";
+import "codemirror/mode/clike/clike.js";
 import 'codemirror/theme/material.css'
 
 interface File {
@@ -99,7 +99,7 @@ export default Vue.extend({
       cmOptions: {
         theme: 'material',
         tabSize: 2,
-        mode: 'text/javascript',
+        mode: 'text/x-csharp',
         lineNumbers: true,
         line: true,
         readOnly: true,
