@@ -10,7 +10,6 @@
   "dependencies": {
     "axios": "^0.20.0",
     "core-js": "^3.6.5",
-    "highlight.js": "^10.4.0",
     "vee-validate": "^3.4.2",
     "vue": "^2.6.11",
     "vue-chartist": "^2.3.1",

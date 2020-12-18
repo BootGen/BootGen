@@ -49,6 +49,7 @@ import { codemirror } from 'vue-codemirror'
 // import base style
 import 'codemirror/lib/codemirror.css'
 import "codemirror/mode/javascript/javascript.js";
+import 'codemirror/theme/material.css'
 
 export default Vue.extend({
   components: {
@@ -64,7 +65,8 @@ export default Vue.extend({
       generatedFiles: [],
       activeProject: {id: -1, name: "New Project", json: '{ "users": [{"userName": "Test User", "email": "aa@bb@cc"}], "tasks": [{"title": "Task Title", "description": "Task des"}] }'},
       cmOptions: {
-        tabSize: 4,
+        theme: 'material',
+        tabSize: 2,
         mode: 'text/javascript',
         lineNumbers: true,
         line: true,

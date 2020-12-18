@@ -4,14 +4,11 @@ import router from './router/index'
 import store from './store/index'
 import vuetify from './plugins/vuetify'
 import { User } from './models/User'
-import hljs from 'highlight.js'
-import 'highlight.js/styles/vs.css'
 import './plugins/base'
 import './plugins/chartist'
 import './plugins/vee-validate'
 import i18n from './i18n'
 
-Vue.use(hljs.vuePlugin);
 Vue.config.productionTip = false
 
 store.commit('init');
