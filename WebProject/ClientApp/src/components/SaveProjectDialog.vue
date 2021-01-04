@@ -18,7 +18,7 @@
 import Vue from "vue";
 import { FieldType } from '../models/Forms/Field';
 import { Form } from "../models/Forms/Form";
-import FormComponent from "@/components/FormComponent.vue";
+import FormComponent from "../components/FormComponent.vue";
 
 export default Vue.extend({
   props: [

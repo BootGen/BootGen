@@ -32,7 +32,7 @@
           <codemirror v-model="activeProject.json" :options="cmOptions" />
         </base-material-generator-card>
       </v-col>
-      <v-col cols="12" md="6" class="pr-0 pl-0">
+      <v-col cols="12" md="6" class="pa-0">
         <file-reader :files="generatedFiles"></file-reader>
       </v-col>
     </v-row>
@@ -109,6 +109,6 @@ export default Vue.extend({
     overflow: auto!important;
   }
   .CodeMirror{
-    height: 100%;
+    height: 100%;z-index: 0;
   }
 </style>

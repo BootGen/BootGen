@@ -1,7 +1,7 @@
 <template>
   <v-container fluid>
     <v-row>
-      <v-col cols="12" class="pl-0">
+      <v-col cols="12" class="pa-0">
         <base-material-generator-card>
           <template v-slot:heading>
             <div class="d-flex display-1 font-weight-light align-center justify-space-between pa-2">
@@ -145,5 +145,6 @@ export default Vue.extend({
     width: fit-content;
     border-radius: 3px;
     word-wrap: break-word!important;
+    z-index: 1;
   }
 </style>
