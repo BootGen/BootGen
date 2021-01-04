@@ -44,7 +44,7 @@ namespace WebProject
             modelBuilder.Entity<Project>().HasData(new Project {
                 Id = 1,
                 Name = "First Project",
-                Json = "{users: [{'userName': 'Test User', 'email': 'aa@bb@cc'}]}",
+                Json = "{'users': [{'userName': 'Test User', 'email': 'aa@bb@cc'}]}",
                 OwnerId = 1
             });
         }

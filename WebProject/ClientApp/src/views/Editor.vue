@@ -1,5 +1,20 @@
 <template>
   <v-container fluid>
+    <div class="toolBar d-flex align-center justify-space-between">
+      <div class="d-flex align-center">
+        <v-toolbar-title class="font-weight-light">Editing -</v-toolbar-title>
+        <v-text-field v-model="activeProject.name" type="text" required></v-text-field>
+        <div class="d-flex align-center pa-1" @click="save">
+          <v-btn class="mr-4" color="primary" small>Save</v-btn>
+        </div>
+        <div class="d-flex align-center pa-1" @click="close">
+          <v-btn class="mr-4" color="primary" small>Cancel</v-btn>
+        </div>
+      </div>
+      <v-btn class="ml-2" v-if="this.$store.state.jwt" min-width="0" text to="/profile">
+        <v-icon>mdi-account</v-icon>
+      </v-btn>
+    </div>
     <options :project="activeProject" @select-project="selectProject"></options>
     <v-row class="d-flex align-center">
       <v-col cols="12" md="6" class="pr-0 pl-0">
@@ -62,7 +77,7 @@ export default Vue.extend({
   data: function () {
     return {
       generatedFiles: [],
-      activeProject: {id: -1, name: "New Project", json: '{ "users": [{"userName": "Test User", "email": "aa@bb@cc"}], "tasks": [{"title": "Task Title", "description": "Task des"}] }'},
+      activeProject: {id: -1, ownerId: -1, name: "New Project", json: '{ "users": [{"userName": "Test User", "email": "aa@bb@cc"}], "tasks": [{"title": "Task Title", "description": "Task des"}] }'},
       cmOptions: {
         theme: 'material',
         tabSize: 2,
@@ -82,6 +97,7 @@ export default Vue.extend({
       }
     },
     prettyPrint: function(json: string){
+      json = json.replace(/'/g, "\"");
       this.activeProject.json = JSON.stringify(JSON.parse(json),null,'\t');
     },
     selectProject: function(project: Project){
@@ -93,6 +109,13 @@ export default Vue.extend({
         this.activeProject = project;
         this.setJson(this.activeProject.json);
       }
+    },
+    save: async function (){
+      console.log("save")
+      this.close();
+    },
+    close: function (){
+      console.log("close");
     }
   },
 });
@@ -110,4 +133,19 @@ export default Vue.extend({
   .CodeMirror{
     height: 100%;z-index: 0;
   }
+  .toolBar {
+    position: absolute;
+    top: -70px;
+    left: 85px;
+    width: calc(100% - 85px);
+    z-index: 5;
+  }
+
+  .toolBar .v-input {
+    max-width: 200px;
+    min-width: 200px;
+    padding-right: 10px;
+    padding-left: 10px;
+  }
+  
 </style>

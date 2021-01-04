@@ -38,7 +38,7 @@ namespace Generator
                     Projects = new List<Project> {
                         new Project {
                             Name = "First Project",
-                            Json = "{users: [{'userName': 'Test User', 'email': 'aa@bb@cc'}]}"
+                            Json = "{'users': [{'userName': 'Test User', 'email': 'aa@bb@cc'}]}"
                         }
                     }
                 },
