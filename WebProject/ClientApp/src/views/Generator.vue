@@ -45,8 +45,6 @@ import FileReader from "../components/FileReader.vue";
 import Options from "../components/Options.vue";
 import { Project } from "../models/Project";
 import { codemirror } from 'vue-codemirror'
-
-// import base style
 import 'codemirror/lib/codemirror.css'
 import "codemirror/mode/javascript/javascript.js";
 import 'codemirror/theme/material.css'
@@ -58,6 +56,7 @@ export default Vue.extend({
     codemirror
   },
   created: async function(){
+    this.prettyPrint(this.activeProject.json);
     this.setJson(this.activeProject.json);
   },
   data: function () {
