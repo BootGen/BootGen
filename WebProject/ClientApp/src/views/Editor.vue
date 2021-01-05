@@ -3,7 +3,7 @@
     <div class="toolBar d-flex align-center justify-space-between">
       <div class="d-flex align-center">
         <v-toolbar-title class="font-weight-light">Editing -</v-toolbar-title>
-        <v-text-field v-model="activeProject.name" type="text" required></v-text-field>
+        <v-text-field v-model="activeProject.name" placeholder="Name your project" type="text" required></v-text-field>
         <div class="d-flex align-center pa-1" @click="save">
           <v-btn class="mr-4" color="primary" small>Save</v-btn>
         </div>
@@ -15,6 +15,17 @@
         <v-icon>mdi-account</v-icon>
       </v-btn>
     </div>
+    <v-snackbar v-model="snackbar.visible" :color="snackbar.type" timeout="5000" top>
+      <v-layout align-center justify-space-between>
+        <div class="d-flex align-center">
+          <v-icon class="pr-3" dark large>{{ snackbar.icon }}</v-icon>
+          <div>{{ snackbar.text }}</div>
+        </div>
+        <v-btn icon @click="snackbar.visible = false">
+          <v-icon>mdi-close-thick</v-icon>
+        </v-btn>
+      </v-layout>
+    </v-snackbar>
     <options :project="activeProject" @select-project="selectProject"></options>
     <v-row class="d-flex align-center">
       <v-col cols="12" md="6" class="pr-0 pl-0">
@@ -77,14 +88,20 @@ export default Vue.extend({
   data: function () {
     return {
       generatedFiles: [],
-      activeProject: {id: -1, ownerId: -1, name: "New Project", json: '{ "users": [{"userName": "Test User", "email": "aa@bb@cc"}], "tasks": [{"title": "Task Title", "description": "Task des"}] }'},
+      activeProject: {id: -1, ownerId: -1, name: "", json: '{ "users": [{"userName": "Test User", "email": "aa@bb@cc"}], "tasks": [{"title": "Task Title", "description": "Task des"}] }'},
       cmOptions: {
         theme: 'material',
         tabSize: 2,
         mode: 'text/javascript',
         lineNumbers: true,
         line: true,
-      }
+      },
+      snackbar: {
+        visible: false,
+        type: "",
+        icon: "mdi-alert-circle",
+        text: "",
+      },
     };
   },
   methods: {
@@ -110,9 +127,36 @@ export default Vue.extend({
         this.setJson(this.activeProject.json);
       }
     },
+    existsProjectName: function(){
+      for(const i in this.$store.state.projects){
+        if(this.activeProject.name === this.$store.state.projects[i].name){
+          return this.$store.state.projects[i];
+        }
+      }
+      return null;
+    },
     save: async function (){
-      console.log("save")
-      this.close();
+      if(this.activeProject.name){
+        const exists = this.existsProjectName();
+        if(!exists && this.activeProject.id === -1){
+          this.snackbar.type = "success",
+          this.snackbar.text = "The new project was successfully created!"
+          this.activeProject.id = 0;
+          this.activeProject.ownerId = this.$root.$data.user.id;
+          this.activeProject = await this.$store.dispatch("addProject", this.activeProject);
+        }else if(exists && exists.id !== this.activeProject.id){
+          this.snackbar.type = "error",
+          this.snackbar.text = "This name is already in use, please enter another name!"
+        }else{   
+          this.snackbar.type = "success",
+          this.snackbar.text = "Project updated successfully!"
+          await this.$store.dispatch("updateProject", this.activeProject);
+        }
+      }else{
+        this.snackbar.type = "error",
+        this.snackbar.text = "This name is incorrect!"
+      }
+      this.snackbar.visible = true;
     },
     close: function (){
       console.log("close");
