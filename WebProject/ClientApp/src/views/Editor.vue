@@ -1,6 +1,6 @@
 <template>
   <v-container fluid>
-    <div class="toolBar d-flex align-center justify-space-between">
+    <div class="toolBar d-flex align-center justify-space-between flex-wrap">
       <div class="d-flex align-center">
         <v-toolbar-title class="font-weight-light">Editing -</v-toolbar-title>
         <v-text-field v-model="activeProject.name" placeholder="Name your project" type="text" required></v-text-field>
@@ -139,27 +139,35 @@ export default Vue.extend({
       if(this.activeProject.name){
         const exists = this.existsProjectName();
         if(!exists && this.activeProject.id === -1){
-          this.snackbar.type = "success",
-          this.snackbar.text = "The new project was successfully created!"
+          this.snackbar.type = "success";
+          this.snackbar.text = "The new project was successfully created!";
           this.activeProject.id = 0;
           this.activeProject.ownerId = this.$root.$data.user.id;
           this.activeProject = await this.$store.dispatch("addProject", this.activeProject);
         }else if(exists && exists.id !== this.activeProject.id){
-          this.snackbar.type = "error",
-          this.snackbar.text = "This name is already in use, please enter another name!"
+          this.snackbar.type = "error";
+          this.snackbar.text = "This name is already in use, please enter another name!";
         }else{   
-          this.snackbar.type = "success",
-          this.snackbar.text = "Project updated successfully!"
+          this.snackbar.type = "success";
+          this.snackbar.text = "Project updated successfully!";
           await this.$store.dispatch("updateProject", this.activeProject);
         }
       }else{
-        this.snackbar.type = "error",
-        this.snackbar.text = "This name is incorrect!"
+        this.snackbar.type = "error";
+        this.snackbar.text = "This name is incorrect!";
       }
       this.snackbar.visible = true;
     },
-    close: function (){
-      console.log("close");
+    close: async function (){
+      if(this.activeProject.id === -1){
+        this.activeProject = {id: -1, ownerId: -1, name: "", json: '{ "users": [{"userName": "Test User", "email": "aa@bb@cc"}], "tasks": [{"title": "Task Title", "description": "Task des"}] }'};
+      }else{
+        this.activeProject = await this.$store.dispatch("getProject", this.activeProject.id);
+      }
+      this.prettyPrint(this.activeProject.json);
+      this.snackbar.type = "info";
+      this.snackbar.text = "Restored everything to its previous state!";
+      this.snackbar.visible = true;
     }
   },
 });
@@ -187,7 +195,6 @@ export default Vue.extend({
 
   .toolBar .v-input {
     max-width: 200px;
-    min-width: 200px;
     padding-right: 10px;
     padding-left: 10px;
   }
