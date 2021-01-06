@@ -1,16 +1,13 @@
 <template>
   <v-container fluid>
-    <div class="toolBar d-flex align-center justify-space-between flex-wrap">
-      <div class="d-flex align-center">
+    <div class="toolBar d-flex align-center justify-space-between">
+      <div class="d-flex align-center flex-wrap">
         <v-toolbar-title class="font-weight-light">Editing -</v-toolbar-title>
         <v-text-field v-model="activeProject.name" placeholder="Name your project" type="text" required></v-text-field>
-        <div class="d-flex align-center pa-1" v-if="$store.state.jwt" @click="save">
-          <v-btn class="mr-4" color="primary" small>Save</v-btn>
-        </div>
-        <div class="mr-4" v-else>for save <a href="/">sign in</a></div>
-        <div class="d-flex align-center pa-1" @click="close">
-          <v-btn class="mr-4" color="primary" small>Cancel</v-btn>
-        </div>
+        <v-btn class="mr-1" color="primary" small v-if="$store.state.jwt" @click="save">Save</v-btn>
+        <div class="mr-1" v-else>for save <a href="/">sign in</a></div>
+        <v-btn class="mr-1" color="primary" small @click="close">Cancel</v-btn>
+        <v-btn class="mr-1" color="primary" small @click="newProject"><v-icon>mdi-plus</v-icon></v-btn>
       </div>
       <v-btn class="ml-2" v-if="$store.state.jwt" min-width="0" text to="/profile">
         <v-icon>mdi-account</v-icon>
@@ -109,6 +106,10 @@ export default Vue.extend({
     };
   },
   methods: {
+    newProject: async function(){
+      this.activeProject = {id: -1, ownerId: -1, name: "", json: '{ "users": [{"userName": "Test User", "email": "aa@bb@cc"}], "tasks": [{"title": "Task Title", "description": "Task des"}] }'};
+      this.prettyPrint(this.activeProject.json);
+    },
     setJson: async function(json: string) {
       const generate = await this.$store.dispatch("generate", {data: json});
       this.generatedFiles = generate.generatedFiles;
@@ -123,7 +124,7 @@ export default Vue.extend({
       this.activeProject.json = JSON.stringify(JSON.parse(json),null,'\t');
     },
     selectProject: function(project: Project){
-      let select = true
+      let select = true;
       if(this.activeProject.id === -1){
         select = confirm("changes will not be saved!");
       }
