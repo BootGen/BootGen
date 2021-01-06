@@ -10,6 +10,14 @@
               <div class="d-flex">
                 <v-tooltip bottom>
                   <template v-slot:activator="{ on, attrs }">
+                    <v-btn color="white" class="mr-2" elevation="1" fab small v-bind="attrs" v-on="on">
+                      <v-icon color="primary">mdi-download</v-icon>
+                    </v-btn>
+                  </template>
+                  <span>Download</span>
+                </v-tooltip>
+                <v-tooltip bottom>
+                  <template v-slot:activator="{ on, attrs }">
                     <v-btn color="white" @click="drawer = !drawer" elevation="1" fab small v-bind="attrs" v-on="on">
                       <v-icon color="primary" v-if="drawer">mdi-folder-open</v-icon>
                       <v-icon color="primary" v-else>mdi-folder</v-icon>

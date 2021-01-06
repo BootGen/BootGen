@@ -4,14 +4,15 @@
       <div class="d-flex align-center">
         <v-toolbar-title class="font-weight-light">Editing -</v-toolbar-title>
         <v-text-field v-model="activeProject.name" placeholder="Name your project" type="text" required></v-text-field>
-        <div class="d-flex align-center pa-1" @click="save">
+        <div class="d-flex align-center pa-1" v-if="$store.state.jwt" @click="save">
           <v-btn class="mr-4" color="primary" small>Save</v-btn>
         </div>
+        <div class="mr-4" v-else>for save <a href="/">sign in</a></div>
         <div class="d-flex align-center pa-1" @click="close">
           <v-btn class="mr-4" color="primary" small>Cancel</v-btn>
         </div>
       </div>
-      <v-btn class="ml-2" v-if="this.$store.state.jwt" min-width="0" text to="/profile">
+      <v-btn class="ml-2" v-if="$store.state.jwt" min-width="0" text to="/profile">
         <v-icon>mdi-account</v-icon>
       </v-btn>
     </div>
@@ -26,7 +27,6 @@
         </v-btn>
       </v-layout>
     </v-snackbar>
-    <options :project="activeProject" @select-project="selectProject"></options>
     <v-row class="d-flex align-center">
       <v-col cols="12" md="6" class="pr-0 pl-0">
         <base-material-generator-card>
@@ -36,6 +36,8 @@
                 JSON
               </div>
               <div>
+                <help-dialog></help-dialog>
+                <file-explorer v-if="$store.state.jwt" @select-project="selectProject"></file-explorer>
                 <v-tooltip bottom>
                   <template v-slot:activator="{ on, attrs }">
                     <v-btn color="white" elevation="1" fab small :disabled="activeProject.json == ''" @click="prettyPrint(activeProject.json)" v-bind="attrs" v-on="on">
@@ -68,7 +70,8 @@
 <script lang="ts">
 import Vue from "vue";
 import FileReader from "../components/FileReader.vue";
-import Options from "../components/Options.vue";
+import FileExplorer from "../components/FileExplorer.vue";
+import HelpDialog from "../components/HelpDialog.vue";
 import { Project } from "../models/Project";
 import { codemirror } from 'vue-codemirror'
 import 'codemirror/lib/codemirror.css'
@@ -78,7 +81,8 @@ import 'codemirror/theme/material.css'
 export default Vue.extend({
   components: {
     FileReader,
-    Options,
+    FileExplorer,
+    HelpDialog,
     codemirror
   },
   created: async function(){
@@ -112,6 +116,7 @@ export default Vue.extend({
       if(this.$root.$data.user && this.activeProject.id >= 0){
         await this.$store.dispatch("updateProject", this.activeProject);
       }
+      this.prettyPrint(this.activeProject.json);
     },
     prettyPrint: function(json: string){
       json = json.replace(/'/g, "\"");
@@ -187,7 +192,7 @@ export default Vue.extend({
   }
   .toolBar {
     position: absolute;
-    top: -70px;
+    top: -75px;
     left: 85px;
     width: calc(100% - 85px);
     z-index: 5;
