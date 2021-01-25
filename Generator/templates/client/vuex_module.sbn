@@ -1,0 +1,167 @@
+import axios from 'axios'
+import { ActionContext } from 'vuex';
+import { config, findById, findObjectsById, patchArray, setArray, setItem } from './util';
+import { State } from '.';
+import { {{resource.class.name}} } from '@/models/{{resource.class.name}}'
+{{~ for r in resource.alternate_resources ~}}
+import { {{r.parent_resource.class.name}} } from '@/models/{{r.parent_resource.class.name}}'
+{{~ end ~}}
+
+export function {{ camel_case resource.class.name }}ToDto({{ camel_case resource.class.name }}: {{ resource.class.name }}): {{ resource.class.name }} {
+  return {
+    {{~ for property in resource.class.common_properties~}}
+    {{ camel_case property.name }}: {{ camel_case resource.class.name }}.{{ camel_case property.name }},
+    {{~ end ~}}
+  };
+}
+
+export interface {{resource.class.name}}sState {
+  items: Array<{{resource.class.name}}>;
+}
+
+type Context = ActionContext<{{resource.class.name}}sState, State>;
+
+{{~ for r in resource.alternate_resources ~}}
+interface {{resource.class.name}}{{r.parent_resource.class.name}}Pair {
+  {{ camel_case resource.name}}: {{ resource.class.name}};
+  {{ camel_case r.parent_resource.name}}: {{ r.parent_resource.class.name}};
+}
+{{~ end ~}}
+
+export default {
+  namespaced: true,
+  state: () => ({
+    items: Array<{{resource.class.name}}>()
+  }),
+  mutations: {
+    set{{ resource.name.plural }}: function(state: {{resource.class.name}}sState, {{ camel_case resource.name.plural }}: Array<{{resource.class.name}}>) {
+      state.items = setArray(state.items,{{ camel_case resource.name.plural }});
+    },
+    patch{{ resource.name.plural }}: function(state: {{resource.class.name}}sState, {{ camel_case resource.name.plural }}: Array<{{resource.class.name}}>) {
+      patchArray(state.items,{{ camel_case resource.name.plural }});
+    },
+    set{{ resource.name }}: function(state: {{resource.class.name}}sState, {{ camel_case resource.name }}: {{resource.class.name}}) {
+      setItem(state.items, {{ camel_case resource.name }});
+    }
+  },
+  actions: {
+    {{ get_list_function_name resource }}: function(context: Context): Promise<Array<{{resource.class.name}}>> {
+      return new Promise((resolve, reject) => {
+        axios.get({{path_template resource}}, config(context.rootState.jwt)).then(response => {
+          context.commit("set{{ resource.name.plural }}", response.data);
+          resolve(context.state.items);
+        }).catch(reason => {
+          reject(reason);
+        })
+      })
+    },
+    {{ get_item_function_name resource }}: function(context: Context, id: number): Promise<{{resource.class.name}}> {
+      return new Promise((resolve, reject) => {
+        axios.get({{get_item_path_template resource}}, config(context.rootState.jwt)).then(response => {
+          context.commit("set{{resource.name}}", response.data);
+          const savedItem = findById<{{resource.class.name}}>(context.state.items, response.data.id);
+          if (savedItem)
+            resolve(savedItem);
+        }).catch(reason => {
+          reject(reason);
+        })
+      })
+    },
+    {{~ if !resource.is_readonly ~}}
+    {{ add_function_name resource }}: function(context: Context, {{ camel_case resource.name}}: {{ resource.class.name}}): Promise<{{resource.class.name}}> {
+      return new Promise((resolve, reject) => {
+        axios.post({{path_template resource}}, {{ camel_case resource.class.name}}ToDto({{ camel_case resource.name}}), config(context.rootState.jwt)).then(response => {
+          context.commit("set{{ resource.name }}", response.data);
+          const savedItem = findById<{{resource.class.name}}>(context.state.items, response.data.id);
+          if (savedItem)
+            resolve(savedItem);
+        }).catch(reason => {
+          reject(reason);
+        })
+      })
+    },
+    {{ update_function_name resource }}: function(context: Context, {{ camel_case resource.name}}: {{ resource.class.name}}): Promise<{{resource.class.name}}> {
+      return new Promise((resolve, reject) => {
+        axios.put({{item_path_template resource}}, {{ camel_case resource.class.name}}ToDto({{ camel_case resource.name}}), config(context.rootState.jwt)).then(response => {
+          context.commit("set{{resource.name}}", response.data);
+          const savedItem = findById<{{resource.class.name}}>(context.state.items, response.data.id);
+          if (savedItem)
+            resolve(savedItem);
+        }).catch(reason => {
+          reject(reason);
+        })
+      })
+    },
+    {{ delete_function_name resource }}: function(context: Context, {{ camel_case resource.name}}: {{ resource.class.name}}): Promise<void> {
+      context.commit("set{{ resource.name.plural }}", context.state.items.filter((i: {{ resource.class.name}}) => i !== {{ camel_case resource.name}}));
+
+      return new Promise((resolve, reject) => {
+        axios.delete({{item_path_template resource}}, config(context.rootState.jwt)).then(() => {
+          resolve()
+        }).catch(reason => {
+          reject(reason);
+        })
+      })
+    },
+    {{~ end ~}}
+    {{~ for alternate in resource.alternate_resources
+    parent = alternate.parent_resource
+    ~}}
+    {{ get_list_function_name alternate }}: function(context: Context, {{camel_case parent.name}}: {{parent.class.name}}): Promise<Array<{{alternate.class.name}}>> {
+      return new Promise((resolve, reject) => {
+        axios.get({{path_template alternate}}, config(context.rootState.jwt)).then(response => {
+          context.commit("patch{{alternate.name.plural}}", response.data);
+          resolve(findObjectsById(context.state.items, response.data));
+        }).catch(reason => {
+          reject(reason);
+        })
+      })
+    },
+    {{~ if !alternate.is_readonly ~}}
+    {{ add_function_name alternate }}: function(context: Context, data: {{resource.class.name}}{{parent.class.name}}Pair): Promise<{{alternate.class.name}}> {
+      const {{camel_case resource.name}}: {{resource.class.name}} = data.{{camel_case resource.name}};
+      const {{camel_case parent.name}}: {{parent.class.name}} = data.{{camel_case parent.name}};
+      return new Promise((resolve, reject) => {
+        axios.post({{path_template alternate}}, {{ camel_case resource.class.name}}ToDto({{ camel_case resource.name}}), config(context.rootState.jwt)).then(response => {
+          context.commit("set{{ resource.name }}", response.data);
+          const savedItem = findById<{{resource.class.name}}>(context.state.items, response.data.id);
+          if (savedItem)
+            resolve(savedItem);
+        }).catch(reason => {
+          reject(reason);
+        })
+      })
+    },
+    {{~ if !alternate.pivot ~}}
+    {{ update_function_name alternate }}: function(context: Context, data: {{resource.class.name}}{{parent.class.name}}Pair): Promise<{{alternate.class.name}}> {
+      const {{camel_case alternate.name}}: {{alternate.class.name}} = data.{{camel_case alternate.name}};
+      const {{camel_case parent.name}}: {{parent.class.name}} = data.{{camel_case parent.name}};
+      return new Promise((resolve, reject) => {
+        axios.put({{item_path_template alternate}}, {{ camel_case alternate.class.name}}ToDto({{ camel_case alternate.name}}), config(context.rootState.jwt)).then(response => {
+          context.commit("set{{alternate.name}}", response.data);
+          const savedItem = findById<{{resource.class.name}}>(context.state.items, response.data.id);
+          if (savedItem)
+            resolve(savedItem);
+        }).catch(reason => {
+          reject(reason);
+        })
+      })
+    },
+    {{~ end ~}}
+    {{ delete_function_name alternate }}: function(context: Context, data: {{resource.class.name}}{{parent.class.name}}Pair): Promise<void> {
+      const {{camel_case alternate.name}}: {{alternate.class.name}} = data.{{camel_case alternate.name}};
+      const {{camel_case parent.name}}: {{parent.class.name}} = data.{{camel_case parent.name}};
+      context.commit("set{{ alternate.name.plural }}", context.state.items.filter((i: {{ resource.class.name}}) => i !== {{ camel_case alternate.name}}));
+
+      return new Promise((resolve, reject) => {
+        axios.delete({{item_path_template alternate}}, config(context.rootState.jwt)).then(() => {
+          resolve()
+        }).catch(reason => {
+          reject(reason);
+        })
+      })
+    },
+    {{~ end ~}}
+    {{~ end ~}}
+  }
+}

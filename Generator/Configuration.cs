@@ -13,20 +13,13 @@ namespace Generator
 
         public static string NameSpace => "WebProject";
 
-        private static Resource UserResource { get; set; }
+        private static RootResource UserResource { get; set; }
 
         internal static void AddResources(ResourceCollection resourceCollection)
         {
             UserResource = resourceCollection.Add<User>();
         }
 
-        internal static void AddControllers(ControllerCollection controllerCollection)
-        {
-            controllerCollection.Add<Authentication>();
-            controllerCollection.Add<Registration>();
-            controllerCollection.Add<Profile>();
-            controllerCollection.Add<Generate>();
-        }
 
         internal static void AddSeeds(SeedDataStore seedStore)
         {

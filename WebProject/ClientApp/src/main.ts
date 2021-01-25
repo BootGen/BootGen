@@ -11,7 +11,7 @@ import i18n from './i18n'
 
 Vue.config.productionTip = false
 
-store.commit('init');
+store.dispatch('init');
 
 new Vue({
   router,
