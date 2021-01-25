@@ -12,11 +12,17 @@ namespace WebProject
     public class DataContext : DbContext
     {
         public DbSet<User> Users { get; set; }
+        public DbSet<Project> Projects { get; set; }
         protected override void OnConfiguring(DbContextOptionsBuilder options)
             => options.UseSqlite("Data Source=web_project.db");
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Project>()
+                .HasOne(p => p.Owner)
+                .WithMany()
+                .HasForeignKey(p => p.OwnerId);
+
             modelBuilder.Entity<User>().HasData(new User {
                 Id = 1,
                 UserName = "Sample User",
@@ -34,6 +40,12 @@ namespace WebProject
                 UserName = "Sample User 3",
                 Email = "example3@email.com",
                 PasswordHash = "AQAAAAEAACcQAAAAENffyhoiBzkUXycLNzvQOYJJGCXsXw+7U2ZL1ED+kCFCnDmL4yGGQT7Xkr4ZaNV8/A=="
+            });
+            modelBuilder.Entity<Project>().HasData(new Project {
+                Id = 1,
+                Name = "First Project",
+                Json = "{'users': [{'userName': 'Test User', 'email': 'aa@bb@cc'}]}",
+                OwnerId = 1
             });
         }
     }

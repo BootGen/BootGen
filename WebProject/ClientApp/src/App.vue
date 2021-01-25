@@ -1,28 +1,58 @@
 <template>
   <v-app id="inspire">
-    <v-navigation-drawer v-model="drawer" app>
-      <v-list dense nav>
-        <v-list-item
-          v-for="item in items"
-          :key="item.title"
-          :to="item.link"
-          link
-        >
-          <v-list-item-icon>
-            <v-icon>{{ item.icon }}</v-icon>
-          </v-list-item-icon>
+    <v-navigation-drawer 
+      v-model="drawer"
+      :dark="barColor !== 'rgba(228, 226, 226, 1), rgba(255, 255, 255, 0.7)'"
+      :src="barImage"
+      app>
+      <template v-slot:img="props">
+        <v-img
+          :gradient="`to bottom, ${barColor}`"
+          v-bind="props"
+        />
+      </template>
+    
+      <v-list nav>
+        <div v-for="item in items" :key="item.title" link>
+          <div v-if="item.children">
+            <v-list-group active-class="primary white--text" :prepend-icon="item.icon">
+              <template v-slot:activator>
+                <v-list-item-content>
+                  <v-list-item-title>{{ item.title }}</v-list-item-title>
+                </v-list-item-content>
+              </template>
 
-          <v-list-item-content>
+              <v-list-item active-class="primary white--text" v-for="child in item.children" :key="child.title" :to="child.link" link class="ml-14">
+                <v-list-item-title>{{ child.title }}</v-list-item-title>
+                <v-list-item-icon>
+                  <v-icon>{{ child.icon }}</v-icon>
+                </v-list-item-icon>
+              </v-list-item>
+            </v-list-group>
+          </div>
+          
+          <v-list-item v-else active-class="primary white--text" class="mb-1" :to="item.link" link>
+            <v-list-item-icon>
+              <v-icon>{{ item.icon }}</v-icon>
+            </v-list-item-icon>
             <v-list-item-title>{{ item.title }}</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
+          </v-list-item>
+        </div>
       </v-list>
     </v-navigation-drawer>
 
-    <v-app-bar app>
-      <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
-
-      <v-toolbar-title>{{ $route.name }}</v-toolbar-title>
+    <v-app-bar app color="transparent" flat height="75">
+      <v-btn class="mr-3" @click="drawer = !drawer" elevation="1" fab small>
+        <v-icon v-if="drawer">mdi-dots-vertical</v-icon>
+        <v-icon v-else>mdi-view-quilt</v-icon>
+      </v-btn>
+      <v-toolbar-title class="hidden-sm-and-down font-weight-light" v-if="$route.name !== 'Editor'">{{ $route.name }}</v-toolbar-title>
+      
+      <v-spacer v-if="$route.name !== 'Editor'"></v-spacer>
+      
+      <v-btn class="ml-2" v-if="this.$store.state.jwt && $route.name !== 'Editor'" min-width="0" text to="/profile">
+        <v-icon>mdi-account</v-icon>
+      </v-btn>
     </v-app-bar>
 
     <v-main>
@@ -36,38 +66,71 @@
 </template>
 
 <script>
+ import { mapState } from 'vuex'
+
 export default {
-  data: () => ({
-    drawer: null,
-  }),
   computed: {
+    ...mapState(['barColor', 'barImage']),
     items: function () {
       if (this.$store.state.jwt) {
         return [
-          { title: "Profile", link: "/profile", icon: "mdi-account-outline" },
-          {
-            title: "Edit Profile",
-            link: "/edit-profile",
-            icon: "mdi-account-edit-outline",
-          },
+          { title: "Profile", link: "/profile", icon: "mdi-account" },
           {
             title: "Change Password",
             link: "/change-password",
             icon: "mdi-form-textbox-password",
           },
-          { title: "Logout", link: "/logout", icon: "mdi-account-arrow-right-outline" },
+          { title: "Editor", link: "/editor", icon: "mdi-cog" },
+          { title: "Logout", link: "/logout", icon: "mdi-account-arrow-right" },
+          { title: "Vuetify MD", link: "/index", icon: "mdi-vuetify", children: [
+            { title: "Dashboard", link: "/dashboard", icon: "mdi-view-dashboard" },
+            { title: "User Profile", link: "/user-profile", icon: "mdi-account" },
+            { title: "Regular Tables", link: "/regular-tables", icon: "mdi-clipboard-outline" },
+            { title: "Typography", link: "/typography", icon: "mdi-format-font" },
+            { title: "Icons", link: "/icons", icon: "mdi-chart-bubble" },
+            { title: "Google Maps", link: "/google-maps", icon: "mdi-map-marker" },
+            { title: "Notifications", link: "/notifications", icon: "mdi-bell" },
+            { title: "Upgrade To PRO", link: "/upgrade", icon: "mdi-package-up" },
+          ]},
         ];
       } else {
         return [
-          { title: "Login", link: "/", icon: "mdi-account-arrow-left-outline" },
+          { title: "Login", link: "/", icon: "mdi-account-arrow-left" },
           {
             title: "Sign Up",
             link: "sign-up",
-            icon: "mdi-account-plus-outline",
+            icon: "mdi-account-plus",
           },
+          { title: "Editor", link: "/editor", icon: "mdi-cog" },
+          { title: "Vuetify MD", link: "/index", icon: "mdi-vuetify", children: [
+            { title: "Dashboard", link: "/dashboard", icon: "mdi-view-dashboard" },
+            { title: "User Profile", link: "/user-profile", icon: "mdi-account" },
+            { title: "Regular Tables", link: "/regular-tables", icon: "mdi-clipboard-outline" },
+            { title: "Typography", link: "/typography", icon: "mdi-format-font" },
+            { title: "Icons", link: "/icons", icon: "mdi-chart-bubble" },
+            { title: "Google Maps", link: "/google-maps", icon: "mdi-map-marker" },
+            { title: "Notifications", link: "/notifications", icon: "mdi-bell" },
+            { title: "Upgrade To PRO", link: "/upgrade", icon: "mdi-package-up" },
+          ]},
         ];
       }
     },
   },
+  data: () => ({
+    drawer: null,
+  }),
 };
 </script>
+
+<style lang="css">
+  .v-application--wrap{
+    background-color: #ededed;
+  }
+  header{
+    position: inherit!important;
+  }
+  main{
+    padding-top: unset!important;
+  }
+
+</style>

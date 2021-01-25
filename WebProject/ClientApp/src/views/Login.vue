@@ -1,29 +1,50 @@
 <template>
   <v-container fluid>
-    <v-row>
-      <v-col cols="8">
-        <ValidationObserver v-slot="{ invalid }">
-            <ValidationProvider v-slot="{ errors }" name="email" rules="required|email">
-            <v-text-field
-                v-model="email"
-                :error-messages="errors"
-                placeholder="E-mail"
-            ></v-text-field>
-            </ValidationProvider>
-            <ValidationProvider v-slot="{ errors }" name="password" rules="required">
-            <v-text-field
-                v-model="password"
-                :error-messages="errors"
-                placeholder="Password"
-                type="password" 
-            ></v-text-field>
-            </ValidationProvider>
-            <p>email: example@email.com | pass: password123</p>
-            <v-alert type="error" v-if="errorMsg">{{ errorMsg }}</v-alert>
-            <v-btn large @click="tryLogin" :disabled="invalid">Sign in</v-btn>
-        </ValidationObserver>
+    <v-row class="d-flex justify-center">
+      <v-col cols="12" sm="5">
+        <base-material-card>
+          <template v-slot:heading>
+            <div class="d-flex display-2 font-weight-light flex-column justify-space-between align-center">
+              <span>Login</span>
+              <v-icon class="pa-2">mdi-account-arrow-left</v-icon>
+            </div>
+          </template>
+
+          <v-form>
+            <v-container class="py-0">
+              <v-row>
+                <v-col cols="12">
+                  <ValidationObserver v-slot="{ invalid }">
+                    <v-col cols="12" class="text-center"> 
+                      <ValidationProvider v-slot="{ errors }" name="email" rules="required|email">
+                      <v-text-field
+                        label="E-mail"
+                        v-model="email"
+                        :error-messages="errors"
+                        prepend-icon="mdi-email-outline"
+                      ></v-text-field>
+                      </ValidationProvider>
+                      <ValidationProvider v-slot="{ errors }" name="password" rules="required">
+                        <v-text-field
+                          label="Password"
+                          v-model="password"
+                          :error-messages="errors"
+                          type="password" 
+                          prepend-icon="mdi-form-textbox-password"
+                        ></v-text-field>
+                      </ValidationProvider> 
+                      <p>email: example@email.com | pass: password123</p>
+                      <v-alert class="text-left" type="error" v-if="errorMsg">{{ errorMsg }}</v-alert>
+                      <v-btn color="primary" large @click="tryLogin" :disabled="invalid">Sign in</v-btn>
+                    </v-col>
+                </ValidationObserver>
+                </v-col>
+              </v-row>
+            </v-container>
+          </v-form>
+        </base-material-card>
       </v-col>
-      </v-row>
+    </v-row>
   </v-container>
 </template>
 

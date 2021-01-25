@@ -13,20 +13,13 @@ namespace Generator
 
         public static string NameSpace => "WebProject";
 
-        private static Resource UserResource { get; set; }
+        private static RootResource UserResource { get; set; }
 
         internal static void AddResources(ResourceCollection resourceCollection)
         {
             UserResource = resourceCollection.Add<User>();
         }
 
-        internal static void AddControllers(ControllerCollection controllerCollection)
-        {
-            controllerCollection.Add<Authentication>();
-            controllerCollection.Add<Registration>();
-            controllerCollection.Add<Profile>();
-            controllerCollection.Add<Generate>();
-        }
 
         internal static void AddSeeds(SeedDataStore seedStore)
         {
@@ -34,7 +27,13 @@ namespace Generator
                 new User{
                     UserName = "Sample User",
                     Email = "example@email.com",
-                    PasswordHash = "AQAAAAEAACcQAAAAEL//UdrNeiFjd0hYeQEBOtAN+OXME8tu8kNMTg4wZUrBSt1/t0Okfs389I82ZaIU2Q==" //password123
+                    PasswordHash = "AQAAAAEAACcQAAAAEL//UdrNeiFjd0hYeQEBOtAN+OXME8tu8kNMTg4wZUrBSt1/t0Okfs389I82ZaIU2Q==", //password123
+                    Projects = new List<Project> {
+                        new Project {
+                            Name = "First Project",
+                            Json = "{'users': [{'userName': 'Test User', 'email': 'aa@bb@cc'}]}"
+                        }
+                    }
                 },
                 new User{
                     UserName = "Sample User 2",
