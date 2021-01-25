@@ -21,11 +21,12 @@ namespace WebProject.Services
                 var jObject = JObject.Parse(request.Data);
                 collection.Load(jObject);
                 var generator = new Generator.Generator(collection, "Test");
-                var files = generator.GenerateClasses().ToList();
+                var files = generator.GenerateServerClasses().ToList();
                 var seedStore = new JsonSeedStore(collection);
                 seedStore.Load(jObject);
                 var f = generator.GenerateDBContext(seedStore);
                 files.Add(f);
+                files.AddRange(generator.GenerateClientClasses());
                 return new ServiceResponse<GenerateResponse> {
                     StatusCode = 200,
                     ResponseData = new GenerateResponse {
