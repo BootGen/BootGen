@@ -60,7 +60,7 @@ namespace WebProject.Migrations
             migrationBuilder.InsertData(
                 table: "Projects",
                 columns: new[] { "Id", "Json", "Name", "OwnerId" },
-                values: new object[] { 1, "{users: [{'userName': 'Test User', 'email': 'aa@bb@cc'}]}", "First Project", 1 });
+                values: new object[] { 1, "{'users': [{'userName': 'Test User', 'email': 'aa@bb@cc'}]}", "First Project", 1 });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Projects_OwnerId",

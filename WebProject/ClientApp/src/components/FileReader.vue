@@ -1,13 +1,21 @@
 <template>
   <v-container fluid>
     <v-row>
-      <v-col cols="12" class="pl-0">
+      <v-col cols="12" class="pa-0">
         <base-material-generator-card>
           <template v-slot:heading>
             <div class="d-flex display-1 font-weight-light align-center justify-space-between pa-2">
               <span class="text-break" v-if="activeFile && activeFile.name">{{ activeFile.name }}</span>
               <span v-else>Select a file</span>
               <div class="d-flex">
+                <v-tooltip bottom>
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-btn color="white" class="mr-2" elevation="1" fab small v-bind="attrs" v-on="on">
+                      <v-icon color="primary">mdi-download</v-icon>
+                    </v-btn>
+                  </template>
+                  <span>Download</span>
+                </v-tooltip>
                 <v-tooltip bottom>
                   <template v-slot:activator="{ on, attrs }">
                     <v-btn color="white" @click="drawer = !drawer" elevation="1" fab small v-bind="attrs" v-on="on">
@@ -145,5 +153,6 @@ export default Vue.extend({
     width: fit-content;
     border-radius: 3px;
     word-wrap: break-word!important;
+    z-index: 1;
   }
 </style>

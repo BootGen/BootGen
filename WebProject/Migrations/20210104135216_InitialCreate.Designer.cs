@@ -8,7 +8,7 @@ using WebProject;
 namespace WebProject.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20201202115556_InitialCreate")]
+    [Migration("20210104135216_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -42,7 +42,7 @@ namespace WebProject.Migrations
                         new
                         {
                             Id = 1,
-                            Json = "{users: [{'userName': 'Test User', 'email': 'aa@bb@cc'}]}",
+                            Json = "{'users': [{'userName': 'Test User', 'email': 'aa@bb@cc'}]}",
                             Name = "First Project",
                             OwnerId = 1
                         });

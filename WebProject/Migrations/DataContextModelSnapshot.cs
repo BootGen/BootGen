@@ -40,7 +40,7 @@ namespace WebProject.Migrations
                         new
                         {
                             Id = 1,
-                            Json = "{users: [{'userName': 'Test User', 'email': 'aa@bb@cc'}]}",
+                            Json = "{'users': [{'userName': 'Test User', 'email': 'aa@bb@cc'}]}",
                             Name = "First Project",
                             OwnerId = 1
                         });

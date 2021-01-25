@@ -46,11 +46,11 @@
         <v-icon v-if="drawer">mdi-dots-vertical</v-icon>
         <v-icon v-else>mdi-view-quilt</v-icon>
       </v-btn>
-      <v-toolbar-title class="hidden-sm-and-down font-weight-light">{{ $route.name }}</v-toolbar-title>
+      <v-toolbar-title class="hidden-sm-and-down font-weight-light" v-if="$route.name !== 'Editor'">{{ $route.name }}</v-toolbar-title>
       
-      <v-spacer></v-spacer>
+      <v-spacer v-if="$route.name !== 'Editor'"></v-spacer>
       
-      <v-btn class="ml-2" v-if="this.$store.state.jwt" min-width="0" text to="/profile">
+      <v-btn class="ml-2" v-if="this.$store.state.jwt && $route.name !== 'Editor'" min-width="0" text to="/profile">
         <v-icon>mdi-account</v-icon>
       </v-btn>
     </v-app-bar>
@@ -80,7 +80,7 @@ export default {
             link: "/change-password",
             icon: "mdi-form-textbox-password",
           },
-          { title: "Generator", link: "/generator", icon: "mdi-cog" },
+          { title: "Editor", link: "/editor", icon: "mdi-cog" },
           { title: "Logout", link: "/logout", icon: "mdi-account-arrow-right" },
           { title: "Vuetify MD", link: "/index", icon: "mdi-vuetify", children: [
             { title: "Dashboard", link: "/dashboard", icon: "mdi-view-dashboard" },
@@ -101,7 +101,7 @@ export default {
             link: "sign-up",
             icon: "mdi-account-plus",
           },
-          { title: "Generator", link: "/generator", icon: "mdi-cog" },
+          { title: "Editor", link: "/editor", icon: "mdi-cog" },
           { title: "Vuetify MD", link: "/index", icon: "mdi-vuetify", children: [
             { title: "Dashboard", link: "/dashboard", icon: "mdi-view-dashboard" },
             { title: "User Profile", link: "/user-profile", icon: "mdi-account" },
