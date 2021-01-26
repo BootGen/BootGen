@@ -107,7 +107,7 @@ export default Vue.extend({
       cmOptions: {
         theme: 'material',
         tabSize: 2,
-        mode: 'text/x-csharp',
+        mode: 'text/x-csharp', //text/typescript
         lineNumbers: true,
         line: true,
         readOnly: true,
@@ -118,6 +118,11 @@ export default Vue.extend({
     selectFile: function(data: Element[]){
       if(data[0] && data[0].content){
         this.activeFile = data[0];
+        if(this.activeFile.name.split('.')[1] === "cs"){
+          this.cmOptions.mode = 'text/x-csharp';
+        }else{
+          this.cmOptions.mode = 'text/typescript';
+        }
       }
     },
     placement: function(element: Element[], file: File, id: number): Element[]{
