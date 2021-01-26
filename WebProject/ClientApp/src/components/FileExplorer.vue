@@ -48,13 +48,14 @@ export default Vue.extend({
   },
   methods: {
     init: async function(){
-      await this.$store.dispatch("getProjects");
+      await this.$store.dispatch("projects/getProjects");
       this.projects = [];
-      for(const i in this.$store.state.projects){
+      for(const i in this.$store.state.projects.items){
+        const ownerId = this.$store.state.projects.items[i].ownerId;
         this.projects.push({
-          id: this.$store.state.projects[i].id,
-          name: this.$store.state.projects[i].name,
-          owner: (await this.$store.dispatch("getUser", this.$store.state.projects[i].ownerId)).userName,
+          id: this.$store.state.projects.items[i].id,
+          name: this.$store.state.projects.items[i].name,
+          owner: (await this.$store.dispatch("users/getUser", ownerId)).userName,
         });
       }
     },
