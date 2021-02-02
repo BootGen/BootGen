@@ -58,7 +58,7 @@
         </base-material-generator-card>
       </v-col>
       <v-col cols="12" md="6" class="pa-0">
-        <file-reader :files="generatedFiles"></file-reader>
+        <file-reader :files="generatedFiles" :json="json"></file-reader>
       </v-col>
     </v-row>
   </v-container>
@@ -70,6 +70,7 @@ import FileReader from "../components/FileReader.vue";
 import FileExplorer from "../components/FileExplorer.vue";
 import HelpDialog from "../components/HelpDialog.vue";
 import { Project } from "../models/Project";
+import { GeneratedFile } from "../models/GeneratedFile";
 import { codemirror } from 'vue-codemirror'
 import 'codemirror/lib/codemirror.css'
 import "codemirror/mode/javascript/javascript.js";
@@ -103,6 +104,7 @@ export default Vue.extend({
         icon: "mdi-alert-circle",
         text: "",
       },
+      json: "",
     };
   },
   methods: {
@@ -111,8 +113,10 @@ export default Vue.extend({
       this.prettyPrint(this.activeProject.json);
     },
     setJson: async function(json: string) {
+      this.json = json;
       const generate = await this.$store.dispatch("generate", {data: json});
       this.generatedFiles = generate.generatedFiles;
+
       this.activeProject.json = json;
       if(this.$root.$data.user && this.activeProject.id >= 0){
         await this.$store.dispatch("updateProject", this.activeProject);
