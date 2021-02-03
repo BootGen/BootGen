@@ -11,5 +11,6 @@ namespace WebProject
     {
         public string Data { get; set; }
         public bool GenerateClient { get; set; }
+        public string NameSpace { get; set;}
     }
 }

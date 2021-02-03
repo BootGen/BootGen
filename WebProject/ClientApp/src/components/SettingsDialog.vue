@@ -19,7 +19,7 @@ import Vue from "vue";
 import { FieldType } from '../models/Forms/Field';
 import { Form } from "../models/Forms/Form";
 import FormComponent from "../components/FormComponent.vue";
-
+import { GenerateRequest } from "../models/GenerateRequest"
 export default Vue.extend({
   props: [
     "json"
@@ -34,7 +34,7 @@ export default Vue.extend({
         title: "Settings",
         model: settings,
         fields: [
-          {property: "namespace", placeholder: "Namespace", type: FieldType.Text, validation: "min:3"},
+          {property: "namespace", placeholder: "Namespace", type: FieldType.Text, validation: "min:3|required"},
           {property: "engine", placeholder: "Database engine:", data: ["SQLite", "MySql", "Postgres", "MSSql"], type: FieldType.Radio, validation: "required"},
           {property: "connection", placeholder: "Connection", type: FieldType.Text, validation: ""},
           {property: "generateTS", placeholder: "Generate typescript files", type: FieldType.Checkbox, validation: ""},
@@ -54,7 +54,8 @@ export default Vue.extend({
       this.dialog = false;
     },
     save: async function () {
-      const data = await this.$store.dispatch("generate", {data: this.json, generateClient: this.form.model.generateTS})
+      const asd: GenerateRequest = {data: this.json, generateClient: this.form.model.generateTS, nameSpace: this.form.model.namespace};
+      const data = await this.$store.dispatch("generate", asd);
       this.$emit("new-files", data.generatedFiles);
       this.close();
     },

@@ -113,7 +113,7 @@ export default Vue.extend({
       this.prettyPrint(this.activeProject.json);
     },
     setJson: async function(json: string) {
-      const generate = await this.$store.dispatch("generate", {data: json, generateClient: true});
+      const generate = await this.$store.dispatch("generate", {data: json, generateClient: true, nameSpace: "Test"});
       this.generatedFiles = generate.generatedFiles;
       this.activeProject.json = json;
       if(this.$root.$data.user && this.activeProject.id >= 0){

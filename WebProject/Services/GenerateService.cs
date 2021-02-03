@@ -20,7 +20,7 @@ namespace WebProject.Services
                 var collection = new JsonResourceCollection(dataModel);
                 var jObject = JObject.Parse(request.Data);
                 collection.Load(jObject);
-                var generator = new Generator.Generator(collection, "Test");
+                var generator = new Generator.Generator(collection, request.NameSpace);
                 var files = generator.GenerateServerClasses().ToList();
                 var seedStore = new JsonSeedStore(collection);
                 seedStore.Load(jObject);
