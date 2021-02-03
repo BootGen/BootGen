@@ -21,6 +21,7 @@
         <!-- Checkbox -->
         <v-checkbox v-if="field.type === FieldType.Checkbox"
           v-model="form.model[field.property]"
+          :label="field.placeholder"
           required
         ></v-checkbox>
         <!-- Password -->

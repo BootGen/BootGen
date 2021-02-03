@@ -10,5 +10,6 @@ namespace WebProject
     public class GenerateRequest
     {
         public string Data { get; set; }
+        public bool GenerateClient { get; set; }
     }
 }

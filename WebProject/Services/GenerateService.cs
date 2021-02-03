@@ -26,7 +26,9 @@ namespace WebProject.Services
                 seedStore.Load(jObject);
                 var f = generator.GenerateDBContext(seedStore);
                 files.Add(f);
-                files.AddRange(generator.GenerateClientClasses());
+                if(request.GenerateClient){
+                    files.AddRange(generator.GenerateClientClasses());
+                }
                 return new ServiceResponse<GenerateResponse> {
                     StatusCode = 200,
                     ResponseData = new GenerateResponse {

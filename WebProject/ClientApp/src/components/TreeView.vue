@@ -16,19 +16,16 @@ interface Node {
 
 export default Vue.extend({
 	props: [
-		"json"
+		"files",
 	],
   data: function () {
     return {
 		tree: {id: 0, name: "Root", children: []},
-		files: Array<GeneratedFile>(),
 		filesById: Array<{id: number; file: GeneratedFile}>(),
 		id: 0,
     };
 	},
 	created: async function (){
-		const generate = await this.$store.dispatch("generate", {data: this.json});
-		this.files = generate.generatedFiles;
 		this.setTree();
 	},
   methods: {

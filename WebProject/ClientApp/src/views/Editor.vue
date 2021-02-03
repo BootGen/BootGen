@@ -85,11 +85,11 @@ export default Vue.extend({
   },
   created: async function(){
     this.prettyPrint(this.activeProject.json);
-    this.setJson(this.activeProject.json);
+    await this.setJson(this.activeProject.json);
   },
   data: function () {
     return {
-      generatedFiles: [],
+      generatedFiles: Array<GeneratedFile>(),
       activeProject: {id: -1, ownerId: -1, name: "", json: '{ "users": [{"userName": "Test User", "email": "aa@bb@cc"}], "tasks": [{"title": "Task Title", "description": "Task des"}] }'},
       cmOptions: {
         theme: 'material',
@@ -113,15 +113,14 @@ export default Vue.extend({
       this.prettyPrint(this.activeProject.json);
     },
     setJson: async function(json: string) {
-      this.json = json;
-      const generate = await this.$store.dispatch("generate", {data: json});
+      const generate = await this.$store.dispatch("generate", {data: json, generateClient: true});
       this.generatedFiles = generate.generatedFiles;
-
       this.activeProject.json = json;
       if(this.$root.$data.user && this.activeProject.id >= 0){
         await this.$store.dispatch("updateProject", this.activeProject);
       }
       this.prettyPrint(this.activeProject.json);
+      this.json = json;
     },
     prettyPrint: function(json: string){
       json = json.replace(/'/g, "\"");
