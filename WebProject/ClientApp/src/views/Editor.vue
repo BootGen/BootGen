@@ -117,7 +117,7 @@ export default Vue.extend({
       this.generatedFiles = generate.generatedFiles;
       this.activeProject.json = json;
       if(this.$root.$data.user && this.activeProject.id >= 0){
-        await this.$store.dispatch("updateProject", this.activeProject);
+        await this.$store.dispatch("projects/updateProject", this.activeProject);
       }
       this.prettyPrint(this.activeProject.json);
       this.json = json;
@@ -159,7 +159,7 @@ export default Vue.extend({
         }else{   
           this.snackbar.type = "success";
           this.snackbar.text = "Project updated successfully!";
-          await this.$store.dispatch("updateProject", this.activeProject);
+          await this.$store.dispatch("projects/updateProject", this.activeProject);
         }
       }else{
         this.snackbar.type = "error";

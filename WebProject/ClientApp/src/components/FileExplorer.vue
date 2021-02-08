@@ -25,11 +25,6 @@
 import Vue from "vue";
 
 export default Vue.extend({
-  components: {
-  },
-	created: async function (){
-    this.init();
-	},
   data: function () {
     return {
 			dialog: false,
@@ -43,24 +38,23 @@ export default Vue.extend({
         },
         { text: 'Owner', value: 'owner' },
       ],
-      projects: [{id: Number, name: String, owner: String}],
+      projects: Array<{id: number; name: string; owner: string}>(),
     };
   },
   methods: {
     init: async function(){
-      await this.$store.dispatch("projects/getProjects");
       this.projects = [];
-      for(const i in this.$store.state.projects.items){
-        const ownerId = this.$store.state.projects.items[i].ownerId;
+      for(let i = 0; i < this.$store.state.projects.items.length; i++){
+        const owner = await this.$store.dispatch("users/getUser", this.$store.state.projects.items[i].ownerId);
         this.projects.push({
           id: this.$store.state.projects.items[i].id,
           name: this.$store.state.projects.items[i].name,
-          owner: (await this.$store.dispatch("users/getUser", ownerId)).userName,
+          owner: owner.userName,
         });
       }
     },
 		openProject: async function(project: {id: number; name: string; owner: string}){
-			this.$emit("select-project", await this.$store.dispatch("getProject", project.id));
+			this.$emit("select-project", await this.$store.dispatch("projects/getProject", project.id));
 			this.dialog = false;
 		}
   },
