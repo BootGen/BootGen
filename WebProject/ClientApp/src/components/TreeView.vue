@@ -32,9 +32,7 @@ export default Vue.extend({
 	},
   methods: {
 		setTree: function (){
-			for(const i in this.files){
-				this.addToTree(this.files[i]);
-			}
+			this.files.forEach(file => this.addToTree(file));
 			this.addToFile(this.tree);
 			this.removeEmptyNode(this.tree);
 		},
@@ -59,16 +57,16 @@ export default Vue.extend({
 			return null;
 		},
 		addToFile: function(tree: Node){
-			for(let i = 0; i < this.filesById.length; i++){
+			this.filesById.forEach(fileById => {
 				if(tree.children){
-					for(let j = 0; j < tree.children.length; j++){
-						if(this.filesById[i].id === tree.children[j].id){
-							const node = {id: ++this.id, name: this.filesById[i].file.name};
-							let parent = tree.children[j];
-							if(this.filesById[i].file.path === ""){
+					tree.children.forEach(child => {
+						if(fileById.id === child.id){
+							const node = {id: ++this.id, name: fileById.file.name};
+							let parent = child;
+							if(fileById.file.path === ""){
 								parent = tree;
 							}
-							const isExists = this.getChild(parent, this.filesById[i].file.name);
+							const isExists = this.getChild(parent, fileById.file.name);
 							if(parent && !isExists){
 								if(!parent.children){
 									parent.children = [node];
@@ -77,20 +75,18 @@ export default Vue.extend({
 								}
 							}
 						}
-					}
-					for(const i in tree.children){
-						this.addToFile(tree.children[i]);
-					}
+						this.addToFile(child);
+					});
 				}
-			}
+			});
 		},
 		addToTree: function(file: GeneratedFile){
 			const path = file.path.split('/');
 			let currentNode: Node = this.tree;
-			for(const i in path){
-				const childNode = this.getChild(currentNode, path[i]);
+			path.forEach(part => {
+				const childNode = this.getChild(currentNode, part);
 				if(!childNode){
-					const node: Node = {id: ++this.id, name: path[i]};
+					const node: Node = {id: ++this.id, name: part};
 					if(!currentNode.children){
 						currentNode.children = [node];
 					}else{
@@ -100,7 +96,7 @@ export default Vue.extend({
 				}else{
 					currentNode = childNode;
 				}
-			}
+			});
 			this.filesById.push({id: currentNode.id, file: file});
 		},
 		getFile: function(node: Node){
