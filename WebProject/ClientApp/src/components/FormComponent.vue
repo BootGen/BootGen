@@ -98,9 +98,9 @@ export default Vue.extend({
       message: this.validationMessage(ErrorType.Password),
     });
   },
-  props: [
-    "form"
-  ],
+  props: {
+    form: Object,
+  },
   components: {
     ValidationObserver,
     ValidationProvider,

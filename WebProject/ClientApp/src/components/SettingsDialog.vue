@@ -21,9 +21,9 @@ import { Form } from "../models/Forms/Form";
 import FormComponent from "../components/FormComponent.vue";
 import { GenerateRequest } from "../models/GenerateRequest"
 export default Vue.extend({
-  props: [
-    "json"
-  ],
+  props: {
+    json: String,
+  },
   components: {
     FormComponent,
   },

@@ -15,9 +15,11 @@ interface Node {
 }
 
 export default Vue.extend({
-	props: [
-		"files",
-	],
+	props: {
+		files: {
+			type: Array as () => GeneratedFile[]
+		},
+	},
   data: function () {
     return {
 		tree: {id: 0, name: "Root", children: []},
