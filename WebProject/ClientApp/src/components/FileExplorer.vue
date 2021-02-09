@@ -23,7 +23,6 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { Project } from "../models/Project";
 
 export default Vue.extend({
   data: function () {

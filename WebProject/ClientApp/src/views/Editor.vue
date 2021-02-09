@@ -58,7 +58,7 @@
         </base-material-generator-card>
       </v-col>
       <v-col cols="12" md="6" class="pa-0">
-        <file-reader :files="generatedFiles" :json="json"></file-reader>
+        <file-reader :files="generatedFiles"></file-reader>
       </v-col>
     </v-row>
   </v-container>
@@ -75,6 +75,7 @@ import { codemirror } from 'vue-codemirror'
 import 'codemirror/lib/codemirror.css'
 import "codemirror/mode/javascript/javascript.js";
 import 'codemirror/theme/material.css'
+import { GenerateRequest } from "../models/GenerateRequest";
 
 export default Vue.extend({
   components: {
@@ -106,7 +107,6 @@ export default Vue.extend({
         icon: "mdi-alert-circle",
         text: "",
       },
-      json: "",
     };
   },
   methods: {
@@ -115,14 +115,19 @@ export default Vue.extend({
       this.prettyPrint(this.activeProject.json);
     },
     setJson: async function(json: string) {
-      const generate = await this.$store.dispatch("generate", {data: json, generateClient: true, nameSpace: "Test"});
+      const data: GenerateRequest = {
+        data: json,
+        generateClient: this.$store.state.projectSettings.item.generateClient,
+        nameSpace: this.$store.state.projectSettings.item.nameSpace
+      };
+      await this.$store.dispatch("updateProjectSettings", data);
+      const generate = await this.$store.dispatch("generate", this.$store.state.projectSettings.item);
       this.generatedFiles = generate.generatedFiles;
       this.activeProject.json = json;
       if(this.$root.$data.user && this.activeProject.id >= 0){
         await this.$store.dispatch("projects/updateProject", this.activeProject);
       }
       this.prettyPrint(this.activeProject.json);
-      this.json = json;
     },
     prettyPrint: function(json: string){
       json = json.replace(/'/g, "\"");

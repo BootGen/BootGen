@@ -21,15 +21,16 @@ import { Form } from "../models/Forms/Form";
 import FormComponent from "../components/FormComponent.vue";
 import { GenerateRequest } from "../models/GenerateRequest"
 export default Vue.extend({
-  props: {
-    json: String,
-  },
   components: {
     FormComponent,
   },
   computed: {
     form: function (): Form {
-      const settings = {namespace: "", engine: "SQLite", connection: "", generateTS: true};
+      const settings = {
+        namespace: this.$store.state.projectSettings.item.nameSpace,
+        engine: "SQLite",
+        connection: "",
+        generateTS: this.$store.state.projectSettings.item.generateClient};
       return {
         title: "Settings",
         model: settings,
@@ -55,11 +56,11 @@ export default Vue.extend({
     },
     save: async function () {
       const data: GenerateRequest = {
-        data: this.json,
+        data: this.$store.state.projectSettings.item.data,
         generateClient: this.form.model.generateTS,
         nameSpace: this.form.model.namespace
       };
-      console.log("updateSettings:", await this.$store.dispatch("updateProjectSettings", data));
+      await this.$store.dispatch("updateProjectSettings", data);
       this.close();
     },
   },

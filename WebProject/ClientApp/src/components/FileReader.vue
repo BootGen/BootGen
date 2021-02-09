@@ -25,9 +25,9 @@
                   </template>
                   <span>Files</span>
                 </v-tooltip>
-                <settings-dialog :json="json"></settings-dialog>
+                <settings-dialog></settings-dialog>
                 <v-col class="d-flex fileSelector" v-if="drawer" v-click-outside="closeTreeView">
-                  <tree-view :files="files" :json="json" @select-file="selectFile"></tree-view>
+                  <tree-view :files="files" @select-file="selectFile"></tree-view>
                 </v-col>
               </div>
             </div>
@@ -53,10 +53,11 @@ import 'codemirror/theme/material.css'
 import { GeneratedFile } from "../models/GeneratedFile";
 
 export default Vue.extend({
-  props:[
-    "files",
-    "json"
-  ],
+  props: {
+    files: {
+			type: Array as () => GeneratedFile[]
+		},
+  },
   components: {
     SettingsDialog,
     TreeView,
