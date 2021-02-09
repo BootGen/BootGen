@@ -23,28 +23,14 @@ export default Vue.extend({
   data: function () {
     return {
 		tree: {id: 0, name: "Root", children: []},
-		filesById: Array<{id: number; file: GeneratedFile}>(),
+		filesById: Array<GeneratedFile>(),
 		id: 0,
     };
 	},
-	created: async function (){
-		this.setTree();
+	created: function (){
+		this.files.forEach(file => this.addToTree(file));
 	},
   methods: {
-		setTree: function (){
-			this.files.forEach(file => this.addToTree(file));
-			this.addToFile(this.tree);
-			this.removeEmptyNode(this.tree);
-		},
-		removeEmptyNode: function(node: Node){
-			if(node && node.children){
-				for(let i = 0; i < node.children.length; i++){
-					if(node.children[i] && node.children[i].name === ""){
-						node.children.splice(i, 1);
-					}
-				}
-			}
-		},
 		getChild: function(node: Node, name: string): Node | null{
 			if(!node.children){
 				return null;
@@ -56,55 +42,34 @@ export default Vue.extend({
 			}
 			return null;
 		},
-		addToFile: function(tree: Node){
-			this.filesById.forEach(fileById => {
-				if(tree.children){
-					tree.children.forEach(child => {
-						if(fileById.id === child.id){
-							const node = {id: ++this.id, name: fileById.file.name};
-							let parent = child;
-							if(fileById.file.path === ""){
-								parent = tree;
-							}
-							const isExists = this.getChild(parent, fileById.file.name);
-							if(parent && !isExists){
-								if(!parent.children){
-									parent.children = [node];
-								}else{
-									parent.children.push(node);
-								}
-							}
-						}
-						this.addToFile(child);
-					});
-				}
-			});
-		},
 		addToTree: function(file: GeneratedFile){
 			const path = file.path.split('/');
 			let currentNode: Node = this.tree;
-			path.forEach(part => {
-				const childNode = this.getChild(currentNode, part);
-				if(!childNode){
-					const node: Node = {id: ++this.id, name: part};
-					if(!currentNode.children){
-						currentNode.children = [node];
+			if(path[0] !== ""){
+				path.forEach(part => {
+					const childNode = this.getChild(currentNode, part);
+					if(!childNode){
+						const node: Node = {id: ++this.id, name: part};
+						if(!currentNode.children){
+							currentNode.children = [node];
+						}else{
+							currentNode.children.push(node);
+						}
+						currentNode = node;
 					}else{
-						currentNode.children.push(node);
+						currentNode = childNode;
 					}
-					currentNode = node;
-				}else{
-					currentNode = childNode;
-				}
-			});
-			this.filesById.push({id: currentNode.id, file: file});
+				});
+			}
+			if(!currentNode.children){
+				currentNode.children = [{id: ++this.id, name: file.name}];
+			}else{
+				currentNode.children.push({id: ++this.id, name: file.name});
+			}
+			this.filesById[this.id] = file;
 		},
 		getFile: function(node: Node){
-			for(let i = 0; this.filesById.length; i++){
-				if(this.filesById[i].file.name === node.name){
-					return this.filesById[i].file;
-				}
-			}
+			return this.filesById[node.id];
 		},
 		selectFile: function (node: Node[]){
 			if(node[0]){
