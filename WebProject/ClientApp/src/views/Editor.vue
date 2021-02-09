@@ -33,8 +33,24 @@
                 JSON
               </div>
               <div>
-                <help-dialog></help-dialog>
-                <file-explorer v-if="$store.state.jwt" @select-project="selectProject"></file-explorer>
+                <v-tooltip bottom>
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-btn class="ml-2" color="white" elevation="1" fab small @click="openHelp = true" v-bind="attrs" v-on="on">
+                      <v-icon color="primary">mdi-help</v-icon>
+                    </v-btn>
+                    </template>
+                  <span>Help</span>
+                </v-tooltip>
+                <help-dialog v-if="openHelp" @close-help="openHelp = false"></help-dialog>
+                <v-tooltip bottom>
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-btn class="ml-2 mr-2" color="white" elevation="1" fab small @click="openExplorer = true" v-bind="attrs" v-on="on">
+                      <v-icon color="primary">mdi-file-multiple</v-icon>
+                    </v-btn>
+                    </template>
+                  <span>Files</span>
+                </v-tooltip>
+                <file-explorer v-if="$store.state.jwt && openExplorer" @select-project="selectProject" @close-explorer="openExplorer = false"></file-explorer>
                 <v-tooltip bottom>
                   <template v-slot:activator="{ on, attrs }">
                     <v-btn color="white" elevation="1" fab small :disabled="activeProject.json == ''" @click="prettyPrint(activeProject.json)" v-bind="attrs" v-on="on">
@@ -91,6 +107,8 @@ export default Vue.extend({
   },
   data: function () {
     return {
+      openExplorer: false,
+      openHelp: false,
       generatedFiles: Array<GeneratedFile>(),
       initialProject: {id: -1, ownerId: -1, name: "", json: '{ "users": [{"userName": "Test User", "email": "aa@bb@cc"}], "tasks": [{"title": "Task Title", "description": "Task des"}] }'},
       activeProject: {id: -1, ownerId: -1, name: "", json: ""},
@@ -142,6 +160,7 @@ export default Vue.extend({
         this.activeProject = project;
         this.setJson(this.activeProject.json);
       }
+      this.openExplorer = !this.openExplorer;
     },
     existsProjectName: function(): Project | null{
       for(const i in this.$store.state.projects.items){

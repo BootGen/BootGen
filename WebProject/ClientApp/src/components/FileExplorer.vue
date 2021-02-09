@@ -1,11 +1,6 @@
 <template>
   <v-dialog v-model="dialog">
-    <template v-slot:activator="{ on, attrs }">
-			<v-btn class="ml-2 mr-2" color="white" elevation="1" fab small v-bind="attrs" v-on="on">
-				<v-icon color="primary">mdi-file-multiple</v-icon>
-			</v-btn>
-    </template>
-    <v-card>
+    <v-card v-click-outside="outClick">
       <v-card-title>
         <v-text-field v-model="search" append-icon="mdi-magnify" label="Search" single-line hide-details></v-text-field>
       </v-card-title>
@@ -27,7 +22,7 @@ import Vue from "vue";
 export default Vue.extend({
   data: function () {
     return {
-			dialog: false,
+			dialog: true,
 			search: '',
       headers: [
         {
@@ -43,7 +38,10 @@ export default Vue.extend({
 		openProject: async function(project: {id: number; name: string; owner: string}){
 			this.$emit("select-project", await this.$store.dispatch("projects/getProject", project.id));
 			this.dialog = false;
-		}
+		},
+    outClick: function(){
+      this.$emit("close-explorer");
+    }
   },
 });
 </script>

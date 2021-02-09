@@ -1,11 +1,6 @@
 <template>
   <v-dialog v-model="dialog" persistent max-width="500px">
-    <template v-slot:activator="{ on, attrs }">
-			<v-btn class="ml-2" color="white" elevation="1" fab small v-bind="attrs" v-on="on">
-				<v-icon color="primary">mdi-cog</v-icon>
-			</v-btn>
-    </template>
-    <v-card>
+    <v-card v-click-outside="close">
       <v-container>
         <h2 class="text-center">Settings</h2>
         <FormComponent :form="form"></FormComponent>
@@ -47,12 +42,13 @@ export default Vue.extend({
   },
   data: function () {
     return {
-      dialog: false,
+      dialog: true,
     };
   },
   methods: {
     close: function () {
       this.dialog = false;
+      this.$emit("close-settings", true);
     },
     save: async function () {
       const data: GenerateRequest = {

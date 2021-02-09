@@ -1,13 +1,8 @@
 <template>
   <v-dialog v-model="dialog">
-    <template v-slot:activator="{ on, attrs }">
-			<v-btn class="ml-2" color="white" elevation="1" fab small v-bind="attrs" v-on="on">
-				<v-icon color="primary">mdi-help</v-icon>
-			</v-btn>
-    </template>
-    <v-card>
+    <v-card v-click-outside="close">
       <v-toolbar flat color="primary" dark>
-				<v-btn icon dark @click="dialog = false">
+				<v-btn icon dark @click="close">
 					<v-icon>mdi-close</v-icon>
 				</v-btn>
         <v-toolbar-title>Help</v-toolbar-title>
@@ -41,7 +36,7 @@ export default Vue.extend({
   },
   data: function () {
     return {
-      dialog: false,
+      dialog: true,
       help: [
         {title: "Title 1", icon: "mdi-account", description: "Description 1"}, 
         {title: "Title 2", icon: "mdi-clock", description: "Description 2"}, 
@@ -50,6 +45,10 @@ export default Vue.extend({
     };
   },
   methods: {
+    close: function(){
+      this.dialog = false;
+      this.$emit("close-help");
+    }
   },
 });
 </script>
