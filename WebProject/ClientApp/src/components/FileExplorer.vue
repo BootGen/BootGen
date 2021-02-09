@@ -1,7 +1,7 @@
 <template>
   <v-dialog v-model="dialog">
     <template v-slot:activator="{ on, attrs }">
-			<v-btn class="ml-2 mr-2" color="white" elevation="1" @click="init" fab small v-bind="attrs" v-on="on">
+			<v-btn class="ml-2 mr-2" color="white" elevation="1" fab small v-bind="attrs" v-on="on">
 				<v-icon color="primary">mdi-file-multiple</v-icon>
 			</v-btn>
     </template>
@@ -11,7 +11,7 @@
       </v-card-title>
       <v-data-table
         :headers="headers"
-        :items="projects"
+        :items="$store.state.projects.items"
         :search="search"
 				sort-by="name"
 				@click:row="openProject"
@@ -23,6 +23,7 @@
 
 <script lang="ts">
 import Vue from "vue";
+import { Project } from "../models/Project";
 
 export default Vue.extend({
   data: function () {
@@ -36,23 +37,10 @@ export default Vue.extend({
           sortable: true,
           value: 'name',
         },
-        { text: 'Owner', value: 'owner' },
       ],
-      projects: Array<{id: number; name: string; owner: string}>(),
     };
   },
   methods: {
-    init: async function(){
-      this.projects = [];
-      for(let i = 0; i < this.$store.state.projects.items.length; i++){
-        const owner = await this.$store.dispatch("users/getUser", this.$store.state.projects.items[i].ownerId);
-        this.projects.push({
-          id: this.$store.state.projects.items[i].id,
-          name: this.$store.state.projects.items[i].name,
-          owner: owner.userName,
-        });
-      }
-    },
 		openProject: async function(project: {id: number; name: string; owner: string}){
 			this.$emit("select-project", await this.$store.dispatch("projects/getProject", project.id));
 			this.dialog = false;
