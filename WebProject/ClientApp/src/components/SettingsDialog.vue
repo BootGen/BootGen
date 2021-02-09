@@ -54,9 +54,12 @@ export default Vue.extend({
       this.dialog = false;
     },
     save: async function () {
-      const asd: GenerateRequest = {data: this.json, generateClient: this.form.model.generateTS, nameSpace: this.form.model.namespace};
-      const data = await this.$store.dispatch("generate", asd);
-      this.$emit("new-files", data.generatedFiles);
+      const data: GenerateRequest = {
+        data: this.json,
+        generateClient: this.form.model.generateTS,
+        nameSpace: this.form.model.namespace
+      };
+      console.log("updateSettings:", await this.$store.dispatch("updateProjectSettings", data));
       this.close();
     },
   },

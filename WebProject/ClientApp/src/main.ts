@@ -22,6 +22,11 @@ new Vue({
     if(store.state.jwt){
       this.$root.$data.user = await this.$store.dispatch("profile");
       await this.$store.dispatch("projects/getProjects");
+      const initialSettings = {
+        data: '{ "users": [{"userName": "Test User", "email": "aa@bb@cc"}], "tasks": [{"title": "Task Title", "description": "Task des"}] }',
+        generateClient: true,
+        nameSpace: "Test"
+      };
     }
   },
   data: function () {

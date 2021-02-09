@@ -25,9 +25,9 @@
                   </template>
                   <span>Files</span>
                 </v-tooltip>
-                <settings-dialog :json="json" @new-files="refreshFiles"></settings-dialog>
+                <settings-dialog :json="json"></settings-dialog>
                 <v-col class="d-flex fileSelector" v-if="drawer" v-click-outside="closeTreeView">
-                  <tree-view :files="newFiles" :json="json" @select-file="selectFile"></tree-view>
+                  <tree-view :files="files" :json="json" @select-file="selectFile"></tree-view>
                 </v-col>
               </div>
             </div>
@@ -62,9 +62,6 @@ export default Vue.extend({
     TreeView,
     codemirror
   },
-  created: function(){
-    this.newFiles = this.files;
-  },
   watch: {
     files: {
       handler(files: GeneratedFile[]) {
@@ -93,7 +90,6 @@ export default Vue.extend({
         line: true,
         readOnly: true,
       },
-      newFiles: Array<GeneratedFile>(),
     };
   },
   methods: {
@@ -104,9 +100,6 @@ export default Vue.extend({
       }else{
         this.cmOptions.mode = 'text/typescript';
       }
-    },
-    refreshFiles: function(files: GeneratedFile[]){
-      this.newFiles = files;
     },
     closeTreeView: function(){
       this.drawer = false;

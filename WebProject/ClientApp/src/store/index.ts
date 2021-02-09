@@ -3,8 +3,10 @@ import Vuex from 'vuex'
 import axios from 'axios'
 import projectModule, { ProjectsState } from '@/store/ProjectModule'
 import userModule, { UsersState } from '@/store/UserModule'
+import ProjectSettingsModule, { ProjectSettingsState} from '@/store/ProjectSettingsModule'
 import authModule from '@/store/AuthModule'
 import generateModule from '@/store/GenerateModule'
+import { GenerateRequest } from '@/models/GenerateRequest';
 
 Vue.use(Vuex)
 
@@ -14,6 +16,7 @@ export interface State {
   jwt: string;
   users: UsersState;
   projects: ProjectsState;
+  projectSettings: ProjectSettingsState;
 }
 
 export default new Vuex.Store<State>({
@@ -24,6 +27,9 @@ export default new Vuex.Store<State>({
     },
     projects : {
       items: []
+    },
+    projectSettings : {
+      item: {data: "", generateClient: false, nameSpace: ""}
     }
   },
   mutations: {
@@ -56,6 +62,7 @@ export default new Vuex.Store<State>({
     auth: authModule,
     generate: generateModule,
     projects: projectModule,
-    users: userModule
+    users: userModule,
+    projectSettings: ProjectSettingsModule,
   }
 })
