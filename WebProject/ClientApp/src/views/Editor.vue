@@ -84,13 +84,15 @@ export default Vue.extend({
     codemirror
   },
   created: async function(){
+    this.activeProject = {...this.initialProject};
     this.prettyPrint(this.activeProject.json);
     await this.setJson(this.activeProject.json);
   },
   data: function () {
     return {
       generatedFiles: Array<GeneratedFile>(),
-      activeProject: {id: -1, ownerId: -1, name: "", json: '{ "users": [{"userName": "Test User", "email": "aa@bb@cc"}], "tasks": [{"title": "Task Title", "description": "Task des"}] }'},
+      initialProject: {id: -1, ownerId: -1, name: "", json: '{ "users": [{"userName": "Test User", "email": "aa@bb@cc"}], "tasks": [{"title": "Task Title", "description": "Task des"}] }'},
+      activeProject: {id: -1, ownerId: -1, name: "", json: ""},
       cmOptions: {
         theme: 'material',
         tabSize: 2,
@@ -109,7 +111,7 @@ export default Vue.extend({
   },
   methods: {
     newProject: async function(){
-      this.activeProject = {id: -1, ownerId: -1, name: "", json: '{ "users": [{"userName": "Test User", "email": "aa@bb@cc"}], "tasks": [{"title": "Task Title", "description": "Task des"}] }'};
+      this.activeProject = {...this.initialProject};
       this.prettyPrint(this.activeProject.json);
     },
     setJson: async function(json: string) {
@@ -136,10 +138,10 @@ export default Vue.extend({
         this.setJson(this.activeProject.json);
       }
     },
-    existsProjectName: function(){
-      for(const i in this.$store.state.projects){
-        if(this.activeProject.name === this.$store.state.projects[i].name){
-          return this.$store.state.projects[i];
+    existsProjectName: function(): Project | null{
+      for(const i in this.$store.state.projects.items){
+        if(this.activeProject.name === this.$store.state.projects.items[i].name){
+          return this.$store.state.projects.items[i];
         }
       }
       return null;
@@ -152,7 +154,7 @@ export default Vue.extend({
           this.snackbar.text = "The new project was successfully created!";
           this.activeProject.id = 0;
           this.activeProject.ownerId = this.$root.$data.user.id;
-          this.activeProject = await this.$store.dispatch("addProject", this.activeProject);
+          this.activeProject = await this.$store.dispatch("projects/addProject", this.activeProject);
         }else if(exists && exists.id !== this.activeProject.id){
           this.snackbar.type = "error";
           this.snackbar.text = "This name is already in use, please enter another name!";
@@ -169,9 +171,9 @@ export default Vue.extend({
     },
     close: async function (){
       if(this.activeProject.id === -1){
-        this.activeProject = {id: -1, ownerId: -1, name: "", json: '{ "users": [{"userName": "Test User", "email": "aa@bb@cc"}], "tasks": [{"title": "Task Title", "description": "Task des"}] }'};
+        this.activeProject = {...this.initialProject};
       }else{
-        this.activeProject = await this.$store.dispatch("getProject", this.activeProject.id);
+        this.activeProject = await this.$store.dispatch("projects/getProject", this.activeProject.id);
       }
       this.prettyPrint(this.activeProject.json);
       this.snackbar.type = "info";
