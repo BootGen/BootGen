@@ -5,7 +5,7 @@
         <base-material-generator-card>
           <template v-slot:heading>
             <div class="d-flex display-1 font-weight-light align-center justify-space-between pa-2">
-              <span class="text-break" v-if="activeFile && activeFile.name">{{ activeFile.name }}</span>
+              <span class="text-break" v-if="activeFile && activeFile.name">{{ activeFile.path }}/{{ activeFile.name }}</span>
               <span v-else>Select a file</span>
               <div class="d-flex">
                 <v-tooltip bottom>
