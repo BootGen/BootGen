@@ -1,4 +1,4 @@
-# client-app
+# BootGen Editor
 
 ## Project setup
 ```

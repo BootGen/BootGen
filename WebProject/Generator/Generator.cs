@@ -24,7 +24,7 @@ namespace WebProject.Generator
             {
                 yield return new GeneratedFile {
                     Name = $"{Api.DataModel.Classes[idx].Name}.cs",
-                    Path = "models",
+                    Path = "server/models",
                     Content = content
                 };
                 idx += 1;
@@ -48,7 +48,7 @@ namespace WebProject.Generator
         {
             return new GeneratedFile {
                 Name = "DataContext.cs",
-                Path = "",
+                Path = "server",
                 Content = Gen.Render("templates/dataContext.sbn", new Dictionary<string, object> {
                 {"classes", Api.DataModel.StoredClasses},
                 {"seedList", seedStore.All()},
