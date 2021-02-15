@@ -9,7 +9,7 @@
         <v-btn class="mr-1" color="primary" small @click="newProject"><v-icon>mdi-plus</v-icon></v-btn>
       </div>
     </div>
-    <v-snackbar v-model="snackbar.visible" :color="snackbar.type" timeout="5000" top>
+    <v-snackbar v-model="snackbar.visible" :color="snackbar.type" timeout="5000" bottom>
       <v-layout align-center justify-space-between>
         <div class="d-flex align-center">
           <v-icon class="pr-3" dark large>{{ snackbar.icon }}</v-icon>
