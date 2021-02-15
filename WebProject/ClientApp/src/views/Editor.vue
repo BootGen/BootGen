@@ -4,8 +4,7 @@
       <div class="d-flex align-center flex-wrap">
         <v-toolbar-title class="font-weight-light">Editing -</v-toolbar-title>
         <v-text-field v-model="activeProject.name" placeholder="Name your project" type="text" required></v-text-field>
-        <v-btn class="mr-1" color="primary" small v-if="$store.state.jwt" @click="save">Save</v-btn>
-        <div class="mr-1" v-else>for save <a href="/">sign in</a></div>
+        <div class="mr-1" v-if="!$store.state.jwt">for save <a href="/">sign in</a></div>
         <v-btn class="mr-1" color="primary" small @click="close">Cancel</v-btn>
         <v-btn class="mr-1" color="primary" small @click="newProject"><v-icon>mdi-plus</v-icon></v-btn>
       </div>
@@ -32,16 +31,24 @@
               <div>
                 <v-tooltip bottom>
                   <template v-slot:activator="{ on, attrs }">
-                    <v-btn class="ml-2" color="white" elevation="1" fab small @click="openHelp = true" v-bind="attrs" v-on="on">
+                    <v-btn class="ml-2 mr-2" color="white" elevation="1" fab small @click="openHelp = true" v-bind="attrs" v-on="on">
                       <v-icon color="primary">mdi-help</v-icon>
                     </v-btn>
                     </template>
                   <span>Help</span>
                 </v-tooltip>
                 <help-dialog v-if="openHelp" @close-help="openHelp = false"></help-dialog>
-                <v-tooltip bottom>
+                <v-tooltip bottom v-if="$store.state.jwt">
                   <template v-slot:activator="{ on, attrs }">
-                    <v-btn class="ml-2 mr-2" color="white" elevation="1" fab small @click="openExplorer = true" v-bind="attrs" v-on="on">
+                    <v-btn class="mr-2" color="white" elevation="1" fab small @click="save" v-bind="attrs" v-on="on">
+                      <v-icon color="primary">mdi-floppy</v-icon>
+                    </v-btn>
+                    </template>
+                  <span>Save</span>
+                </v-tooltip>
+                <v-tooltip bottom v-if="$store.state.jwt">
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-btn class="mr-2" color="white" elevation="1" fab small @click="openExplorer = true" v-bind="attrs" v-on="on">
                       <v-icon color="primary">mdi-file-multiple</v-icon>
                     </v-btn>
                     </template>
