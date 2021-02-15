@@ -47,12 +47,6 @@
         <v-icon v-else>mdi-view-quilt</v-icon>
       </v-btn>
       <v-toolbar-title class="hidden-sm-and-down font-weight-light" v-if="$route.name !== 'Editor'">{{ $route.name }}</v-toolbar-title>
-      
-      <v-spacer v-if="$route.name !== 'Editor'"></v-spacer>
-      
-      <v-btn class="ml-2" v-if="this.$store.state.jwt && $route.name !== 'Editor'" min-width="0" text to="/profile">
-        <v-icon>mdi-account</v-icon>
-      </v-btn>
     </v-app-bar>
 
     <v-main>

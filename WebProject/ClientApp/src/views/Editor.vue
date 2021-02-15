@@ -9,9 +9,6 @@
         <v-btn class="mr-1" color="primary" small @click="close">Cancel</v-btn>
         <v-btn class="mr-1" color="primary" small @click="newProject"><v-icon>mdi-plus</v-icon></v-btn>
       </div>
-      <v-btn class="ml-2" v-if="$store.state.jwt" min-width="0" text to="/profile">
-        <v-icon>mdi-account</v-icon>
-      </v-btn>
     </div>
     <v-snackbar v-model="snackbar.visible" :color="snackbar.type" timeout="5000" top>
       <v-layout align-center justify-space-between>
