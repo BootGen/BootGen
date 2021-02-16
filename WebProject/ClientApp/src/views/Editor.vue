@@ -1,25 +1,6 @@
 <template>
   <v-container fluid>
-    <div class="toolBar d-flex align-center justify-space-between">
-      <div class="d-flex align-center flex-wrap">
-        <v-toolbar-title class="font-weight-light">Editing -</v-toolbar-title>
-        <v-text-field v-model="activeProject.name" placeholder="Name your project" type="text" required></v-text-field>
-        <div class="mr-1" v-if="!$store.state.jwt">for save <a href="/">sign in</a></div>
-        <v-btn class="mr-1" color="primary" small @click="close">Cancel</v-btn>
-        <v-btn class="mr-1" color="primary" small @click="newProject"><v-icon>mdi-plus</v-icon></v-btn>
-      </div>
-    </div>
-    <v-snackbar v-model="snackbar.visible" :color="snackbar.type" timeout="5000" bottom>
-      <v-layout align-center justify-space-between>
-        <div class="d-flex align-center">
-          <v-icon class="pr-3" dark large>{{ snackbar.icon }}</v-icon>
-          <div>{{ snackbar.text }}</div>
-        </div>
-        <v-btn icon @click="snackbar.visible = false">
-          <v-icon>mdi-close-thick</v-icon>
-        </v-btn>
-      </v-layout>
-    </v-snackbar>
+    <head-bar :activeProject="activeProject" @new-project="newProject" @change-project-name="changeProjectName" @close="close"></head-bar>
     <v-row class="d-flex align-center">
       <v-col cols="12" md="6" class="pr-0 pl-0">
         <base-material-generator-card>
@@ -38,6 +19,14 @@
                   <span>Help</span>
                 </v-tooltip>
                 <help-dialog v-if="openHelp" @close-help="openHelp = false"></help-dialog>
+                <v-tooltip bottom v-if="$store.state.jwt">
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-btn class="mr-2" color="white" elevation="1" fab small @click="close" v-bind="attrs" v-on="on">
+                      <v-icon color="primary">mdi-undo</v-icon>
+                    </v-btn>
+                    </template>
+                  <span>Undo all changes</span>
+                </v-tooltip>
                 <v-tooltip bottom v-if="$store.state.jwt">
                   <template v-slot:activator="{ on, attrs }">
                     <v-btn class="mr-2" color="white" elevation="1" fab small @click="save" v-bind="attrs" v-on="on">
@@ -81,6 +70,7 @@
         <file-reader :files="generatedFiles"></file-reader>
       </v-col>
     </v-row>
+    <snackbar v-if="snackbar.visible" :snackbar="snackbar"></snackbar>
   </v-container>
 </template>
 
@@ -89,6 +79,8 @@ import Vue from "vue";
 import FileReader from "../components/FileReader.vue";
 import FileExplorer from "../components/FileExplorer.vue";
 import HelpDialog from "../components/HelpDialog.vue";
+import HeadBar from "../components/HeadBar.vue";
+import Snackbar from "../components/Snackbar.vue";
 import { Project } from "../models/Project";
 import { GeneratedFile } from "../models/GeneratedFile";
 import { codemirror } from 'vue-codemirror'
@@ -102,6 +94,8 @@ export default Vue.extend({
     FileReader,
     FileExplorer,
     HelpDialog,
+    HeadBar,
+    Snackbar,
     codemirror
   },
   created: async function(){
@@ -124,11 +118,13 @@ export default Vue.extend({
         line: true,
       },
       snackbar: {
+        dissmissable: true,
         visible: false,
         type: "",
         icon: "mdi-alert-circle",
         text: "",
       },
+      projectName: "",
     };
   },
   methods: {
@@ -175,6 +171,9 @@ export default Vue.extend({
       return null;
     },
     save: async function (){
+      if(this.projectName !== ""){
+        this.activeProject.name = this.projectName;
+      }
       if(this.activeProject.name){
         const exists = this.existsProjectName();
         if(!exists && this.activeProject.id === -1){
@@ -207,7 +206,10 @@ export default Vue.extend({
       this.snackbar.type = "info";
       this.snackbar.text = "Restored everything to its previous state!";
       this.snackbar.visible = true;
-    }
+    },
+    changeProjectName: function(name: string){
+      this.projectName = name;
+    },
   },
 });
 </script>
@@ -223,19 +225,5 @@ export default Vue.extend({
   }
   .CodeMirror{
     height: 100%;z-index: 0;
-  }
-  .toolBar {
-    position: absolute;
-    top: -75px;
-    left: 85px;
-    width: calc(100% - 85px);
-    z-index: 5;
-  }
-
-  .toolBar .v-input {
-    max-width: 200px;
-    padding-right: 10px;
-    padding-left: 10px;
-  }
-  
+  }  
 </style>
