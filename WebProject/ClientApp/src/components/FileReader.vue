@@ -2,8 +2,15 @@
   <base-material-generator-card>
     <template v-slot:heading>
       <div class="d-flex display-1 font-weight-light align-center justify-space-between pa-2">
-        <span class="text-break" v-if="activeFile && activeFile.name">{{ activeFile.path }}/{{ activeFile.name }}</span>
-        <span v-else>Select a file</span>
+        <div class="text-break" v-if="activeFile && activeFile.name">
+          <span v-for="(part, i) in activeFile.path.split('/')" :key="i" @click="openFolder(i+1)">
+            {{ part }}/
+          </span>
+          <span @click="openFolder(activeFile.path.split('/').length)">
+            {{ activeFile.name }}
+          </span>
+        </div>
+        <div v-else @click="drawer = true">Select a file</div>
         <div class="d-flex">
           <v-tooltip bottom>
             <template v-slot:activator="{ on, attrs }">
@@ -31,8 +38,8 @@
             <span>Settings</span>
           </v-tooltip>
           <settings-dialog v-if="openSettings" @close-settings="openSettings = false"></settings-dialog>
-          <v-col class="d-flex fileSelector" v-if="drawer" v-click-outside="closeTreeView">
-            <tree-view :files="files" @select-file="selectFile"></tree-view>
+          <v-col class="d-flex fileSelector" v-if="drawer"><!--v-click-outside="closeTreeView"-->
+            <tree-view :files="files" :openPath="openPath" @select-file="selectFile"></tree-view>
           </v-col>
         </div>
       </div>
@@ -100,9 +107,20 @@ export default Vue.extend({
         line: true,
         readOnly: true,
       },
+      openPath: "",
     };
   },
   methods: {
+    openFolder: function(idx: number){
+      this.openPath = "";
+      for(let i = 0; i < idx; i++){
+        if(this.activeFile.path.split('/')[i]){
+          this.openPath += this.activeFile.path.split('/')[i]+"/";
+        }
+      }
+      this.openPath = this.openPath.slice(0, -1);
+      this.drawer = true;
+    },
     selectFile: function(data: GeneratedFile){
       this.activeFile = data;
       if(this.activeFile.name.split('.')[1] === "cs"){

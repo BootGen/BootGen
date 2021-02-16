@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<v-treeview class="text-break" active-class="info--text" :items="tree.children" @update:active="selectFile" return-object activatable hoverable dense open-on-click></v-treeview>
+		<v-treeview class="text-break" active-class="info--text" :items="tree.children" :open.sync="tree.open" @update:active="selectFile" return-object activatable hoverable dense open-on-click></v-treeview>
 	</div>
 </template>
 
@@ -19,18 +19,37 @@ export default Vue.extend({
 		files: {
 			type: Array as () => GeneratedFile[]
 		},
+		openPath: {
+			type: String
+		}
 	},
+	watch: {
+    openPath: {
+      handler(openPath: string) {
+        this.init();
+      }
+    }
+  },
   data: function () {
     return {
-		tree: {id: 0, name: "Root", children: []},
-		filesById: Array<GeneratedFile>(),
-		id: 0,
+			tree: {id: 0, name: "Root", children: [], open: [] as Array<number>},
+			filesById: Array<GeneratedFile>(),
+			id: 0,
     };
 	},
 	created: function (){
 		this.files.forEach(file => this.addToTree(file));
+		this.init();
 	},
   methods: {
+		init: function(){
+			if(this.openPath){
+				this.tree.open = [];
+				this.setOpenFolder(this.openPath.split("/"), this.tree.children);
+				console.log("tree: ", this.tree.open);
+				console.log("tree: ", JSON.stringify(this.tree.open));
+			}
+		},
 		getChild: function(node: Node, name: string): Node | null{
 			if(!node.children){
 				return null;
@@ -67,6 +86,25 @@ export default Vue.extend({
 				currentNode.children.push({id: ++this.id, name: file.name});
 			}
 			this.filesById[this.id] = file;
+		},
+		setOpenFolder: function(path: string[], node: Node[]){
+			console.log("PATH:", path);
+			if(!this.tree.open){
+				this.tree.open = [];
+			}
+			for(let i = 0; i < path.length; i++){
+				for(let j = 0; j < node.length; j++){
+					console.log({path: path[i], node: node[j].name});
+					if(path[i] === node[j].name){
+						this.tree.open.push(node[j].id);
+						path.shift();
+						const nodeChildren = node[j].children;
+						if(nodeChildren && path){
+							this.setOpenFolder(path, nodeChildren);
+						}
+					}
+				}
+			}
 		},
 		getFile: function(node: Node){
 			return this.filesById[node.id];
