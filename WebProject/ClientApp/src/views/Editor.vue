@@ -1,6 +1,10 @@
 <template>
-  <v-container fluid>
-    <head-bar :activeProject="activeProject" @new-project="newProject" @change-project-name="changeProjectName" @close="close"></head-bar>
+  <v-container fluid class="editor">
+    <v-row class="d-flex align-center">
+      <v-col lg="5" md="6" sm="8" cols="12" class="pa-0 headBar">
+        <head-bar :activeProject="activeProject" @new-project="newProject" @change-project-name="changeProjectName" @close="close"></head-bar>
+      </v-col>
+    </v-row>
     <v-row class="d-flex align-center">
       <v-col cols="12" md="6" class="pr-0 pl-0">
         <base-material-generator-card>
@@ -9,10 +13,10 @@
               <div class="display-1 font-weight-light pa-2">
                 JSON
               </div>
-              <div>
+              <div class="icons">
                 <v-tooltip bottom>
                   <template v-slot:activator="{ on, attrs }">
-                    <v-btn class="ml-2 mr-2" color="white" elevation="1" fab small @click="openHelp = true" v-bind="attrs" v-on="on">
+                    <v-btn class="mr-2" color="white" elevation="1" fab small @click="openHelp = true" v-bind="attrs" v-on="on">
                       <v-icon color="primary">mdi-help</v-icon>
                     </v-btn>
                     </template>
@@ -46,7 +50,7 @@
                 <file-explorer v-if="$store.state.jwt && openExplorer" @select-project="selectProject" @close-explorer="openExplorer = false"></file-explorer>
                 <v-tooltip bottom>
                   <template v-slot:activator="{ on, attrs }">
-                    <v-btn color="white" elevation="1" fab small :disabled="activeProject.json == ''" @click="prettyPrint(activeProject.json)" v-bind="attrs" v-on="on">
+                    <v-btn class="mr-2" color="white" elevation="1" fab small :disabled="activeProject.json == ''" @click="prettyPrint(activeProject.json)" v-bind="attrs" v-on="on">
                       <v-icon color="primary">mdi-format-align-left</v-icon>
                     </v-btn>
                   </template>
@@ -54,7 +58,7 @@
                 </v-tooltip>
                 <v-tooltip bottom>
                   <template v-slot:activator="{ on, attrs }">
-                    <v-btn class="ml-2" color="white" elevation="1" fab small :disabled="activeProject.json == ''" @click="setJson(activeProject.json)" v-bind="attrs" v-on="on">
+                    <v-btn class="mr-2" color="white" elevation="1" fab small :disabled="activeProject.json == ''" @click="setJson(activeProject.json)" v-bind="attrs" v-on="on">
                       <v-icon color="primary">mdi-arrow-right-bold</v-icon>
                     </v-btn>
                     </template>
@@ -225,5 +229,30 @@ export default Vue.extend({
   }
   .CodeMirror{
     height: 100%;z-index: 0;
-  }  
+  }
+  .editor{
+    position: relative;
+    top: -30px;
+  }
+  .headBar{
+    margin: 0;
+    margin-left: 20px;
+  }
+  @media screen and (max-width: 960px) {
+    .headBar {
+      margin-left: 60px;
+    }
+  }
+  @media screen and (max-width: 600px) {
+    .headBar {
+      margin-top: 60px;
+      margin-left: 15px;
+    }
+    .icons button{
+      margin-top: 5px;
+    }
+  }
+  header {
+    position: absolute!important;
+  }
 </style>
