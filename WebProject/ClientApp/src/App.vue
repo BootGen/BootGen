@@ -100,11 +100,13 @@ export default {
   .v-application--wrap{
     background-color: #ededed;
   }
+  .v-application--wrap nav{
+    z-index: 999;
+  }
   header{
     position: inherit!important;
   }
   main{
     padding-top: unset!important;
   }
-
 </style>

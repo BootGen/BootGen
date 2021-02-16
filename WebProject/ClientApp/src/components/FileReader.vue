@@ -1,50 +1,44 @@
 <template>
-  <v-container fluid>
-    <v-row>
-      <v-col cols="12" class="pa-0">
-        <base-material-generator-card>
-          <template v-slot:heading>
-            <div class="d-flex display-1 font-weight-light align-center justify-space-between pa-2">
-              <span class="text-break" v-if="activeFile && activeFile.name">{{ activeFile.path }}/{{ activeFile.name }}</span>
-              <span v-else>Select a file</span>
-              <div class="d-flex">
-                <v-tooltip bottom>
-                  <template v-slot:activator="{ on, attrs }">
-                    <v-btn color="white" class="mr-2" elevation="1" fab small v-bind="attrs" v-on="on">
-                      <v-icon color="primary">mdi-download</v-icon>
-                    </v-btn>
-                  </template>
-                  <span>Download</span>
-                </v-tooltip>
-                <v-tooltip bottom>
-                  <template v-slot:activator="{ on, attrs }">
-                    <v-btn color="white" @click="drawer = !drawer" elevation="1" fab small v-bind="attrs" v-on="on">
-                      <v-icon color="primary" v-if="drawer">mdi-folder-open</v-icon>
-                      <v-icon color="primary" v-else>mdi-folder</v-icon>
-                    </v-btn>
-                  </template>
-                  <span>Files</span>
-                </v-tooltip>                
-                <v-tooltip bottom>
-                  <template v-slot:activator="{ on, attrs }">
-                    <v-btn class="ml-2 mr-2" color="white" elevation="1" fab small @click="openSettings = true" v-bind="attrs" v-on="on">
-                      <v-icon color="primary">mdi-cog</v-icon>
-                    </v-btn>
-                    </template>
-                  <span>Settings</span>
-                </v-tooltip>
-                <settings-dialog v-if="openSettings" @close-settings="openSettings = false"></settings-dialog>
-                <v-col class="d-flex fileSelector" v-if="drawer" v-click-outside="closeTreeView">
-                  <tree-view :files="files" @select-file="selectFile"></tree-view>
-                </v-col>
-              </div>
-            </div>
-          </template>
-          <codemirror v-model="activeFile.content" :options="cmOptions" />
-        </base-material-generator-card>
-      </v-col>
-    </v-row>
-  </v-container>
+  <base-material-generator-card>
+    <template v-slot:heading>
+      <div class="d-flex display-1 font-weight-light align-center justify-space-between pa-2">
+        <span class="text-break" v-if="activeFile && activeFile.name">{{ activeFile.path }}/{{ activeFile.name }}</span>
+        <span v-else>Select a file</span>
+        <div class="d-flex">
+          <v-tooltip bottom>
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn color="white" class="mr-2" elevation="1" fab small v-bind="attrs" v-on="on">
+                <v-icon color="primary">mdi-download</v-icon>
+              </v-btn>
+            </template>
+            <span>Download</span>
+          </v-tooltip>
+          <v-tooltip bottom>
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn color="white" @click="drawer = !drawer" elevation="1" fab small v-bind="attrs" v-on="on">
+                <v-icon color="primary" v-if="drawer">mdi-folder-open</v-icon>
+                <v-icon color="primary" v-else>mdi-folder</v-icon>
+              </v-btn>
+            </template>
+            <span>Files</span>
+          </v-tooltip>                
+          <v-tooltip bottom>
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn class="ml-2 mr-2" color="white" elevation="1" fab small @click="openSettings = true" v-bind="attrs" v-on="on">
+                <v-icon color="primary">mdi-cog</v-icon>
+              </v-btn>
+              </template>
+            <span>Settings</span>
+          </v-tooltip>
+          <settings-dialog v-if="openSettings" @close-settings="openSettings = false"></settings-dialog>
+          <v-col class="d-flex fileSelector" v-if="drawer" v-click-outside="closeTreeView">
+            <tree-view :files="files" @select-file="selectFile"></tree-view>
+          </v-col>
+        </div>
+      </div>
+    </template>
+    <codemirror v-model="activeFile.content" :options="cmOptions" />
+  </base-material-generator-card>
 </template>
 
 <script lang="ts">

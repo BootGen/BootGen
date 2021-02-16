@@ -5,7 +5,7 @@
         <div class="d-flex align-center flex-wrap" v-if="$store.state.jwt">
           <v-toolbar-title class="font-weight-light mr-2">Editor -</v-toolbar-title>
           <v-text-field v-model="activeProject.name" placeholder="Name your project" type="text" required @input="changeName"></v-text-field>
-          <v-btn class="ml-2" color="primary" small @click="newProject"><v-icon>mdi-plus</v-icon></v-btn>
+          <v-btn class="mr-0 ml-3" color="primary" small @click="newProject"><v-icon>mdi-plus</v-icon></v-btn>
         </div>
         <div class="d-flex align-center justify-space-between" v-else>
           <v-toolbar-title class="font-weight-light mr-2">Editor</v-toolbar-title>

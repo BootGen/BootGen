@@ -1,6 +1,6 @@
 <template>
   <v-container fluid class="editor">
-    <v-row class="d-flex align-center">
+    <v-row class="d-flex align-center ma-0 pa-0">
       <v-col lg="5" md="6" sm="8" cols="12" class="pa-0 headBar">
         <head-bar :activeProject="activeProject" @new-project="newProject" @change-project-name="changeProjectName" @close="close"></head-bar>
       </v-col>
@@ -221,32 +221,39 @@ export default Vue.extend({
 <style lang="css">
   .vue-codemirror{
     width: 100%;
-    height: calc(100% - 41px);
+    height: calc(100% - 40px);
+    margin-bottom: 0!important;
+    padding-bottom: 0!important;
   }
   .CodeMirror-scroll{
-    margin: 0!important;
     overflow: auto!important;
+    margin: 0!important;
+    padding: 0!important;
   }
   .CodeMirror{
-    height: 100%;z-index: 0;
+    height: 100%;
+    z-index: 0;
   }
   .editor{
+    margin: 0!important;
+    padding: 0!important;
     position: relative;
     top: -30px;
   }
   .headBar{
-    margin: 0;
-    margin-left: 20px;
+    margin-left: 40px;
+    margin-top: 7px;
+    z-index: 99;
   }
   @media screen and (max-width: 960px) {
     .headBar {
-      margin-left: 60px;
+      margin-left: 70px;
     }
   }
   @media screen and (max-width: 600px) {
     .headBar {
       margin-top: 60px;
-      margin-left: 15px;
+      margin-left: unset;
     }
     .icons button{
       margin-top: 5px;

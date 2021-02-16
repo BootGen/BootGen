@@ -2,8 +2,8 @@
   <v-card
     v-bind="$attrs"
     :class="classes"
-    style="height: 530px;"
-    class="v-card--material pa-2"
+    style="height: calc(100vh - 185px);"
+    class="v-card--material pa-2 mb-0 mr-2 ml-2"
   >
     <div class="d-flex grow flex-wrap">
       <v-avatar
