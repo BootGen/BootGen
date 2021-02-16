@@ -41,7 +41,7 @@
       </v-list>
     </v-navigation-drawer>
 
-    <v-app-bar app color="transparent" flat height="75">
+    <v-app-bar app color="transparent" flat height="75" class="navPosition" :data-value="$route.name !== 'Editor'">
       <v-btn class="mr-3" @click="drawer = !drawer" elevation="1" fab small>
         <v-icon v-if="drawer">mdi-dots-vertical</v-icon>
         <v-icon v-else>mdi-view-quilt</v-icon>
@@ -103,10 +103,13 @@ export default {
   .v-application--wrap nav{
     z-index: 999;
   }
-  header{
-    position: inherit!important;
-  }
   main{
     padding-top: unset!important;
+  }
+  .navPosition[data-value=true]{
+    position: inherit!important;
+  }
+  .navPosition[data-value=false]{
+    position: absolute!important;
   }
 </style>
