@@ -44,7 +44,7 @@ export default {
   actions: {
     getProjects: function(context: Context): Promise<Array<Project>> {
       return new Promise((resolve, reject) => {
-        axios.get(`projects`, config(context.rootState.jwt)).then(response => {
+        axios.get(`projects`, config(context.rootState.auth.jwt)).then(response => {
           context.commit("setProjects", response.data);
           resolve(context.state.items);
         }).catch(reason => {
@@ -54,7 +54,7 @@ export default {
     },
     getProject: function(context: Context, id: number): Promise<Project> {
       return new Promise((resolve, reject) => {
-        axios.get(`projects/${id}`, config(context.rootState.jwt)).then(response => {
+        axios.get(`projects/${id}`, config(context.rootState.auth.jwt)).then(response => {
           context.commit("setProject", response.data);
           const savedItem = findById<Project>(context.state.items, response.data.id);
           if (savedItem)
@@ -66,7 +66,7 @@ export default {
     },
     addProject: function(context: Context, project: Project): Promise<Project> {
       return new Promise((resolve, reject) => {
-        axios.post(`projects`, projectToDto(project), config(context.rootState.jwt)).then(response => {
+        axios.post(`projects`, projectToDto(project), config(context.rootState.auth.jwt)).then(response => {
           context.commit("setProject", response.data);
           const savedItem = findById<Project>(context.state.items, response.data.id);
           if (savedItem)
@@ -78,7 +78,7 @@ export default {
     },
     updateProject: function(context: Context, project: Project): Promise<Project> {
       return new Promise((resolve, reject) => {
-        axios.put(`projects/${project.id}`, projectToDto(project), config(context.rootState.jwt)).then(response => {
+        axios.put(`projects/${project.id}`, projectToDto(project), config(context.rootState.auth.jwt)).then(response => {
           context.commit("setProject", response.data);
           const savedItem = findById<Project>(context.state.items, response.data.id);
           if (savedItem)
@@ -92,7 +92,7 @@ export default {
       context.commit("setProjects", context.state.items.filter((i: Project) => i !== project));
 
       return new Promise((resolve, reject) => {
-        axios.delete(`projects/${project.id}`, config(context.rootState.jwt)).then(() => {
+        axios.delete(`projects/${project.id}`, config(context.rootState.auth.jwt)).then(() => {
           resolve()
         }).catch(reason => {
           reject(reason);
@@ -101,7 +101,7 @@ export default {
     },
     getProjectsOfUser: function(context: Context, user: User): Promise<Array<Project>> {
       return new Promise((resolve, reject) => {
-        axios.get(`users/${user.id}/projects`, config(context.rootState.jwt)).then(response => {
+        axios.get(`users/${user.id}/projects`, config(context.rootState.auth.jwt)).then(response => {
           context.commit("patchProjects", response.data);
           resolve(findObjectsById(context.state.items, response.data));
         }).catch(reason => {

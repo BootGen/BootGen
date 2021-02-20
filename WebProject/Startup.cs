@@ -42,8 +42,6 @@ namespace WebProject
                                 });
             });
 
-            services.AddSpaStaticFiles(opt => opt.RootPath = "ClientApp/dist");
-
             services.AddControllers();
 
             services.AddAuthentication(option =>
@@ -95,7 +93,6 @@ namespace WebProject
             {
                 endpoints.MapControllers();
             });
-            app.UseSpaStaticFiles();
             app.UseSpa(spa =>
             {
                 if (env.IsDevelopment())

@@ -1,7 +1,7 @@
 <template>
   <v-container fluid>
     <v-row>
-      <v-col cols="8" v-if="$root.$data.user">
+      <v-col cols="8" v-if="$store.state.auth.user">
         <h2>Goodbye!</h2>
       </v-col>
     </v-row>

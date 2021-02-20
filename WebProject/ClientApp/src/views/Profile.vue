@@ -1,6 +1,6 @@
 <template>
   <v-container id="user-profile" fluid tag="section">
-    <v-row justify="center" v-if="$root.$data.user">
+    <v-row justify="center" v-if="$store.state.auth.user">
       <v-col cols="12" md="8">
         <base-material-card>
           <template v-slot:heading>
@@ -21,14 +21,14 @@
                     <ValidationProvider v-slot="{ errors }" name="user name" rules="required">
                       <v-text-field
                         label="User Name"
-                        v-model="$root.$data.user.userName"
+                        v-model="$store.state.auth.user.userName"
                         :error-messages="errors"
                       ></v-text-field>
                     </ValidationProvider>
                     <ValidationProvider v-slot="{ errors }" name="email" rules="required|email">
                       <v-text-field
                         label="Email Address"
-                        v-model="$root.$data.user.email"
+                        v-model="$store.state.auth.user.email"
                         :error-messages="errors"
                       ></v-text-field>
                     </ValidationProvider>
@@ -54,11 +54,11 @@
         >
           <v-card-text class="text-center">
             <h4 class="display-2 font-weight-light mb-3 black--text">
-              {{ $root.$data.user.userName }}
+              {{ $store.state.auth.user.userName }}
             </h4>
 
             <p class="font-weight-light grey--text">
-              {{ $root.$data.user.email }}
+              {{ $store.state.auth.user.email }}
             </p>
 
             <v-btn color="primary" rounded class="mr-0" to="/change-password">
@@ -92,8 +92,8 @@ export default Vue.extend({
     ValidationObserver,
   },
   mounted: async function() {
-    if(this.$store.state.jwt){
-      this.$root.$data.user = await this.$store.dispatch("profile");
+    if(this.$store.state.auth.jwt){
+      this.$store.state.auth.user = await this.$store.dispatch("profile");
     }
   },
   data: function () {
@@ -106,7 +106,7 @@ export default Vue.extend({
   methods: {
     saveUser: async function () {
       this.successMsg = "";
-      const response = await this.$store.dispatch("updateProfile", this.$root.$data.user);
+      const response = await this.$store.dispatch("updateProfile", this.$store.state.auth.user);
       if (response.isUserNameInUse) {
         this.errorMsg = "This user name already exists!";
       } else if (response.isEmailInUse) {

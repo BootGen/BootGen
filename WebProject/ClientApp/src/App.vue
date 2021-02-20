@@ -66,7 +66,7 @@ export default {
   computed: {
     ...mapState(['barColor', 'barImage']),
     items: function () {
-      if (this.$store.state.jwt) {
+      if (this.$store.state.auth.jwt) {
         return [
           { title: "Editor", link: "/", icon: "mdi-cog" },
           { title: "Profile", link: "/profile", icon: "mdi-account" },

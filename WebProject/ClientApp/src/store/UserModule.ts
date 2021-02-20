@@ -38,7 +38,7 @@ export default {
   actions: {
     getUsers: function(context: Context): Promise<Array<User>> {
       return new Promise((resolve, reject) => {
-        axios.get(`users`, config(context.rootState.jwt)).then(response => {
+        axios.get(`users`, config(context.rootState.auth.jwt)).then(response => {
           context.commit("setUsers", response.data);
           resolve(context.state.items);
         }).catch(reason => {
@@ -48,7 +48,7 @@ export default {
     },
     getUser: function(context: Context, id: number): Promise<User> {
       return new Promise((resolve, reject) => {
-        axios.get(`users/${id}`, config(context.rootState.jwt)).then(response => {
+        axios.get(`users/${id}`, config(context.rootState.auth.jwt)).then(response => {
           context.commit("setUser", response.data);
           const savedItem = findById<User>(context.state.items, response.data.id);
           if (savedItem)

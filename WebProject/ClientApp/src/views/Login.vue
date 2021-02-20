@@ -90,7 +90,7 @@ export default Vue.extend({
           password: this.password,
         });
         this.$store.commit("setJwt", response.jwt);
-        this.$root.$data.user = response.user;
+        this.$store.state.auth.user = response.user;
         this.$router.push("profile");
       } catch (reason) {
         this.errorMsg = "Incorrect email or password";

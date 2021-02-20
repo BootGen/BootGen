@@ -1,6 +1,6 @@
 <template>
   <v-container id="user-profile" fluid tag="section">
-    <v-row justify="center" v-if="$root.$data.user">
+    <v-row justify="center" v-if="$store.state.auth.user">
       <v-col cols="12" md="8">
         <base-material-card>
           <template v-slot:heading>
@@ -76,11 +76,11 @@
         >
           <v-card-text class="text-center">
             <h4 class="display-2 font-weight-light mb-3 black--text">
-              {{ $root.$data.user.userName }}
+              {{ $store.state.auth.user.userName }}
             </h4>
 
             <p class="font-weight-light grey--text">
-              {{ $root.$data.user.email }}
+              {{ $store.state.auth.user.email }}
             </p>
 
             <v-btn color="primary" rounded class="mr-0" to="/profile">
@@ -137,7 +137,7 @@ export default Vue.extend({
       this.errorMsg = "";
       try {
             await this.$store.dispatch("changePassword", {
-                user: this.$root.$data.user,
+                user: this.$store.state.auth.user,
                 oldPassword: this.oldPassword,
                 newPassword: this.newPassword,
             });

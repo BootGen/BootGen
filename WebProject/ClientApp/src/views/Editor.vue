@@ -1,7 +1,7 @@
 <template>
   <v-container fluid class="editor">
     <v-row class="d-flex align-center ma-0 pa-0">
-      <v-col lg="5" md="6" sm="8" cols="12" class="pa-0 headBar" v-if="$store.state.jwt">
+      <v-col lg="5" md="6" sm="8" cols="12" class="pa-0 headBar" v-if="$store.state.auth.jwt">
         <head-bar :activeProject="activeProject" @new-project="newProject" @change-project-name="changeProjectName" @close="close"></head-bar>
       </v-col>
       <v-col cols="12" class="headBar pl-0 pt-6" v-else>
@@ -26,7 +26,7 @@
                   <span>Help</span>
                 </v-tooltip>
                 <help-dialog v-if="openHelp" @close-help="openHelp = false"></help-dialog>
-                <v-tooltip bottom v-if="$store.state.jwt">
+                <v-tooltip bottom v-if="$store.state.auth.jwt">
                   <template v-slot:activator="{ on, attrs }">
                     <v-btn class="mr-2" color="white" elevation="1" fab small @click="close" v-bind="attrs" v-on="on">
                       <v-icon color="primary">mdi-undo</v-icon>
@@ -34,7 +34,7 @@
                     </template>
                   <span>Undo all changes</span>
                 </v-tooltip>
-                <v-tooltip bottom v-if="$store.state.jwt">
+                <v-tooltip bottom v-if="$store.state.auth.jwt">
                   <template v-slot:activator="{ on, attrs }">
                     <v-btn class="mr-2" color="white" elevation="1" fab small @click="save" v-bind="attrs" v-on="on">
                       <v-icon color="primary">mdi-floppy</v-icon>
@@ -42,7 +42,7 @@
                     </template>
                   <span>Save</span>
                 </v-tooltip>
-                <v-tooltip bottom v-if="$store.state.jwt">
+                <v-tooltip bottom v-if="$store.state.auth.jwt">
                   <template v-slot:activator="{ on, attrs }">
                     <v-btn class="mr-2" color="white" elevation="1" fab small @click="openExplorer = true" v-bind="attrs" v-on="on">
                       <v-icon color="primary">mdi-file-multiple</v-icon>
@@ -50,7 +50,7 @@
                     </template>
                   <span>Files</span>
                 </v-tooltip>
-                <file-explorer v-if="$store.state.jwt && openExplorer" @select-project="selectProject" @close-explorer="openExplorer = false"></file-explorer>
+                <file-explorer v-if="$store.state.auth.jwt && openExplorer" @select-project="selectProject" @close-explorer="openExplorer = false"></file-explorer>
                 <v-tooltip bottom>
                   <template v-slot:activator="{ on, attrs }">
                     <v-btn class="mr-2" color="white" elevation="1" fab small :disabled="activeProject.json == ''" @click="prettyPrint(activeProject.json)" v-bind="attrs" v-on="on">
@@ -149,7 +149,7 @@ export default Vue.extend({
       const generate = await this.$store.dispatch("generate", this.$store.state.projectSettings.item);
       this.generatedFiles = generate.generatedFiles;
       this.activeProject.json = json;
-      if(this.$root.$data.user && this.activeProject.id >= 0){
+      if(this.$store.state.auth.user && this.activeProject.id >= 0){
         await this.$store.dispatch("projects/updateProject", this.activeProject);
       }
       this.prettyPrint(this.activeProject.json);
@@ -187,7 +187,7 @@ export default Vue.extend({
           this.snackbar.type = "success";
           this.snackbar.text = "The new project was successfully created!";
           this.activeProject.id = 0;
-          this.activeProject.ownerId = this.$root.$data.user.id;
+          this.activeProject.ownerId = this.$store.state.auth.user.id;
           this.activeProject = await this.$store.dispatch("projects/addProject", this.activeProject);
         }else if(exists && exists.id !== this.activeProject.id){
           this.snackbar.type = "error";

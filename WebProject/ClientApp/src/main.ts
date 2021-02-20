@@ -26,8 +26,8 @@ new Vue({
     });
   },
   mounted: async function() {
-    if(store.state.jwt){
-      this.$root.$data.user = await this.$store.dispatch("profile");
+    if(store.state.auth.jwt){
+      await this.$store.dispatch("profile");
       await this.$store.dispatch("projects/getProjects");
     }
   },

@@ -12,13 +12,50 @@ import { userToDto } from '@/store/UserModule'
 import { config, findById } from './util';
 import { State } from '.';
 
-type Context = ActionContext<{}, State>;
+export interface AuthState {
+  jwt: string;
+  user: User | null;
+}
+type Context = ActionContext<AuthState, State>;
 export default {
+  state: {
+    jwt: "",
+    user: null
+  },
+  mutations: {
+    setJwt: function(state: AuthState, jwt: string) {
+      state.jwt = jwt
+    },
+    setUser: function(state: AuthState, user: User) {
+      state.user = user
+    }
+  },
   actions: {
+    init: function(context: Context) {
+      const jwt = localStorage.getItem("jwt")
+      if (jwt) {
+        context.dispatch('setJwt', jwt);
+      }
+    },
+    setJwt(context: Context, jwt: string) {
+      context.commit('setJwt', jwt);
+      try {
+        if (jwt) {
+          localStorage.setItem("jwt", jwt);
+        } else {
+          localStorage.removeItem("jwt");
+        } 
+      } catch {
+        console.log("Local storage is not available.")
+      }
+    },
     login: function (context: Context, data: AuthenticationData): Promise<LoginResponse> {
       return new Promise((resolve, reject) => {
         axios.post("authentication/login", data).then(response => {
-          resolve(response.data);
+          context.commit("setJwt", response.data.jwt);
+          context.dispatch("profile").then(() => {
+            resolve(response.data);
+          });
         }).catch(reason => {
           reject({
             status: reason.response.status,
@@ -43,11 +80,13 @@ export default {
     },
     profile: function (context: Context): Promise<User> {
       return new Promise((resolve, reject) => {
-        axios.get("profile/profile", config(context.rootState.jwt)).then(response => {
+        axios.get("profile/profile", config(context.state.jwt)).then(response => {
           context.commit("users/setUser", response.data);
           const savedItem = findById<User>(context.rootState.users.items, response.data.id);
-          if (savedItem)
+          if (savedItem) {
+            context.commit('setUser', savedItem);
             resolve(savedItem);
+          }
         }).catch(reason => {
           console.log(reason);
           reject({
@@ -60,7 +99,7 @@ export default {
     },
     updateProfile: function (context: Context, user: User): Promise<ProfileResponse> {
       return new Promise((resolve, reject) => {
-        axios.post("profile/update-profile", userToDto(user), config(context.rootState.jwt)).then(response => {
+        axios.post("profile/update-profile", userToDto(user), config(context.state.jwt)).then(response => {
           resolve(response.data);
         }).catch(reason => {
           reject({
@@ -73,7 +112,7 @@ export default {
     },
     changePassword: function (context: Context, data: ChangePasswordData): Promise<ChangePasswordResponse> {
       return new Promise((resolve, reject) => {
-        axios.post("profile/change-password", data, config(context.rootState.jwt)).then(response => {
+        axios.post("profile/change-password", data, config(context.state.jwt)).then(response => {
           resolve(response.data);
         }).catch(reason => {
           reject({

@@ -12,7 +12,7 @@ import store from "../store/index"
 Vue.use(VueRouter)
 
 const loggedInGuard = (to: any, from: any, next: any) => {
-  if(store.state.jwt){
+  if(store.state.auth.jwt){
     next();
   }else{
     next('/login');
@@ -20,7 +20,7 @@ const loggedInGuard = (to: any, from: any, next: any) => {
 };
 
 const loggedOutGuard = (to: any, from: any, next: any) => {
-  if(store.state.jwt){
+  if(store.state.auth.jwt){
     next('/profile');
   }else{
     next();
