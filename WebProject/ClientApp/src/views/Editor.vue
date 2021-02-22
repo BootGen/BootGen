@@ -70,7 +70,7 @@
               </div>
             </div>
           </template>
-          <codemirror v-model="activeProject.json" :options="cmOptions" />
+          <codemirror id="cm0" v-model="activeProject.json" :options="cmOptions" />
         </base-material-generator-card>
       </v-col>
       <v-col cols="12" md="6" class="pa-0">
@@ -140,23 +140,64 @@ export default Vue.extend({
       this.prettyPrint(this.activeProject.json);
     },
     setJson: async function(json: string) {
-      const data: GenerateRequest = {
-        data: json,
-        generateClient: this.$store.state.projectSettings.item.generateClient,
-        nameSpace: this.$store.state.projectSettings.item.nameSpace
-      };
-      await this.$store.dispatch("updateProjectSettings", data);
-      const generate = await this.$store.dispatch("generate", this.$store.state.projectSettings.item);
-      this.generatedFiles = generate.generatedFiles;
-      this.activeProject.json = json;
-      if(this.$store.state.auth.user && this.activeProject.id >= 0){
-        await this.$store.dispatch("projects/updateProject", this.activeProject);
+      const valid = this.validJSON(json)
+      if(valid === true){
+        const data: GenerateRequest = {
+          data: json,
+          generateClient: this.$store.state.projectSettings.item.generateClient,
+          nameSpace: this.$store.state.projectSettings.item.nameSpace
+        };
+        await this.$store.dispatch("updateProjectSettings", data);
+        const generate = await this.$store.dispatch("generate", this.$store.state.projectSettings.item);
+        this.generatedFiles = generate.generatedFiles;
+        this.activeProject.json = json;
+        if(this.$store.state.auth.user && this.activeProject.id >= 0){
+          await this.$store.dispatch("projects/updateProject", this.activeProject);
+        }
+        this.prettyPrint(this.activeProject.json);
+      }else{
+        this.highlightLine(0, this.getLine(valid.message.match(/\d+/g)[0]-1, this.activeProject.json), "red");
       }
-      this.prettyPrint(this.activeProject.json);
+    },
+    validJSON: function (text: string) {
+      try {
+        JSON.parse(text);
+        return true;
+      } catch (err) {
+        return err;
+      }
+    },
+    highlightLine: function(cmId: number, line: number, color: string){
+      console.log({line:line})
+      const elementById = document.getElementById("cm"+cmId);
+      if(elementById){
+        //console.log("selector", elementById.querySelectorAll(".CodeMirror-line"));
+        //console.log("byClassName", elementById.getElementsByClassName("CodeMirror-line"));
+        elementById.getElementsByClassName("CodeMirror-line")[line].setAttribute("style", "background-color:"+color+";");
+      }
+    },
+    getLine: function(idx: number, str: string): number{
+      let line = 0;
+      let char = 0;
+      const strArray: string[] = str.split("\n");
+      
+      for(let i = 0; i < strArray.length; i++){
+        char += strArray[i].length;
+        if(char >= idx-i){
+          line = i;
+          break;
+        }
+      }
+      return line;
     },
     prettyPrint: function(json: string){
-      json = json.replace(/'/g, "\"");
-      this.activeProject.json = JSON.stringify(JSON.parse(json),null,'\t');
+      try{
+        json = json.replace(/'/g, "\"");
+        this.activeProject.json = JSON.stringify(JSON.parse(json),null,'\t');
+      }
+      catch(err){
+        this.highlightLine(0, this.getLine(err.message.match(/\d+/g)[0]-1, this.activeProject.json), "red");
+      }
     },
     selectProject: function(project: Project){
       let select = true;
