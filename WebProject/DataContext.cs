@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 using Newtonsoft.Json.Linq;
 
 namespace WebProject
@@ -23,24 +24,28 @@ namespace WebProject
                 .WithMany()
                 .HasForeignKey(p => p.OwnerId);
 
-            modelBuilder.Entity<User>().HasData(new User {
+            var passwordHasher = new PasswordHasher<User>();
+            var user1 = new User {
                 Id = 1,
                 UserName = "Sample User",
                 Email = "example@email.com",
-                PasswordHash = "AQAAAAEAACcQAAAAEL//UdrNeiFjd0hYeQEBOtAN+OXME8tu8kNMTg4wZUrBSt1/t0Okfs389I82ZaIU2Q=="
-            });
-            modelBuilder.Entity<User>().HasData(new User {
+            };
+            user1.PasswordHash = passwordHasher.HashPassword(user1, "password123");
+            modelBuilder.Entity<User>().HasData(user1);
+            var user2 = new User {
                 Id = 2,
                 UserName = "Sample User 2",
                 Email = "example2@email.com",
-                PasswordHash = "AQAAAAEAACcQAAAAENZt+JlnUq5Ukt83M//z8Y/GlXWwYj6d260pmjQEz3Usac29eNfhmZTXHCGVOz70Hg=="
-            });
-            modelBuilder.Entity<User>().HasData(new User {
+            };
+            user2.PasswordHash = passwordHasher.HashPassword(user2, "password123");
+            modelBuilder.Entity<User>().HasData(user2);
+            var user3 = new User {
                 Id = 3,
                 UserName = "Sample User 3",
                 Email = "example3@email.com",
-                PasswordHash = "AQAAAAEAACcQAAAAENffyhoiBzkUXycLNzvQOYJJGCXsXw+7U2ZL1ED+kCFCnDmL4yGGQT7Xkr4ZaNV8/A=="
-            });
+            };
+            user3.PasswordHash = passwordHasher.HashPassword(user3, "password123");
+            modelBuilder.Entity<User>().HasData(user3);
             modelBuilder.Entity<Project>().HasData(new Project {
                 Id = 1,
                 Name = "First Project",

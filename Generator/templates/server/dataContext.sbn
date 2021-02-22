@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 using Newtonsoft.Json.Linq;
 
 namespace {{ name_space }}
@@ -30,12 +31,27 @@ namespace {{ name_space }}
             {{~ end ~}}
             {{~ end ~}}
             {{~ end ~}}
+            var passwordHasher = new PasswordHasher<User>();
+            {{~ idx = 1 ~}}
             {{~ for item in seedList ~}}
+            {{~ if item.name == "User"~}}
+            var user{{idx}} = new User {
+                {{~ for kvp in item.values ~}}
+                {{~ if kvp.key != "PasswordHash" ~}}
+                {{ kvp.key }} = {{ kvp.value }}{{ if !for.last}},{{ end }}
+                {{~ end ~}}
+                {{~ end ~}}
+            };
+            user{{idx}}.PasswordHash = passwordHasher.HashPassword(user{{idx}}, "password123");
+            modelBuilder.Entity<User>().HasData(user{{idx}});
+            {{~ idx = idx + 1 ~}}
+            {{~ else ~}}
             modelBuilder.Entity<{{item.name}}>().HasData(new {{item.name}} {
                 {{~ for kvp in item.values ~}}
                 {{ kvp.key }} = {{ kvp.value }}{{ if !for.last}},{{ end }}
                 {{~ end ~}}
             });
+            {{~ end ~}}
             {{~ end ~}}
         }
     }
