@@ -70,7 +70,7 @@
               </div>
             </div>
           </template>
-          <codemirror id="cm0" v-model="activeProject.json" :options="cmOptions" />
+          <codemirror id="cm0" v-model="activeProject.json" :options="cmOptions" @scroll="onScroll"/>
         </base-material-generator-card>
       </v-col>
       <v-col cols="12" md="6" class="pa-0">
@@ -132,9 +132,28 @@ export default Vue.extend({
         text: "",
       },
       projectName: "",
+      minLine: 5000000,
+      maxLine: -1
     };
   },
   methods: {
+    onScroll: function() {
+      const elementById = document.getElementById("cm0");
+      const list = elementById.getElementsByClassName("CodeMirror-linenumber");
+      this.minLine = 5000000;
+      this.maxLine = -1;
+        for (let i = 1; i < list.length; i++) {
+          const textval = list[i].textContent;
+          if (textval) {
+            const lineNum = parseInt(textval, 10);
+            if (lineNum < this.minLine)
+              this.minLine = lineNum;
+            if (lineNum > this.maxLine)
+              this.maxLine = lineNum;
+          }
+        }
+      console.log("onScroll", this.minLine, this.maxLine);
+    },
     newProject: async function(){
       this.activeProject = {...this.initialProject};
       this.prettyPrint(this.activeProject.json);
@@ -169,26 +188,27 @@ export default Vue.extend({
     },
     highlightLine: function(cmId: number, line: number, color: string){
       console.log({line:line})
+      if (line < this.minLine || line > this.maxLine)
+        return;
       const elementById = document.getElementById("cm"+cmId);
       if(elementById){
         //console.log("selector", elementById.querySelectorAll(".CodeMirror-line"));
-        //console.log("byClassName", elementById.getElementsByClassName("CodeMirror-line"));
-        elementById.getElementsByClassName("CodeMirror-line")[line].setAttribute("style", "background-color:"+color+";");
+
+        console.log("byClassName", elementById.getElementsByClassName("CodeMirror-line").length, elementById.getElementsByClassName("CodeMirror-linenumber").length);
+        elementById.getElementsByClassName("CodeMirror-line")[line-this.minLine+1].setAttribute("style", "background-color:"+color+";");
       }
     },
     getLine: function(idx: number, str: string): number{
-      let line = 0;
-      let char = 0;
+      let charCount = 0;
       const strArray: string[] = str.split("\n");
       
       for(let i = 0; i < strArray.length; i++){
-        char += strArray[i].length;
-        if(char >= idx-i){
-          line = i;
-          break;
+        charCount += strArray[i].length;
+        if(charCount >= idx-i){
+          return i;
         }
       }
-      return line;
+      return -1;
     },
     prettyPrint: function(json: string){
       try{
