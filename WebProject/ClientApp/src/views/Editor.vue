@@ -323,7 +323,7 @@ export default Vue.extend({
   }
   .headBar{
     margin-left: 40px;
-    margin-top: 7px;
+    margin-top: 17px;
     z-index: 99;
   }
   @media screen and (max-width: 960px) {

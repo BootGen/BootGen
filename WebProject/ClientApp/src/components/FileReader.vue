@@ -141,9 +141,11 @@ export default Vue.extend({
 
 <style lang="css">
   .fileSelector {
+    max-height: calc(100vh - 230px);
+    overflow: auto;
     position: absolute;
     background:#412fb3;
-    top: 55px;
+    top: 60px;
     right: 0px;
     width: fit-content;
     border-radius: 3px;
