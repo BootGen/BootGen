@@ -123,10 +123,13 @@ export default Vue.extend({
     },
     selectFile: function(data: GeneratedFile){
       this.activeFile = data;
-      if(this.activeFile.name.split('.')[1] === "cs"){
+      const type = this.activeFile.name.split('.')[1];
+      if(type === "cs"){
         this.cmOptions.mode = 'text/x-csharp';
-      }else{
+      }else if(type === "ts"){
         this.cmOptions.mode = 'text/typescript';
+      }else{
+        this.cmOptions.mode = 'text/x-yaml';
       }
     },
     closeTreeView: function(){
