@@ -65,7 +65,7 @@
                       <v-icon color="primary">mdi-arrow-right-bold</v-icon>
                     </v-btn>
                     </template>
-                  <span>Generation</span>
+                  <span>Generate</span>
                 </v-tooltip>
               </div>
             </div>
@@ -138,29 +138,37 @@ export default Vue.extend({
   },
   methods: {
     onScroll: function() {
+      this.unsetHighlight(0, "CodeMirror-line");
       const elementById = document.getElementById("cm0");
+      if(!elementById){
+        return;
+      }
       const list = elementById.getElementsByClassName("CodeMirror-linenumber");
       this.minLine = 5000000;
       this.maxLine = -1;
-        for (let i = 1; i < list.length; i++) {
-          const textval = list[i].textContent;
-          if (textval) {
-            const lineNum = parseInt(textval, 10);
-            if (lineNum < this.minLine)
-              this.minLine = lineNum;
-            if (lineNum > this.maxLine)
-              this.maxLine = lineNum;
-          }
+      for (let i = 1; i < list.length; i++) {
+        const textval = list[i].textContent;
+        if (textval) {
+          const lineNum = parseInt(textval, 10);
+          if (lineNum < this.minLine)
+            this.minLine = lineNum;
+          if (lineNum > this.maxLine)
+            this.maxLine = lineNum;
         }
-      console.log("onScroll", this.minLine, this.maxLine);
+      }
+      const jsonError = this.jsonError(this.activeProject.json);
+      if(jsonError !== false){
+        this.highlightLine(0, this.getLine(jsonError, this.activeProject.json), "red");
+      }
     },
     newProject: async function(){
       this.activeProject = {...this.initialProject};
       this.prettyPrint(this.activeProject.json);
     },
     setJson: async function(json: string) {
-      const valid = this.validJSON(json)
-      if(valid === true){
+      const jsonError = this.jsonError(json);
+      if(jsonError === false){
+        this.unsetHighlight(0, "CodeMirror-line");
         const data: GenerateRequest = {
           data: json,
           generateClient: this.$store.state.projectSettings.item.generateClient,
@@ -175,48 +183,57 @@ export default Vue.extend({
         }
         this.prettyPrint(this.activeProject.json);
       }else{
-        this.highlightLine(0, this.getLine(valid.message.match(/\d+/g)[0]-1, this.activeProject.json), "red");
-      }
-    },
-    validJSON: function (text: string) {
-      try {
-        JSON.parse(text);
-        return true;
-      } catch (err) {
-        return err;
+        this.highlightLine(0, this.getLine(jsonError, json), "red");
       }
     },
     highlightLine: function(cmId: number, line: number, color: string){
-      console.log({line:line})
-      if (line < this.minLine || line > this.maxLine)
+      this.unsetHighlight(0, "CodeMirror-line");
+      const elementById = document.getElementById("cm" + cmId);
+      if(!elementById || (this.minLine > line && this.minLine < 5000000) || (this.maxLine < line && this.maxLine > -1)){
         return;
-      const elementById = document.getElementById("cm"+cmId);
-      if(elementById){
-        //console.log("selector", elementById.querySelectorAll(".CodeMirror-line"));
-
-        console.log("byClassName", elementById.getElementsByClassName("CodeMirror-line").length, elementById.getElementsByClassName("CodeMirror-linenumber").length);
-        elementById.getElementsByClassName("CodeMirror-line")[line-this.minLine+1].setAttribute("style", "background-color:"+color+";");
+      }
+      if(this.minLine < 5000000){
+        elementById.getElementsByClassName("CodeMirror-line")[line-this.minLine+2].setAttribute("style", "background-color:" + color + ";");
+      }else{
+        elementById.getElementsByClassName("CodeMirror-line")[line].setAttribute("style", "background-color:" + color + ";");
       }
     },
     getLine: function(idx: number, str: string): number{
       let charCount = 0;
       const strArray: string[] = str.split("\n");
-      
       for(let i = 0; i < strArray.length; i++){
-        charCount += strArray[i].length;
-        if(charCount >= idx-i){
+        charCount += strArray[i].length+1;
+        if(charCount >= idx){
           return i;
         }
       }
       return -1;
     },
+    jsonError: function (text: string) {
+      try {
+        JSON.parse(text);
+        return false;
+      } catch (err) {
+        return err.message.match(/\d+/g)[0]-1;
+      }
+    },
+    unsetHighlight(cmId: number, from: string){
+      const elementById = document.getElementById("cm" + cmId);
+      if(!elementById){
+        return;
+      }
+      const e = elementById.getElementsByClassName(from);
+      for(let i = 0; i < e.length; i++){
+        e[i].setAttribute("style", "background-color: unset;");
+      }
+    },
     prettyPrint: function(json: string){
-      try{
+      const jsonError = this.jsonError(json);
+      if(jsonError !== false){
+        this.highlightLine(0, this.getLine(jsonError, this.activeProject.json), "red");
+      }else{
         json = json.replace(/'/g, "\"");
         this.activeProject.json = JSON.stringify(JSON.parse(json),null,'\t');
-      }
-      catch(err){
-        this.highlightLine(0, this.getLine(err.message.match(/\d+/g)[0]-1, this.activeProject.json), "red");
       }
     },
     selectProject: function(project: Project){
