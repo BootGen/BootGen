@@ -38,7 +38,8 @@ export default Vue.extend({
     };
 	},
 	created: function (){
-		this.files.forEach(file => this.addToTree(file));
+		const files = this.sortFiles();
+		files.forEach(file => this.addToTree(file));
 		this.init();
 	},
   methods: {
@@ -113,6 +114,18 @@ export default Vue.extend({
 			if(node[0]){
 				this.$emit("select-file", this.getFile(node[0]));
 			}
+		},
+		sortFiles: function(){
+			this.files.sort(function (a: GeneratedFile, b: GeneratedFile) {
+				if(a.path === ""){
+					return b.path.localeCompare(a.path) || a.name.localeCompare(b.name);
+				}
+				if(b.path === ""){
+					return b.path.localeCompare(a.path) || a.name.localeCompare(b.name);
+				}
+				return a.path.localeCompare(b.path) || a.name.localeCompare(b.name);
+			});
+			return this.files;
 		},
   },
 });
