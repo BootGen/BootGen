@@ -1,0 +1,113 @@
+openapi: '3.0.0'
+info:
+  version: 1.0.0
+  title: '{{ project_title }}'
+  license:
+    name: MIT
+servers:
+  - url: {{ api.base_url }}
+paths:
+  {{~ for route in api.routes ~}}
+  {{ route.path }}:
+  {{~ for operation in route.operations ~}}
+    {{ string.downcase operation.verb }}:
+      {{~ if operation.authenticate ~}}
+      security:
+      - bearerAuth: []
+      {{~ end ~}}
+      summary: {{ operation.summary }}
+      operationId: {{ operation.name }}
+      {{~ if operation.has_parameters ~}}
+      parameters:
+      {{~ for parameter in operation.parameters ~}}
+        - name: {{ parameter.name }}
+          in: {{ lower_case parameter.kind }}
+          required: {{ parameter.is_required }}
+          schema:
+            type: {{ get_type parameter }}
+            {{~ if get_format parameter ~}}
+            format: {{ get_format parameter }}
+            {{~ end ~}}
+        {{~ end ~}}
+      {{~ end ~}}
+      {{~ if operation.body ~}}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+            {{~ if operation.body_is_collection ~}}
+                type: array
+                items:
+                  $ref: '#/components/schemas/{{operation.body.name}}'
+            {{~ else ~}}
+                $ref: '#/components/schemas/{{operation.body.name}}'
+            {{~ end ~}}
+      {{~ end ~}}
+      responses:
+        '{{ operation.success_code }}':
+          description: {{ operation.success_description }}
+          {{~ if operation.response ~}}
+          content:
+            application/json:
+              schema:
+            {{~ if operation.response_is_collection ~}}
+                type: array
+                items:
+                  $ref: '#/components/schemas/{{operation.response.name}}'
+            {{~ else ~}}
+                $ref: '#/components/schemas/{{operation.response.name}}'
+            {{~ end ~}}
+          {{~ end ~}}
+    {{~ end ~}}
+    {{~ end ~}}
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT 
+  schemas:
+  {{~ for class in api.data_model.common_classes ~}}
+    {{ class.name }}:
+      type: object
+      {{~ if class.has_required_properties ~}}
+      required:
+        {{~ for property in class.common_properties ~}}
+        {{~ if property.is_required ~}}
+        - {{ snake_case property.name }}
+        {{~ end ~}}
+        {{~ end ~}}
+      {{~ end ~}}
+      properties:
+      {{~ for property in class.common_properties ~}}
+        {{ snake_case property.name }}:
+          {{~ if property.is_collection ~}}
+          type: array
+          items:
+            {{~ if property.class ~}}
+            $ref: '#/components/schemas/{{ property.class.name }}'
+            {{~ else ~}}
+            type: {{ get_type property }}
+            {{~ if get_format property ~}}
+            format: {{ get_format property }}
+            {{~ end ~}}
+            {{~ end ~}}
+          {{~ else ~}}
+          {{~ if property.class ~}}
+          $ref: '#/components/schemas/{{ property.class.name }}'
+          {{~ else ~}}
+          type: {{ get_type property }}
+          {{~ if get_format property ~}}
+          format: {{ get_format property }}
+          {{~ end ~}}
+          {{~ if property.enum ~}}
+          enum: {{ get_enum property }}
+          {{~ end ~}}
+          {{~ end ~}}
+          {{~ end ~}}
+          {{~ if property.is_client_readonly ~}}
+          readOnly: true
+          {{~ end ~}}
+      {{~ end ~}}
+    {{~ end ~}}
