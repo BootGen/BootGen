@@ -192,10 +192,10 @@ export default Vue.extend({
       if(!elementById || (this.minLine > line && this.minLine < 5000000) || (this.maxLine < line && this.maxLine > -1)){
         return;
       }
-      if(this.minLine < 5000000){
-        elementById.getElementsByClassName("CodeMirror-line")[line-this.minLine+2].setAttribute("style", "background-color:" + color + ";");
+      if(this.minLine < line && line < this.maxLine){
+        elementById.getElementsByClassName("CodeMirror-line")[line-this.minLine+2].setAttribute("style", `background-color:${color};`);
       }else{
-        elementById.getElementsByClassName("CodeMirror-line")[line].setAttribute("style", "background-color:" + color + ";");
+        elementById.getElementsByClassName("CodeMirror-line")[line].setAttribute("style", `background-color:${color};`);
       }
     },
     getLine: function(idx: number, str: string): number{
