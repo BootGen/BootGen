@@ -2,7 +2,7 @@
   <base-material-generator-card>
     <template v-slot:heading>
       <div class="d-flex display-1 font-weight-light align-center justify-space-between pa-2">
-        <div class="text-break" v-if="activeFile && activeFile.name">
+        <div class="text-break" v-if="activeFile.path !== ''">
           <span v-for="(part, i) in activeFile.path.split('/')" :key="i" @click="openFolder(i+1)">
             {{ part }}/
           </span>
@@ -10,7 +10,11 @@
             {{ activeFile.name }}
           </span>
         </div>
-        <div v-else @click="drawer = true">Select a file</div>
+        <div v-else>
+          <span @click="openFolder(activeFile.path.split('/').length)">
+            {{ activeFile.name }}
+          </span>
+        </div>
         <div class="d-flex">
           <v-tooltip bottom>
             <template v-slot:activator="{ on, attrs }">
@@ -54,7 +58,6 @@ import SettingsDialog from "../components/SettingsDialog.vue";
 import TreeView from "../components/TreeView.vue";
 
 import { codemirror } from 'vue-codemirror'
-
 import 'codemirror/lib/codemirror.css'
 import "codemirror/mode/clike/clike.js";
 import "codemirror/mode/yaml/yaml.js";
@@ -82,11 +85,8 @@ export default Vue.extend({
           if(result) {
             this.activeFile = result;  
           } else {
-            this.activeFile = {
-              name: "",
-              path: "",
-              content: ""
-            };
+            this.init();
+
           }
         }
       }
@@ -104,7 +104,7 @@ export default Vue.extend({
       cmOptions: {
         theme: 'material',
         tabSize: 2,
-        mode: 'text/x-csharp',
+        mode: 'text/x-yaml',
         lineNumbers: true,
         line: true,
         readOnly: true,
@@ -112,7 +112,17 @@ export default Vue.extend({
       openPath: "",
     };
   },
+  created:function(){
+    this.init();
+  },
   methods: {
+    init: function(){
+      for(let i = 0; i < this.files.length; i++){
+        if(this.files[i].name === "restapi.yml" && this.files[i].path === ""){
+          this.activeFile = this.files[i];
+        }
+      }
+    },
     openFolder: function(idx: number){
       this.openPath = "";
       for(let i = 0; i < idx; i++){

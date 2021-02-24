@@ -107,7 +107,6 @@ export default Vue.extend({
         this.tree.open = [];
       }
       for (let j = 0; j < node.length; j++) {
-        console.log({ path: path[0], node: node[j].name });
         if (path[0] === node[j].name) {
           this.tree.open.push(node[j]);
           path.shift();
