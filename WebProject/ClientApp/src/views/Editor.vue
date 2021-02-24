@@ -207,6 +207,9 @@ export default Vue.extend({
       }
     },
     getLine: function(idx: number, str: string): number{
+      if(navigator.userAgent.indexOf("Firefox") != -1){
+        return idx;
+      }
       let charCount = 0;
       const strArray: string[] = str.split("\n");
       for(let i = 0; i < strArray.length; i++){
