@@ -38,13 +38,13 @@
             <span>Settings</span>
           </v-tooltip>
           <settings-dialog v-if="openSettings" @close-settings="openSettings = false"></settings-dialog>
-          <v-col class="d-flex fileSelector" v-if="drawer"><!--v-click-outside="closeTreeView"-->
+          <v-col class="d-flex fileSelector" v-if="drawer">
             <tree-view :files="files" :openPath="openPath" @select-file="selectFile"></tree-view>
           </v-col>
         </div>
       </div>
     </template>
-    <codemirror v-model="activeFile.content" :options="cmOptions" />
+    <codemirror v-model="activeFile.content" :options="cmOptions" @scrollCursorIntoView="drawer = false" />
   </base-material-generator-card>
 </template>
 
@@ -134,9 +134,6 @@ export default Vue.extend({
         this.cmOptions.mode = 'text/x-yaml';
       }
     },
-    closeTreeView: function(){
-      this.drawer = false;
-    }
   },
 });
 </script>
