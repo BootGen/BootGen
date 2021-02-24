@@ -57,6 +57,8 @@ import { codemirror } from 'vue-codemirror'
 
 import 'codemirror/lib/codemirror.css'
 import "codemirror/mode/clike/clike.js";
+import "codemirror/mode/yaml/yaml.js";
+import "codemirror/mode/javascript/javascript.js";
 import 'codemirror/theme/material.css'
 import { GeneratedFile } from "../models/GeneratedFile";
 
