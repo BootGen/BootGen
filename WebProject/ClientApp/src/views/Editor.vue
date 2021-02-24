@@ -125,11 +125,12 @@ export default Vue.extend({
         line: true,
       },
       snackbar: {
-        dissmissable: true,
+        dismissable: true,
         visible: false,
         type: "",
         icon: "mdi-alert-circle",
         text: "",
+        timeout: 5000,
       },
       projectName: "",
       minLine: 5000000,
@@ -138,6 +139,7 @@ export default Vue.extend({
   },
   methods: {
     onScroll: function() {
+      this.snackbar.visible = false;
       this.unsetHighlight(0, "CodeMirror-line");
       const elementById = document.getElementById("cm0");
       if(!elementById){
@@ -158,7 +160,7 @@ export default Vue.extend({
       }
       const jsonError = this.jsonError(this.activeProject.json);
       if(jsonError !== false){
-        this.highlightLine(0, this.getLine(jsonError, this.activeProject.json), "red");
+        this.highlightLine(0, this.getLine(jsonError.line, this.activeProject.json), jsonError.message, "red");
       }
     },
     newProject: async function(){
@@ -168,6 +170,7 @@ export default Vue.extend({
     setJson: async function(json: string) {
       const jsonError = this.jsonError(json);
       if(jsonError === false){
+        this.snackbar.visible = false;
         this.unsetHighlight(0, "CodeMirror-line");
         const data: GenerateRequest = {
           data: json,
@@ -183,10 +186,15 @@ export default Vue.extend({
         }
         this.prettyPrint(this.activeProject.json);
       }else{
-        this.highlightLine(0, this.getLine(jsonError, json), "red");
+        this.highlightLine(0, this.getLine(jsonError.line, json), jsonError.message, "red");
       }
     },
-    highlightLine: function(cmId: number, line: number, color: string){
+    highlightLine: function(cmId: number, line: number, errorMessage: string, color: string){
+      this.snackbar.dismissable = true,
+      this.snackbar.timeout = -1;
+      this.snackbar.type = "orange darken-2";
+      this.snackbar.text = errorMessage;
+      this.snackbar.visible = true;
       this.unsetHighlight(0, "CodeMirror-line");
       const elementById = document.getElementById("cm" + cmId);
       if(!elementById || (this.minLine > line && this.minLine < 5000000) || (this.maxLine < line && this.maxLine > -1)){
@@ -214,7 +222,7 @@ export default Vue.extend({
         JSON.parse(text);
         return false;
       } catch (err) {
-        return err.message.match(/\d+/g)[0]-1;
+        return {line: err.message.match(/\d+/g)[0]-1, message: err.message};
       }
     },
     unsetHighlight(cmId: number, from: string){
@@ -230,7 +238,7 @@ export default Vue.extend({
     prettyPrint: function(json: string){
       const jsonError = this.jsonError(json);
       if(jsonError !== false){
-        this.highlightLine(0, this.getLine(jsonError, this.activeProject.json), "red");
+        this.highlightLine(0, this.getLine(jsonError.line, this.activeProject.json), jsonError.message, "red");
       }else{
         json = json.replace(/'/g, "\"");
         this.activeProject.json = JSON.stringify(JSON.parse(json),null,'\t');

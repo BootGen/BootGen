@@ -1,6 +1,6 @@
 <template>
  <v-container fluid>
-    <v-snackbar v-model="snackbar.visible" :color="snackbar.type" timeout="5000" bottom>
+    <v-snackbar v-model="snackbar.visible" :color="snackbar.type" :timeout="snackbar.timeout" bottom>
     <v-layout align-center justify-space-between>
       <div class="d-flex align-center">
         <v-icon class="pr-3" dark large>{{ snackbar.icon }}</v-icon>
