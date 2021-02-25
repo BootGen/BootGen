@@ -29,5 +29,15 @@ namespace WebProject.Controllers
             var response = service.Generate(request);
             return new ObjectResult(response.ResponseData) { StatusCode = response.StatusCode };
         }
+
+        [HttpPost]
+        [Route("download")]
+        public IActionResult Download([FromBody] GenerateRequest request)
+        {
+            var result = service.Download(request);
+            if (result.StatusCode != 200)
+                return BadRequest();
+            return File(result.ResponseData, "application/zip", "project.zip");
+        }
     }
 }

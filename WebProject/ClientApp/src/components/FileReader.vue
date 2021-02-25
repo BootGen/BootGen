@@ -18,7 +18,7 @@
         <div class="d-flex">
           <v-tooltip bottom>
             <template v-slot:activator="{ on, attrs }">
-              <v-btn color="white" class="mr-2" elevation="1" fab small v-bind="attrs" v-on="on">
+              <v-btn color="white" class="mr-2" elevation="1" @click="download" fab small v-bind="attrs" v-on="on">
                 <v-icon color="primary">mdi-download</v-icon>
               </v-btn>
             </template>
@@ -122,6 +122,9 @@ export default Vue.extend({
           this.activeFile = this.files[i];
         }
       }
+    },
+    download: function() {
+      this.$store.dispatch("download", this.$store.state.projectSettings.item);
     },
     openFolder: function(idx: number){
       this.openPath = "";
