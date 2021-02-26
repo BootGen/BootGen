@@ -67,7 +67,7 @@ namespace WebProject.Services
             {
                 var disk = new Disk(tempDir);
                 BootGen.Project project = InitProject(request, disk);
-                project.GenerateFiles("WebProject", request.NameSpace, "http://localhost:5000");
+                project.GenerateFiles("WebProject", "WebProject", "http://localhost:5000");
                 ZipFile.CreateFromDirectory(tempDir, tempFile);
 
                 using var reader = new BinaryReader(File.Open(tempFile, FileMode.Open));
@@ -107,6 +107,12 @@ namespace WebProject.Services
             var collection = new JsonResourceCollection(dataModel);
             var jObject = JObject.Parse(request.Data);
             collection.Load(jObject);
+            var userClass = dataModel.Classes.FirstOrDefault(c => c.Name == "User");
+            userClass.Properties.Add(new Property {
+                Name = "PasswordHash",
+                PropertyType = PropertyType.ServerOnly,
+                BuiltInType = BuiltInType.String
+            });
             var seedStore = new JsonSeedStore(collection);
             seedStore.Load(jObject);
             var project = new BootGen.Project
