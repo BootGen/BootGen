@@ -1,0 +1,37 @@
+<template>
+  <v-container fluid>
+    <v-data-iterator :items="{{ camel_case class.name.plural }}">
+      <template v-slot:default="{ items }">
+        <v-row>
+          <v-col
+            v-for="item in items"
+            :key="item.id"
+            cols="12"
+            sm="12"
+            md="6"
+            lg="4"
+          >
+            <{{ camel_case class.name }}-view :{{ camel_case class.name }}="item"></{{ camel_case class.name }}-view>
+          </v-col>
+        </v-row>
+      </template>
+    </v-data-iterator>
+  </v-container>
+</template>
+
+<script lang="ts">
+import Vue from "vue";
+import {{ class.name }}View from "../components/{{ class.name }}View.vue";
+import { {{ class.name }} } from "../models/{{ class.name }}";
+export default Vue.extend({
+  components: { {{ class.name }}View },
+  data: function () {
+    return {
+        {{ camel_case class.name.plural }}: Array<{{ class.name }}>(),
+    };
+  },
+  created: async function () {
+    this.{{ camel_case class.name.plural }} = await this.$store.dispatch("{{ camel_case class.name.plural }}/get{{ class.name.plural }}");
+  },
+});
+</script>
