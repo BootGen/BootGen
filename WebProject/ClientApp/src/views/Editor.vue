@@ -74,7 +74,7 @@
         </base-material-generator-card>
       </v-col>
       <v-col cols="12" md="6" class="pa-0">
-        <file-reader :files="generatedFiles"></file-reader>
+        <file-reader :files="generatedFiles" @change-settings="generate"></file-reader>
       </v-col>
     </v-row>
     <snackbar v-if="snackbar.visible" :snackbar="snackbar"></snackbar>
@@ -138,6 +138,22 @@ export default Vue.extend({
     };
   },
   methods: {
+    generate: async function(json: string){
+      this.$store.commit('setProjectSettings',
+        {
+          data: json,
+          generateClient: this.$store.state.projectSettings.item.generateClient,
+          nameSpace: this.$store.state.projectSettings.item.nameSpace
+        }
+      );
+      const generate = await this.$store.dispatch("generate", this.$store.state.projectSettings.item);
+      this.generatedFiles = generate.generatedFiles;
+      this.activeProject.json = json;
+      if(this.$store.state.auth.user && this.activeProject.id >= 0){
+        await this.$store.dispatch("projects/updateProject", this.activeProject);
+      }
+      this.prettyPrint(this.activeProject.json);
+    },
     onScroll: function() {
       this.snackbar.visible = false;
       this.unsetHighlight(0, "CodeMirror-line");
@@ -172,19 +188,7 @@ export default Vue.extend({
       if(jsonError === false){
         this.snackbar.visible = false;
         this.unsetHighlight(0, "CodeMirror-line");
-        const data: GenerateRequest = {
-          data: json,
-          generateClient: this.$store.state.projectSettings.item.generateClient,
-          nameSpace: this.$store.state.projectSettings.item.nameSpace
-        };
-        await this.$store.dispatch("updateProjectSettings", data);
-        const generate = await this.$store.dispatch("generate", this.$store.state.projectSettings.item);
-        this.generatedFiles = generate.generatedFiles;
-        this.activeProject.json = json;
-        if(this.$store.state.auth.user && this.activeProject.id >= 0){
-          await this.$store.dispatch("projects/updateProject", this.activeProject);
-        }
-        this.prettyPrint(this.activeProject.json);
+        this.generate(json);
       }else{
         this.highlightLine(0, this.getLine(jsonError.line, json), jsonError.message, "red");
       }

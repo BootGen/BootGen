@@ -19,22 +19,12 @@ export interface ProjectSettingsState {
 type Context = ActionContext<ProjectSettingsState, State>;
 
 export default {
-  //namespaced: true,
-  state: () => ({
-    item: null as (GenerateRequest | null)
+  state: ()  => ({
+    item: {} as GenerateRequest
   }),
   mutations: {
     setProjectSettings: function(state: ProjectSettingsState, settings: GenerateRequest) {
       state.item = settings;
     },
   },
-  actions: {
-    getProjectSettings: function(context: Context): GenerateRequest {
-        return context.state.item;
-    },
-    updateProjectSettings: function(context: Context, settings: GenerateRequest): GenerateRequest {
-      context.commit("setProjectSettings", settings);
-      return context.state.item;
-    },
-  }
 }

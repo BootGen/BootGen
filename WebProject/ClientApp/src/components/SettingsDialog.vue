@@ -48,15 +48,17 @@ export default Vue.extend({
   methods: {
     close: function () {
       this.dialog = false;
-      this.$emit("close-settings", true);
+      this.$emit("close-settings");
     },
-    save: async function () {
-      const data: GenerateRequest = {
-        data: this.$store.state.projectSettings.item.data,
-        generateClient: this.form.model.generateTS,
-        nameSpace: this.form.model.namespace
-      };
-      await this.$store.dispatch("updateProjectSettings", data);
+    save: function () {
+      this.$store.commit('setProjectSettings',
+        {
+          data: this.$store.state.projectSettings.item.data,
+          generateClient: this.form.model.generateTS,
+          nameSpace: this.form.model.namespace
+        }
+      );
+      this.$emit("change-settings", this.$store.state.projectSettings.item.data);
       this.close();
     },
   },

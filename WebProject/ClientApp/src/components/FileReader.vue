@@ -41,7 +41,7 @@
               </template>
             <span>Settings</span>
           </v-tooltip>
-          <settings-dialog v-if="openSettings" @close-settings="openSettings = false"></settings-dialog>
+          <settings-dialog v-if="openSettings" @close-settings="openSettings = false" @change-settings="changeSettings"></settings-dialog>
           <v-col class="d-flex fileSelector" v-if="drawer">
             <tree-view :files="files" :openPath="openPath" @select-file="selectFile"></tree-view>
           </v-col>
@@ -147,6 +147,9 @@ export default Vue.extend({
         this.cmOptions.mode = 'text/x-yaml';
       }
     },
+    changeSettings: function(json: string){
+      this.$emit("change-settings", json);
+    }
   },
 });
 </script>

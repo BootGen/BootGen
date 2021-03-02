@@ -19,11 +19,13 @@ new Vue({
   vuetify,
   i18n,
   created: async function() {
-    await this.$store.dispatch("updateProjectSettings", {
-      data: '{ "users": [{"userName": "Test User", "email": "aa@bb@cc"}], "tasks": [{"title": "Task Title", "description": "Task des"}] }',
-      generateClient: true,
-      nameSpace: "Test"
-    });
+    this.$store.commit('setProjectSettings', 
+      {
+        data: '{ "users": [{"userName": "Test User", "email": "aa@bb@cc"}], "tasks": [{"title": "Task Title", "description": "Task des"}] }',
+        generateClient: true,
+        nameSpace: "Test"
+      }
+    );
   },
   mounted: async function() {
     if(store.state.auth.jwt){
