@@ -226,6 +226,7 @@ export default Vue.extend({
     },
     jsonError: function (text: string) {
       try {
+        text = text.split("\n").filter(line => !line.trim().startsWith("//")).join("\n");
         JSON.parse(text);
         return false;
       } catch (err) {
