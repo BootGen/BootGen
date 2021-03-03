@@ -17,11 +17,11 @@ namespace WebProject.Generator
         {
             foreach (var property in jObject.Properties())
             {
-                Parse(property);
+                Parse(property, out var _);
             }
         }
 
-        private ClassModel Parse(JProperty property)
+        private ClassModel Parse(JProperty property, out bool manyToMany)
         {
             var pluralizer = new Pluralizer();
             Noun className;
@@ -43,13 +43,22 @@ namespace WebProject.Generator
                     Properties = new List<Property>()
                 };
             }
+            manyToMany = false;
             switch (property.Value.Type)
             {
                 case JTokenType.Array:
                     var data = property.Value as JArray;
-                    foreach (JObject item in data)
+                    var comments = new List<JToken>();
+                    foreach (JToken item in data)
                     {
-                        ExtendModel(result, item);
+                        if (item.Type == JTokenType.Comment) {
+                            if (item.Value<string>() == "many-to-many") {
+                                manyToMany = true;
+                            }
+                        }
+                        if (item.Type == JTokenType.Object) {
+                            ExtendModel(result, (JObject)item);
+                        }
                     }
                 break;
                 case JTokenType.Object:
@@ -78,8 +87,12 @@ namespace WebProject.Generator
                         BuiltInType = ConvertType(property.Value.Type),
                         IsCollection = property.Value.Type == JTokenType.Array
                     };
-                    if (prop.BuiltInType == BuiltInType.Object)
-                        prop.Class = Parse(property);
+                    if (prop.BuiltInType == BuiltInType.Object) {
+                        prop.Class = Parse(property, out bool m2m);
+                        prop.IsManyToMany = m2m;
+                        if (prop.IsCollection)
+                            prop.PropertyType = PropertyType.ServerOnly;
+                    }
                     model.Properties.Add(prop);
                 }
             }

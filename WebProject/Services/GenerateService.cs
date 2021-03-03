@@ -105,7 +105,7 @@ namespace WebProject.Services
         {
             DataModel dataModel = new DataModel();
             var collection = new JsonResourceCollection(dataModel);
-            var jObject = JObject.Parse(request.Data);
+            var jObject = JObject.Parse(request.Data, new JsonLoadSettings { CommentHandling = CommentHandling.Load });
             collection.Load(jObject);
             var userClass = dataModel.Classes.FirstOrDefault(c => c.Name == "User");
             userClass.Properties.Add(new Property {
