@@ -26,13 +26,13 @@
                   <span>Help</span>
                 </v-tooltip>
                 <help-dialog v-if="openHelp" @close-help="openHelp = false"></help-dialog>
-                <v-tooltip bottom v-if="$store.state.auth.jwt">
+                <v-tooltip bottom>
                   <template v-slot:activator="{ on, attrs }">
-                    <v-btn class="mr-2" color="white" elevation="1" fab small @click="close" v-bind="attrs" v-on="on">
+                    <v-btn class="mr-2" color="white" elevation="1" fab small @click="undo" v-bind="attrs" v-on="on" :disabled="previousJson.length < 2">
                       <v-icon color="primary">mdi-undo</v-icon>
                     </v-btn>
                     </template>
-                  <span>Undo all changes</span>
+                  <span>Rollback to the last saved state</span>
                 </v-tooltip>
                 <v-tooltip bottom v-if="$store.state.auth.jwt">
                   <template v-slot:activator="{ on, attrs }">
@@ -115,6 +115,7 @@ export default Vue.extend({
       openHelp: false,
       generatedFiles: Array<GeneratedFile>(),
       initialProject: {id: -1, ownerId: -1, name: "", json: '{ "users": [{"userName": "Test User", "email": "aa@bb@cc"}], "tasks": [{"title": "Task Title", "description": "Task des"}] }'},
+      previousJson: Array<string>(),
       activeProject: {id: -1, ownerId: -1, name: "", json: ""},
       cmOptions: {
         theme: 'material',
@@ -133,7 +134,7 @@ export default Vue.extend({
       },
       projectName: "",
       minLine: 5000000,
-      maxLine: -1
+      maxLine: -1,
     };
   },
   methods: {
@@ -144,6 +145,9 @@ export default Vue.extend({
       this.activeProject.json = json;
       if(this.$store.state.auth.user && this.activeProject.id >= 0){
         await this.$store.dispatch("projects/updateProject", this.activeProject);
+      }
+      if(this.previousJson[this.previousJson.length-1] !== this.activeProject.json){
+        this.previousJson.push(this.activeProject.json);
       }
       this.prettyPrint(this.activeProject.json);
     },
@@ -174,6 +178,7 @@ export default Vue.extend({
     },
     newProject: async function(){
       this.activeProject = {...this.initialProject};
+      this.previousJson = [];
       this.prettyPrint(this.activeProject.json);
       this.setProjectSettings(this.activeProject.json, "Test");
       this.generate(this.activeProject.json);
@@ -258,6 +263,7 @@ export default Vue.extend({
         this.setProjectSettings(this.activeProject.json, this.activeProject.name);
         this.setJson(this.activeProject.json);
       }
+      this.previousJson = [];
       this.openExplorer = false;
     },
     existsProjectName: function(): Project | null{
@@ -296,15 +302,13 @@ export default Vue.extend({
       }
       this.snackbar.visible = true;
     },
-    close: async function (){
-      if(this.activeProject.id === -1){
-        this.activeProject = {...this.initialProject};
-      }else{
-        this.activeProject = await this.$store.dispatch("projects/getProject", this.activeProject.id);
-      }
+    undo: async function (){
+      this.activeProject.json = this.previousJson[this.previousJson.length-2];
+      this.previousJson.pop();
+      this.generate(this.activeProject.json);
       this.prettyPrint(this.activeProject.json);
       this.snackbar.type = "info";
-      this.snackbar.text = "Restored everything to its previous state!";
+      this.snackbar.text = "Everything restored to its previous saved state";
       this.snackbar.visible = true;
     },
     changeProjectName: function(name: string){
