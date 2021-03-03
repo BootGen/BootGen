@@ -146,6 +146,7 @@ export default Vue.extend({
       }else{
         this.cmOptions.mode = 'text/x-yaml';
       }
+      this.drawer = false;
     },
     changeSettings: function(json: string){
       this.$emit("change-settings", json);
