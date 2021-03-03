@@ -32,16 +32,7 @@
               </v-btn>
             </template>
             <span>Files</span>
-          </v-tooltip>                
-          <v-tooltip bottom>
-            <template v-slot:activator="{ on, attrs }">
-              <v-btn class="ml-2 mr-2" color="white" elevation="1" fab small @click="openSettings = true" v-bind="attrs" v-on="on">
-                <v-icon color="primary">mdi-cog</v-icon>
-              </v-btn>
-              </template>
-            <span>Settings</span>
           </v-tooltip>
-          <settings-dialog v-if="openSettings" @close-settings="openSettings = false" @change-settings="changeSettings"></settings-dialog>
           <v-col class="d-flex fileSelector" v-if="drawer">
             <tree-view :files="files" :openPath="openPath" @select-file="selectFile"></tree-view>
           </v-col>
@@ -54,7 +45,6 @@
 
 <script lang="ts">
 import Vue from "vue";
-import SettingsDialog from "../components/SettingsDialog.vue";
 import TreeView from "../components/TreeView.vue";
 
 import { codemirror } from 'vue-codemirror'
@@ -72,7 +62,6 @@ export default Vue.extend({
 		},
   },
   components: {
-    SettingsDialog,
     TreeView,
     codemirror
   },
@@ -94,7 +83,6 @@ export default Vue.extend({
   },
   data: function () {
     return {
-      openSettings: false,
       activeFile: {
         name: "",
         path: "",
@@ -148,9 +136,6 @@ export default Vue.extend({
       }
       this.drawer = false;
     },
-    changeSettings: function(json: string){
-      this.$emit("change-settings", json);
-    }
   },
 });
 </script>

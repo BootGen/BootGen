@@ -2,10 +2,10 @@
   <v-container fluid class="editor">
     <v-row class="d-flex align-center ma-0 pa-0">
       <v-col lg="5" md="6" sm="8" cols="12" class="pa-0 headBar" v-if="$store.state.auth.jwt">
-        <head-bar :activeProject="activeProject" @new-project="newProject" @change-project-name="changeProjectName" @close="close"></head-bar>
+        <head-bar :activeProject="activeProject" @new-project="newProject" @change-project-name="changeProjectName"></head-bar>
       </v-col>
       <v-col cols="12" class="headBar pl-0 pt-6" v-else>
-        <head-bar :activeProject="activeProject" @new-project="newProject" @change-project-name="changeProjectName" @close="close"></head-bar>
+        <head-bar :activeProject="activeProject" @new-project="newProject" @change-project-name="changeProjectName"></head-bar>
       </v-col>
     </v-row>
     <v-row class="d-flex align-center">
@@ -74,7 +74,7 @@
         </base-material-generator-card>
       </v-col>
       <v-col cols="12" md="6" class="pa-0">
-        <file-reader :files="generatedFiles" @change-settings="generate"></file-reader>
+        <file-reader :files="generatedFiles"></file-reader>
       </v-col>
     </v-row>
     <snackbar v-if="snackbar.visible" :snackbar="snackbar"></snackbar>
@@ -94,7 +94,6 @@ import { codemirror } from 'vue-codemirror'
 import 'codemirror/lib/codemirror.css'
 import "codemirror/mode/javascript/javascript.js";
 import 'codemirror/theme/material.css'
-import { GenerateRequest } from "../models/GenerateRequest";
 
 export default Vue.extend({
   components: {
@@ -139,13 +138,7 @@ export default Vue.extend({
   },
   methods: {
     generate: async function(json: string){
-      this.$store.commit('setProjectSettings',
-        {
-          data: json,
-          generateClient: this.$store.state.projectSettings.item.generateClient,
-          nameSpace: this.$store.state.projectSettings.item.nameSpace
-        }
-      );
+      this.setProjectSettings(json, this.$store.state.projectSettings.item.nameSpace);
       const generate = await this.$store.dispatch("generate", this.$store.state.projectSettings.item);
       this.generatedFiles = generate.generatedFiles;
       this.activeProject.json = json;
@@ -182,6 +175,8 @@ export default Vue.extend({
     newProject: async function(){
       this.activeProject = {...this.initialProject};
       this.prettyPrint(this.activeProject.json);
+      this.setProjectSettings(this.activeProject.json, "Test");
+      this.generate(this.activeProject.json);
     },
     setJson: async function(json: string) {
       const jsonError = this.jsonError(json);
@@ -259,9 +254,10 @@ export default Vue.extend({
       }
       if(select){
         this.activeProject = project;
+        this.setProjectSettings(this.activeProject.json, this.activeProject.name);
         this.setJson(this.activeProject.json);
       }
-      this.openExplorer = !this.openExplorer;
+      this.openExplorer = false;
     },
     existsProjectName: function(): Project | null{
       for(const i in this.$store.state.projects.items){
@@ -291,6 +287,8 @@ export default Vue.extend({
           this.snackbar.text = "Project updated successfully!";
           await this.$store.dispatch("projects/updateProject", this.activeProject);
         }
+        this.setProjectSettings(this.activeProject.json, this.activeProject.name);
+        this.generate(this.activeProject.json);
       }else{
         this.snackbar.type = "error";
         this.snackbar.text = "This name is incorrect!";
@@ -311,6 +309,15 @@ export default Vue.extend({
     changeProjectName: function(name: string){
       this.projectName = name;
     },
+    setProjectSettings: function(json: string, nameSpace: string){
+      this.$store.commit('setProjectSettings',
+        {
+          data: json,
+          generateClient: true,
+          nameSpace: nameSpace
+        }
+      );
+    }
   },
 });
 </script>
