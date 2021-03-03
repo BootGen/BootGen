@@ -23,7 +23,7 @@ new Vue({
       {
         data: '{ "users": [{"userName": "Test User", "email": "aa@bb@cc"}], "tasks": [{"title": "Task Title", "description": "Task des"}] }',
         generateClient: true,
-        nameSpace: "Test"
+        nameSpace: "test"
       }
     );
   },

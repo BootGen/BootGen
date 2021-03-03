@@ -20,6 +20,9 @@
 import Vue from "vue";
 
 export default Vue.extend({
+  created: async function(){
+    this.$store.dispatch("projects/getProjects");
+  },
   data: function () {
     return {
 			dialog: true,

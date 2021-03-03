@@ -253,6 +253,7 @@ export default Vue.extend({
         select = confirm("changes will not be saved!");
       }
       if(select){
+        project.json = project.json.split("'").join('"');
         this.activeProject = project;
         this.setProjectSettings(this.activeProject.json, this.activeProject.name);
         this.setJson(this.activeProject.json);
@@ -314,9 +315,14 @@ export default Vue.extend({
         {
           data: json,
           generateClient: true,
-          nameSpace: nameSpace
+          nameSpace: this.camalize(nameSpace)
         }
       );
+    },
+    camalize: function(str: string) {
+      return str.replace(/(?:^\w|[A-Z]|\b\w)/g, function(word, index) {
+        return index === 0 ? word.toLowerCase() : word.toUpperCase();
+      }).replace(/\s+/g, '');
     }
   },
 });
