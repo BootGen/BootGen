@@ -9,7 +9,7 @@
         </div>
         <div class="d-flex align-center justify-space-between" v-else>
           <v-toolbar-title class="font-weight-light mr-2">Editor</v-toolbar-title>
-          <div class="mr-1">for save <a href="/">sign in</a></div>
+          <div class="mr-1">for save <a href="/login">sign in</a></div>
         </div>
       </v-col>
     </v-row>
