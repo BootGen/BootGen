@@ -88,7 +88,6 @@ export default {
             resolve(savedItem);
           }
         }).catch(reason => {
-          console.log(reason);
           reject({
             status: reason.response.status,
             statusText: reason.response.statusText,

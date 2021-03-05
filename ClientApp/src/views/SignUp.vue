@@ -106,9 +106,6 @@ export default Vue.extend({
       errorMsg: ""
     };
   },
-  created: function() {
-    console.log("Hello?");
-  },
   methods: {
     trySignUp: async function () {
       const response = await this.$store.dispatch("register", {
