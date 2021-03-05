@@ -104,7 +104,7 @@ namespace WebProject.Services
         private static BootGen.Project InitProject(GenerateRequest request, IDisk disk)
         {
             DataModel dataModel = new DataModel();
-            var collection = new JsonResourceCollection(dataModel);
+            var collection = new ResourceCollection(dataModel);
             var jObject = JObject.Parse(request.Data, new JsonLoadSettings { CommentHandling = CommentHandling.Load });
             collection.Load(jObject);
             var userClass = dataModel.Classes.FirstOrDefault(c => c.Name == "User");
@@ -113,7 +113,7 @@ namespace WebProject.Services
                 PropertyType = PropertyType.ServerOnly,
                 BuiltInType = BuiltInType.String
             });
-            var seedStore = new JsonSeedStore(collection);
+            var seedStore = new SeedDataStore(collection);
             seedStore.Load(jObject);
             var project = new BootGen.Project
             {
