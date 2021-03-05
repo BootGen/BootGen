@@ -5,7 +5,6 @@ import store from './store/index'
 import vuetify from './plugins/vuetify'
 import { User } from './models/User'
 import './plugins/base'
-import './plugins/chartist'
 import './plugins/vee-validate'
 import i18n from './i18n'
 
