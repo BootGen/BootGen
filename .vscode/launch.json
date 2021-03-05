@@ -9,9 +9,9 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceFolder}/WebProject/bin/Debug/net5.0/WebProject.dll",
+            "program": "${workspaceFolder}/bin/Debug/netcoreapp3.1/WebProject.dll",
             "args": [],
-            "cwd": "${workspaceFolder}/WebProject",
+            "cwd": "${workspaceFolder}",
             "stopAtEntry": false,
             "serverReadyAction": {
                 "action": "openExternally",
