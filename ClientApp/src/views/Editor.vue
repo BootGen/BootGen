@@ -175,7 +175,7 @@ export default Vue.extend({
       }
       const jsonError = this.jsonError(this.activeProject.json);
       if(jsonError !== false){
-        this.highlightLine(0, this.getLine(jsonError.line, this.activeProject.json), jsonError.message, "red");
+        this.highlightLine(0, jsonError.line, jsonError.message, "red");
       }
     },
     newProject: async function(){
@@ -192,7 +192,7 @@ export default Vue.extend({
         this.unsetHighlight(0, "CodeMirror-line");
         this.generate(json);
       }else{
-        this.highlightLine(0, this.getLine(jsonError.line, json), jsonError.message, "red");
+        this.highlightLine(0, jsonError.line, jsonError.message, "red");
       }
     },
     highlightLine: function(cmId: number, line: number, errorMessage: string, color: string){
@@ -227,12 +227,20 @@ export default Vue.extend({
       return -1;
     },
     jsonError: function (text: string) {
+      const json = text.split("\n").filter(line => !line.trim().startsWith("//")).join("\n");
       try {
-        text = text.split("\n").filter(line => !line.trim().startsWith("//")).join("\n");
-        JSON.parse(text);
+        JSON.parse(json);
         return false;
       } catch (err) {
-        return {line: err.message.match(/\d+/g)[0]-1, message: err.message};
+        const idx = err.message.match(/\d+/g)[0]-1;
+        const lines = text.split("\n");
+        let errorLine = this.getLine(idx, json);
+        for(let i = 0; i < errorLine; i++){
+          if(lines[i].includes("//")){
+            errorLine++;
+          }
+        }
+        return {line: errorLine, message: err.message};
       }
     },
     unsetHighlight(cmId: number, from: string){
@@ -248,7 +256,7 @@ export default Vue.extend({
     prettyPrint: function(json: string){
       const jsonError = this.jsonError(json);
       if(jsonError !== false){
-        this.highlightLine(0, this.getLine(jsonError.line, this.activeProject.json), jsonError.message, "red");
+        this.highlightLine(0, jsonError.line, jsonError.message, "red");
       }else{
         //json = json.replace(/'/g, "\"");
         //this.activeProject.json = JSON.stringify(JSON.parse(json),null,'\t');
