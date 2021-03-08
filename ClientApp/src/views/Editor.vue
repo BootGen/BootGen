@@ -108,7 +108,6 @@ export default Vue.extend({
   created: async function(){
     this.initialProject.json = (await axios.get("example_input.json", {responseType: "text"})).data;
     this.activeProject = {...this.initialProject};
-    this.prettyPrint(this.activeProject.json);
     await this.setJson(this.activeProject.json);
   },
   data: function () {
@@ -181,7 +180,6 @@ export default Vue.extend({
     newProject: async function(){
       this.activeProject = {...this.initialProject};
       this.previousJson = [];
-      this.prettyPrint(this.activeProject.json);
       this.setProjectSettings(this.activeProject.json, "Test");
       this.generate(this.activeProject.json);
     },
@@ -258,9 +256,60 @@ export default Vue.extend({
       if(jsonError !== false){
         this.highlightLine(0, jsonError.line, jsonError.message, "red");
       }else{
-        //json = json.replace(/'/g, "\"");
-        //this.activeProject.json = JSON.stringify(JSON.parse(json),null,'\t');
+        json = json.split("\r").join("");
+        const comments = json.match(/(\/\/.*)(\n)/g);
+        json = json.replace(/(\/\/.*)(\n)/g, "#>comment<");
+        json = this.formatJson(json);
+        let lines = this.indentLines(json.split("\n"));
+        if(comments){
+          lines = this.replaceToComment(comments, lines);
+        }
+        this.activeProject.json = lines.join("\n");
       }
+    },
+    formatJson: function(json: string): string{
+      json = json.replace(/( )*(}|]|{|\[|,)/g, "$2");
+      json = json.replace(/( {2})*/g, "");
+      json = json.replace(/(: *)/g, ": ");
+      json = json.split("'").join("\"");
+      json = json.split("\t").join("");
+      json = json.split("\n").join("");
+      json = json.split("#>comment<").join("#>comment<\n");
+      json = json.split("{").join("{\n");
+      json = json.split("}").join("}\n");
+      json = json.split("[").join("[\n");
+      json = json.split("]").join("]\n");
+      json = json.split(",").join(",\n");
+      json = json.split("\n,").join(",");
+      json = json.split("\"}").join("\"\n}");
+      json = json.split("\"]").join("\"\n]");
+      return json;
+    },
+    indentLines: function(lines: string[]): string[]{
+      let tabCount = 0;
+      for(let i = 0; i < lines.length; i++){
+        if(lines[i].includes("{") || lines[i].includes("[")){
+          lines[i] = "\t".repeat(tabCount).concat(lines[i].trim());
+          tabCount++;
+        }else if(lines[i].includes("}") || lines[i].includes("]")){
+          --tabCount;
+          lines[i] = "\t".repeat(tabCount).concat(lines[i].trim());
+        }else{
+          lines[i] = "\t".repeat(tabCount).concat(lines[i].trim());
+        }
+      }
+      return lines;
+    },
+    replaceToComment: function(comments: string[], lines: string[]): string[]{
+      comments.forEach(comment => {
+        for(let i = 0; i < lines.length; i++){
+          if(lines[i].includes("#>comment<")){
+            lines[i] = lines[i].replace(/#>comment</g, comment.slice(0, -1));
+            break;
+          }
+        }
+      });
+      return lines;
     },
     selectProject: function(project: Project){
       let select = true;
@@ -316,7 +365,6 @@ export default Vue.extend({
       this.activeProject.json = this.previousJson[this.previousJson.length-2];
       this.previousJson.pop();
       this.generate(this.activeProject.json);
-      this.prettyPrint(this.activeProject.json);
       this.snackbar.type = "info";
       this.snackbar.text = "Everything restored to its previous saved state";
       this.snackbar.visible = true;
