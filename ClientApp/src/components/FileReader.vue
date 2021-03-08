@@ -52,6 +52,7 @@ import 'codemirror/lib/codemirror.css'
 import "codemirror/mode/clike/clike.js";
 import "codemirror/mode/yaml/yaml.js";
 import "codemirror/mode/javascript/javascript.js";
+import "codemirror/mode/vue/vue.js";
 import 'codemirror/theme/material.css'
 import { GeneratedFile } from "../models/GeneratedFile";
 
@@ -131,6 +132,8 @@ export default Vue.extend({
         this.cmOptions.mode = 'text/x-csharp';
       }else if(type === "ts"){
         this.cmOptions.mode = 'text/typescript';
+      }else if(type === "vue"){
+        this.cmOptions.mode = 'text/x-vue';
       }else{
         this.cmOptions.mode = 'text/x-yaml';
       }
