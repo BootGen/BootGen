@@ -1,0 +1,21 @@
+{
+  "users": [
+    {
+      "userName": "Test User",
+      "email": "example@email.com",
+      "tasks": [
+        {
+          "title": "Task Title",
+          "description": "Task description",
+          "tags": [
+            //many-to-many
+            {
+              "name": "important",
+              "color": "red"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

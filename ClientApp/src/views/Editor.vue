@@ -94,6 +94,7 @@ import { codemirror } from 'vue-codemirror'
 import 'codemirror/lib/codemirror.css'
 import "codemirror/mode/javascript/javascript.js";
 import 'codemirror/theme/material.css'
+import axios from 'axios'
 
 export default Vue.extend({
   components: {
@@ -105,6 +106,7 @@ export default Vue.extend({
     codemirror
   },
   created: async function(){
+    this.initialProject.json = (await axios.get("example_input.json", {responseType: "text"})).data;
     this.activeProject = {...this.initialProject};
     this.prettyPrint(this.activeProject.json);
     await this.setJson(this.activeProject.json);
@@ -114,7 +116,7 @@ export default Vue.extend({
       openExplorer: false,
       openHelp: false,
       generatedFiles: Array<GeneratedFile>(),
-      initialProject: {id: -1, ownerId: -1, name: "", json: '{ "users": [{"userName": "Test User", "email": "aa@bb@cc"}], "tasks": [{"title": "Task Title", "description": "Task des"}] }'},
+      initialProject: {id: -1, ownerId: -1, name: "", json: "{}"},
       previousJson: Array<string>(),
       activeProject: {id: -1, ownerId: -1, name: "", json: ""},
       cmOptions: {
@@ -248,8 +250,8 @@ export default Vue.extend({
       if(jsonError !== false){
         this.highlightLine(0, this.getLine(jsonError.line, this.activeProject.json), jsonError.message, "red");
       }else{
-        json = json.replace(/'/g, "\"");
-        this.activeProject.json = JSON.stringify(JSON.parse(json),null,'\t');
+        //json = json.replace(/'/g, "\"");
+        //this.activeProject.json = JSON.stringify(JSON.parse(json),null,'\t');
       }
     },
     selectProject: function(project: Project){
