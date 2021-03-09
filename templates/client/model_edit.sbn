@@ -1,0 +1,39 @@
+<template>
+  <v-card elevation="2">
+    <v-list dense>
+      <v-list-item class="justify-end">
+        <v-btn @click="save"><v-icon>mdi-floppy</v-icon></v-btn>
+      </v-list-item>
+      {{~ for property in class.common_properties ~}}
+      <v-list-item>
+        <v-list-item-content>{{ camel_case property.name }}:</v-list-item-content>
+        {{~ if property.name == "Id" ~}}
+        <v-list-item-content class="align-end">
+          {{'{{'}} {{ camel_case class.name }}.{{ camel_case property.name }} {{'}}'}}
+        </v-list-item-content>
+        {{~ else ~}}
+        <v-text-field v-model="{{ camel_case class.name }}.{{ camel_case property.name }}"></v-text-field>
+        {{~ end ~}}
+        </v-list-item>
+      {{~ end ~}}
+    </v-list>
+  </v-card>
+</template>
+
+<script lang="ts">
+import Vue from "vue";
+import { {{ class.name }} } from "../models/{{ class.name }}"
+
+export default Vue.extend({
+    props: ['{{ camel_case class.name }}'],
+  data: function () {
+    return {};
+  },
+  methods: {
+    save: async function () {
+      await this.$store.dispatch("update{{ class.name }}", this.{{ camel_case class.name }});
+      this.$emit("save-changes");
+    },
+  },
+});
+</script>
