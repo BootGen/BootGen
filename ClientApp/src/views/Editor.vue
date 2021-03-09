@@ -150,7 +150,11 @@ export default Vue.extend({
       if(this.$store.state.auth.user && this.activeProject.id >= 0){
         await this.$store.dispatch("projects/updateProject", this.activeProject);
       }
-      if(this.previousJson[this.previousJson.length-1] !== this.activeProject.json){
+      let prevJson = "";
+      if(this.previousJson[this.previousJson.length-1]){
+        prevJson = this.previousJson[this.previousJson.length-1];
+      }
+      if(this.formatJson(prevJson) !== this.formatJson(this.activeProject.json)){
         this.previousJson.push(this.activeProject.json);
       }
       this.prettyPrint(this.activeProject.json);
@@ -270,6 +274,7 @@ export default Vue.extend({
       }
     },
     formatJson: function(json: string): string{
+      json = json.split("\r").join("");
       json = json.replace(/( )*(}|]|{|\[|,)/g, "$2");
       json = json.replace(/( {2})*/g, "");
       json = json.replace(/(: *)/g, ": ");
