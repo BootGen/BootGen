@@ -6,7 +6,7 @@
         <v-icon class="pr-3" dark large>{{ snackbar.icon }}</v-icon>
       <div>{{ snackbar.text }}</div>
       </div>
-      <v-btn v-if="snackbar.dismissable" icon @click="snackbar.visible = false">
+      <v-btn v-if="snackbar.dismissible" icon @click="snackbar.visible = false">
         <v-icon>mdi-close-thick</v-icon>
       </v-btn>
     </v-layout>
@@ -15,7 +15,7 @@
 </template>
 <script lang="ts">
 interface Snackbar {
-	dismissable: boolean;
+	dismissible: boolean;
 	visible: boolean;
 	type: string;
 	icon: string;
