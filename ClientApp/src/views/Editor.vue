@@ -28,11 +28,19 @@
                 <help-dialog v-if="openHelp" @close-help="openHelp = false"></help-dialog>
                 <v-tooltip bottom>
                   <template v-slot:activator="{ on, attrs }">
+                    <v-btn class="mr-2" color="white" elevation="1" fab small @click="undoAll" v-bind="attrs" v-on="on" :disabled="previousJson.length < 2">
+                      <v-icon color="primary">mdi-replay</v-icon>
+                    </v-btn>
+                    </template>
+                  <span>Rollback to the last saved state</span>
+                </v-tooltip>
+                <v-tooltip bottom>
+                  <template v-slot:activator="{ on, attrs }">
                     <v-btn class="mr-2" color="white" elevation="1" fab small @click="undo" v-bind="attrs" v-on="on" :disabled="previousJson.length < 2">
                       <v-icon color="primary">mdi-undo</v-icon>
                     </v-btn>
                     </template>
-                  <span>Rollback to the last saved state</span>
+                  <span>Rollback to the last generated state</span>
                 </v-tooltip>
                 <v-tooltip bottom v-if="$store.state.auth.jwt">
                   <template v-slot:activator="{ on, attrs }">
@@ -147,9 +155,6 @@ export default Vue.extend({
       const generate = await this.$store.dispatch("generate", {data: json, nameSpace: this.camalize(nameSpace)});
       this.generatedFiles = generate.generatedFiles;
       this.activeProject.json = json;
-      if(this.$store.state.auth.user && this.activeProject.id >= 0){
-        await this.$store.dispatch("projects/updateProject", this.activeProject);
-      }
       let prevJson = "";
       if(this.previousJson[this.previousJson.length-1]){
         prevJson = this.previousJson[this.previousJson.length-1];
@@ -373,6 +378,13 @@ export default Vue.extend({
       this.snackbar.type = "info";
       this.snackbar.text = "Everything restored to its previous saved state";
       this.snackbar.visible = true;
+    },
+    undoAll: async function(){
+      if(this.activeProject.id !== -1){
+        console.log(await this.$store.dispatch("projects/getProject", this.activeProject.id));
+      }else{
+        this.activeProject = {...this.initialProject};
+      }
     },
     changeProjectName: function(name: string){
       this.projectName = name;
