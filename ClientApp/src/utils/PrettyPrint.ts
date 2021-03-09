@@ -110,7 +110,6 @@ export function highlightLine(cmId: number, line: number, errorMessage: string, 
   }
 }
 export function prettyPrint(json: string, snackbar: SnackBar, minLine: number, maxLine: number){
-  console.log("PrettyPrint");
   const error = jsonError(json);
   if(error !== false){
     highlightLine(0, error.line, error.message, "red", snackbar, minLine, maxLine);

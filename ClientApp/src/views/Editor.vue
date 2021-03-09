@@ -264,15 +264,19 @@ export default Vue.extend({
       this.previousJson.pop();
       this.generate(this.activeProject.json);
       this.snackbar.type = "info";
-      this.snackbar.text = "Everything restored to its previous saved state";
+      this.snackbar.text = "Everything restored to its previous generated state";
       this.snackbar.visible = true;
     },
     undoAll: async function(){
       if(this.activeProject.id !== -1){
-        console.log(await this.$store.dispatch("projects/getProject", this.activeProject.id));
+        await this.$store.dispatch("projects/getProject", this.activeProject.id);
       }else{
         this.activeProject = {...this.initialProject};
       }
+      this.snackbar.type = "info";
+      this.snackbar.text = "Everything restored to its previous saved state";
+      this.snackbar.visible = true;
+      this.previousJson = [this.activeProject.json];
     },
     changeProjectName: function(name: string){
       this.projectName = name;
