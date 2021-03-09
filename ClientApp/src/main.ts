@@ -17,15 +17,6 @@ new Vue({
   store,
   vuetify,
   i18n,
-  created: async function() {
-    this.$store.commit('setProjectSettings', 
-      {
-        data: '{ "users": [{"userName": "Test User", "email": "aa@bb@cc"}], "tasks": [{"title": "Task Title", "description": "Task des"}] }',
-        generateClient: true,
-        nameSpace: "test"
-      }
-    );
-  },
   mounted: async function() {
     if(store.state.auth.jwt){
       await this.$store.dispatch("profile");

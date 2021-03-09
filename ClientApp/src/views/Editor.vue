@@ -74,7 +74,7 @@
         </base-material-generator-card>
       </v-col>
       <v-col cols="12" md="6" class="pa-0">
-        <file-reader :files="generatedFiles"></file-reader>
+        <file-reader :json="this.activeProject.json" :jsonName="this.activeProject.name" :files="generatedFiles"></file-reader>
       </v-col>
     </v-row>
     <snackbar v-if="snackbar.visible" :snackbar="snackbar"></snackbar>
@@ -140,8 +140,11 @@ export default Vue.extend({
   },
   methods: {
     generate: async function(json: string){
-      this.setProjectSettings(json, this.$store.state.projectSettings.item.nameSpace);
-      const generate = await this.$store.dispatch("generate", this.$store.state.projectSettings.item);
+      let nameSpace = "Test"
+      if(this.activeProject.name !== ""){
+        nameSpace = this.activeProject.name;
+      }
+      const generate = await this.$store.dispatch("generate", {data: json, nameSpace: this.camalize(nameSpace)});
       this.generatedFiles = generate.generatedFiles;
       this.activeProject.json = json;
       if(this.$store.state.auth.user && this.activeProject.id >= 0){
@@ -180,7 +183,6 @@ export default Vue.extend({
     newProject: async function(){
       this.activeProject = {...this.initialProject};
       this.previousJson = [];
-      this.setProjectSettings(this.activeProject.json, "Test");
       this.generate(this.activeProject.json);
     },
     setJson: async function(json: string) {
@@ -319,7 +321,6 @@ export default Vue.extend({
       if(select){
         project.json = project.json.split("'").join('"');
         this.activeProject = project;
-        this.setProjectSettings(this.activeProject.json, this.activeProject.name);
         this.setJson(this.activeProject.json);
       }
       this.previousJson = [];
@@ -353,7 +354,6 @@ export default Vue.extend({
           this.snackbar.text = "Project updated successfully!";
           await this.$store.dispatch("projects/updateProject", this.activeProject);
         }
-        this.setProjectSettings(this.activeProject.json, this.activeProject.name);
         this.generate(this.activeProject.json);
       }else{
         this.snackbar.type = "error";
@@ -371,15 +371,6 @@ export default Vue.extend({
     },
     changeProjectName: function(name: string){
       this.projectName = name;
-    },
-    setProjectSettings: function(json: string, nameSpace: string){
-      this.$store.commit('setProjectSettings',
-        {
-          data: json,
-          generateClient: true,
-          nameSpace: this.camalize(nameSpace)
-        }
-      );
     },
     camalize: function(str: string) {
       return str.replace(/(?:^\w|[A-Z]|\b\w)/g, function(word, index) {

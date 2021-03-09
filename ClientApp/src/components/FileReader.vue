@@ -58,6 +58,8 @@ import { GeneratedFile } from "../models/GeneratedFile";
 
 export default Vue.extend({
   props: {
+    json: String,
+    jsonName: String,
     files: {
 			type: Array as () => GeneratedFile[]
 		},
@@ -113,7 +115,16 @@ export default Vue.extend({
       }
     },
     download: function() {
-      this.$store.dispatch("download", this.$store.state.projectSettings.item);
+      let nameSpace = "Test"
+      if(this.jsonName !== ""){
+        nameSpace = this.jsonName;
+      }
+      this.$store.dispatch("download", {data: this.json, nameSpace: this.camalize(nameSpace)});
+    },
+    camalize: function(str: string) {
+      return str.replace(/(?:^\w|[A-Z]|\b\w)/g, function(word, index) {
+        return index === 0 ? word.toLowerCase() : word.toUpperCase();
+      }).replace(/\s+/g, '');
     },
     openFolder: function(idx: number){
       this.openPath = "";

@@ -2,7 +2,6 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import axios from 'axios'
 import authModule, { AuthState } from '@/store/AuthModule'
-import ProjectSettingsModule, { ProjectSettingsState} from '@/store/ProjectSettingsModule'
 import generateModule from '@/store/GenerateModule'
 import userModule, { UsersState } from '@/store/UserModule'
 import projectModule, { ProjectsState } from '@/store/ProjectModule'
@@ -15,7 +14,6 @@ export interface State {
   auth: AuthState;
   users: UsersState;
   projects: ProjectsState;
-  projectSettings: ProjectSettingsState;
 }
 
 export default new Vuex.Store<State>({
@@ -24,6 +22,5 @@ export default new Vuex.Store<State>({
     users: userModule,
     projects: projectModule,
     generate: generateModule,
-    projectSettings: ProjectSettingsModule
   }
 })
