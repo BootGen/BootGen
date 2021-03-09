@@ -1,26 +1,38 @@
 <template>
-  <v-card elevation="2">
-    <v-list dense>
-    {{~ for property in class.common_properties ~}}
-      <v-list-item>
-        <v-list-item-content>{{ camel_case property.name }}:</v-list-item-content>
-        <v-list-item-content class="align-end">
-          {{'{{'}} {{ camel_case class.name }}.{{ camel_case property.name }} {{'}}'}}
-        </v-list-item-content>
-      </v-list-item>
-    {{~ end ~}}
-    </v-list>
-  </v-card>
+  <v-container fluid>
+    <{{ camel_case class.name }}-edit v-if="{{ camel_case class.name }}Edit" :{{ camel_case class.name }}="{{ camel_case class.name }}" @save-changes="{{ camel_case class.name }}Edit = false"></{{ camel_case class.name }}-edit>
+    <v-card elevation="2" v-else>
+      <v-list dense>
+        <v-list-item class="justify-end">
+          <v-btn @click="{{ camel_case class.name }}Edit = true"><v-icon>mdi-pencil</v-icon></v-btn>
+        </v-list-item>
+      {{~ for property in class.common_properties ~}}
+        <v-list-item>
+          <v-list-item-content>{{ camel_case property.name }}:</v-list-item-content>
+          <v-list-item-content class="align-end">
+            {{'{{'}} {{ camel_case class.name }}.{{ camel_case property.name }} {{'}}'}}
+          </v-list-item-content>
+        </v-list-item>
+      {{~ end ~}}
+      </v-list>
+    </v-card>
+  </v-container>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
 import { {{ class.name }} } from "../models/{{ class.name }}"
+import {{ camel_case class.name }}Edit from "./{{ class.name }}Edit.vue"
 
 export default Vue.extend({
-    props: ['{{ camel_case class.name }}'],
+  props: ['{{ camel_case class.name }}'],
+  components: {
+    {{ camel_case class.name }}Edit,
+  },
   data: function () {
-    return {};
+    return {
+      {{ camel_case class.name }}Edit: false,
+    };
   },
   methods: {},
 });
