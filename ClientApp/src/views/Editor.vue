@@ -78,9 +78,10 @@
               </div>
             </div>
           </template>
-          <codemirror id="cm0" v-model="activeProject.json" :options="cmOptions" @scroll="onScroll"/>
+          <code-mirror cmId="cm0" :activeProject="activeProject" :error="error" @set-snackbar="setSnackbar"></code-mirror>
         </base-material-generator-card>
       </v-col>
+
       <v-col cols="12" md="6" class="pa-0">
         <file-reader :json="this.activeProject.json" :jsonName="this.activeProject.name" :files="generatedFiles"></file-reader>
       </v-col>
@@ -91,7 +92,8 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { prettyPrint, formatJson, jsonError, highlightLine, unsetHighlight } from '../utils/PrettyPrint';
+import CodeMirror from "../components/CodeMirror.vue";
+import { prettyPrint, formatJson, jsonError } from "../utils/PrettyPrint";
 import FileReader from "../components/FileReader.vue";
 import FileExplorer from "../components/FileExplorer.vue";
 import HelpDialog from "../components/HelpDialog.vue";
@@ -99,11 +101,7 @@ import HeadBar from "../components/HeadBar.vue";
 import Snackbar from "../components/Snackbar.vue";
 import { Project } from "../models/Project";
 import { GeneratedFile } from "../models/GeneratedFile";
-import { codemirror } from 'vue-codemirror'
-import 'codemirror/lib/codemirror.css'
-import "codemirror/mode/javascript/javascript.js";
-import 'codemirror/theme/material.css';
-import axios from 'axios'
+import axios from 'axios';
 
 export default Vue.extend({
   components: {
@@ -112,7 +110,7 @@ export default Vue.extend({
     HelpDialog,
     HeadBar,
     Snackbar,
-    codemirror
+    CodeMirror,
   },
   created: async function(){
     this.initialProject.json = (await axios.get("example_input.json", {responseType: "text"})).data;
@@ -127,13 +125,6 @@ export default Vue.extend({
       initialProject: {id: -1, ownerId: -1, name: "", json: "{}"},
       previousJson: Array<string>(),
       activeProject: {id: -1, ownerId: -1, name: "", json: ""},
-      cmOptions: {
-        theme: 'material',
-        tabSize: 2,
-        mode: 'text/javascript',
-        lineNumbers: true,
-        line: true,
-      },
       snackbar: {
         dismissible: true,
         visible: false,
@@ -143,8 +134,7 @@ export default Vue.extend({
         timeout: 5000,
       },
       projectName: "",
-      minLine: 5000000,
-      maxLine: -1,
+      error: {line: -1, message: ""},
     };
   },
   methods: {
@@ -165,35 +155,13 @@ export default Vue.extend({
       }
       this.callPrettyPrint();
     },
-    onScroll: function() {
-      this.snackbar.visible = false;
-      unsetHighlight(0, "CodeMirror-line");
-      const elementById = document.getElementById("cm0");
-      if(!elementById){
-        return;
-      }
-      const list = elementById.getElementsByClassName("CodeMirror-linenumber");
-      this.minLine = 5000000;
-      this.maxLine = -1;
-      for (let i = 1; i < list.length; i++) {
-        const textval = list[i].textContent;
-        if (textval) {
-          const lineNum = parseInt(textval, 10);
-          if (lineNum < this.minLine)
-            this.minLine = lineNum;
-          if (lineNum > this.maxLine)
-            this.maxLine = lineNum;
-        }
-      }
-      const error = jsonError(this.activeProject.json);
-      if(error !== false){
-        highlightLine(0, error.line, error.message, "red", this.snackbar, this.minLine, this.maxLine);
-      }
-    },
     callPrettyPrint: function(){
-      const formattedJson = prettyPrint(this.activeProject.json, this.snackbar, this.minLine, this.maxLine);
-      if(formattedJson){
-        this.activeProject.json = formattedJson
+      const result = prettyPrint(this.activeProject.json);
+      if(typeof(result) === "string"){
+        this.activeProject.json = result;
+      }else{
+        this.error = result;
+        this.setSnackbar("orange darken-2", this.error.message, true, -1);
       }
     },
     newProject: async function(){
@@ -204,12 +172,20 @@ export default Vue.extend({
     setJson: async function(json: string) {
       const error = jsonError(json);
       if(error === false){
-        this.snackbar.visible = false;
-        unsetHighlight(0, "CodeMirror-line");
+        this.error = {line: -1, message: ""};
+        this.setSnackbar();
         this.generate(json);
       }else{
-        highlightLine(0, error.line, error.message, "red", this.snackbar, this.minLine, this.maxLine);
+        this.error = error;
+        this.setSnackbar("orange darken-2", error.message, true, -1);
       }
+    },
+    setSnackbar: function(type = "", text = "", visible = false, timeout = -1){
+      this.snackbar.dismissible = true,
+      this.snackbar.timeout = timeout;
+      this.snackbar.type = type;
+      this.snackbar.text = text;
+      this.snackbar.visible = visible;
     },
     selectProject: function(project: Project){
       let select = true;
@@ -239,33 +215,26 @@ export default Vue.extend({
       if(this.activeProject.name){
         const exists = this.existsProjectName();
         if(!exists && this.activeProject.id === -1){
-          this.snackbar.type = "success";
-          this.snackbar.text = "The new project was successfully created!";
+          this.setSnackbar("success", "The new project was successfully created!", true, 5000);
           this.activeProject.id = 0;
           this.activeProject.ownerId = this.$store.state.auth.user.id;
           this.activeProject = await this.$store.dispatch("projects/addProject", this.activeProject);
         }else if(exists && exists.id !== this.activeProject.id){
-          this.snackbar.type = "error";
-          this.snackbar.text = "This name is already in use, please enter another name!";
+          this.setSnackbar("error", "This name is already in use, please enter another name!", true, 5000);
         }else{   
-          this.snackbar.type = "success";
-          this.snackbar.text = "Project updated successfully!";
+          this.setSnackbar("success", "Project updated successfully!", true, 5000);
           await this.$store.dispatch("projects/updateProject", this.activeProject);
         }
         this.generate(this.activeProject.json);
       }else{
-        this.snackbar.type = "error";
-        this.snackbar.text = "This name is incorrect!";
+        this.setSnackbar("error", "This name is incorrect!", true, 5000);
       }
-      this.snackbar.visible = true;
     },
     undo: async function (){
       this.activeProject.json = this.previousJson[this.previousJson.length-2];
       this.previousJson.pop();
       this.generate(this.activeProject.json);
-      this.snackbar.type = "info";
-      this.snackbar.text = "Everything restored to its previous generated state";
-      this.snackbar.visible = true;
+      this.setSnackbar("info", "Everything restored to its previous generated state", true, 5000);
     },
     undoAll: async function(){
       if(this.activeProject.id !== -1){
@@ -273,9 +242,7 @@ export default Vue.extend({
       }else{
         this.activeProject = {...this.initialProject};
       }
-      this.snackbar.type = "info";
-      this.snackbar.text = "Everything restored to its previous saved state";
-      this.snackbar.visible = true;
+      this.setSnackbar("info", "Everything restored to its previous saved state", true, 5000);
       this.previousJson = [this.activeProject.json];
     },
     changeProjectName: function(name: string){
@@ -291,21 +258,6 @@ export default Vue.extend({
 </script>
 
 <style lang="css">
-  .vue-codemirror{
-    width: 100%;
-    height: calc(100% - 40px);
-    margin-bottom: 0!important;
-    padding-bottom: 0!important;
-  }
-  .CodeMirror-scroll{
-    overflow: auto!important;
-    margin: 0!important;
-    padding: 0!important;
-  }
-  .CodeMirror{
-    height: 100%;
-    z-index: 0;
-  }
   .editor{
     margin: 0!important;
     padding: 0!important;

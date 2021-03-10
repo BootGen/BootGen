@@ -1,11 +1,3 @@
-interface SnackBar{
-  dismissible: boolean;
-  timeout: number;
-  type: string;
-  text: string;
-  visible: boolean;
-}
-
 function getLine(idx: number, str: string): number{
   if(navigator.userAgent.indexOf("Firefox") != -1){
     return idx;
@@ -82,37 +74,10 @@ function replaceToComment(comments: string[], lines: string[]): string[]{
   });
   return lines;
 }
-export function unsetHighlight(cmId: number, from: string){
-  const elementById = document.getElementById("cm" + cmId);
-  if(!elementById){
-    return;
-  }
-  const e = elementById.getElementsByClassName(from);
-  for(let i = 0; i < e.length; i++){
-    e[i].setAttribute("style", "background-color: unset;");
-  }
-}
-export function highlightLine(cmId: number, line: number, errorMessage: string, color: string, snackbar: SnackBar, minLine: number, maxLine: number){
-  snackbar.dismissible = true,
-  snackbar.timeout = -1;
-  snackbar.type = "orange darken-2";
-  snackbar.text = errorMessage;
-  snackbar.visible = true;
-  unsetHighlight(0, "CodeMirror-line");
-  const elementById = document.getElementById("cm" + cmId);
-  if(!elementById || (minLine > line && minLine < 5000000) || (maxLine < line && maxLine > -1)){
-    return;
-  }
-  if(minLine < line && line < maxLine){
-    elementById.getElementsByClassName("CodeMirror-line")[line-minLine+2].setAttribute("style", `background-color:${color};`);
-  }else{
-    elementById.getElementsByClassName("CodeMirror-line")[line].setAttribute("style", `background-color:${color};`);
-  }
-}
-export function prettyPrint(json: string, snackbar: SnackBar, minLine: number, maxLine: number){
+export function prettyPrint(json: string){
   const error = jsonError(json);
   if(error !== false){
-    highlightLine(0, error.line, error.message, "red", snackbar, minLine, maxLine);
+    return error;
   }else{
     json = json.split("\r").join("");
     const comments = json.match(/(\/\/.*)(\n)/g);
