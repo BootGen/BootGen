@@ -3,7 +3,7 @@
     <v-list dense>
       <v-list-item class="justify-end">
         <v-btn @click="save"><v-icon>mdi-floppy</v-icon></v-btn>
-        <v-btn @click="cancel"><v-icon>mdi-floppy</v-icon></v-btn>
+        <v-btn @click="cancel"><v-icon>mdi-close</v-icon></v-btn>
       </v-list-item>
       {{~ for property in class.common_properties ~}}
       <v-list-item>
@@ -12,7 +12,7 @@
         {{~ if property.name == "Id" ~}}
           {{'{{'}} {{ camel_case class.name }}.{{ camel_case property.name }} {{'}}'}}
         {{~ else ~}}
-        <v-text-field v-model="{{ camel_case class.name }}.{{ camel_case property.name }}"></v-text-field>
+          <v-text-field v-model="{{ camel_case class.name }}.{{ camel_case property.name }}" dense></v-text-field>
         {{~ end ~}}
         </v-list-item-content>
         </v-list-item>
@@ -23,7 +23,6 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { {{ class.name }} } from "../models/{{ class.name }}"
 
 export default Vue.extend({
     props: ['{{ camel_case class.name }}'],
@@ -33,11 +32,10 @@ export default Vue.extend({
   methods: {
     save: async function () {
       await this.$store.dispatch("{{ camel_case class.name.plural }}/update{{ class.name }}", this.{{ camel_case class.name }});
-      this.$emit("save-changes");
+      this.$emit("close");
     },
     cancel: async function () {
-      await this.$store.dispatch("{{ camel_case class.name.plural }}/update{{ class.name }}", this.{{ camel_case class.name }});
-      this.$emit("save-changes");
+      this.$emit("close");
     },
   },
 });

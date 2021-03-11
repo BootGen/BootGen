@@ -11,7 +11,8 @@
             md="6"
             lg="4"
           >
-            <{{ camel_case class.name }}-view :{{ camel_case class.name }}="item"></{{ camel_case class.name }}-view>
+            <{{ camel_case class.name }}-edit :{{ camel_case class.name }}="item" @close="edited{{ class.name }} = null" v-if="item === edited{{ class.name }}"></{{ camel_case class.name }}-edit>
+            <{{ camel_case class.name }}-view :{{ camel_case class.name }}="item" @edit="edited{{ class.name }} = item" v-else></{{ camel_case class.name }}-view>
           </v-col>
         </v-row>
       </template>
@@ -22,12 +23,14 @@
 <script lang="ts">
 import Vue from "vue";
 import {{ class.name }}View from "../components/{{ class.name }}View.vue";
+import {{ class.name }}Edit from "../components/{{ class.name }}Edit.vue";
 import { {{ class.name }} } from "../models/{{ class.name }}";
 export default Vue.extend({
-  components: { {{ class.name }}View },
+  components: { {{ class.name }}View, {{ class.name }}Edit },
   data: function () {
     return {
         {{ camel_case class.name.plural }}: Array<{{ class.name }}>(),
+        edited{{ class.name }}: null as ({{ class.name }}|null)
     };
   },
   created: async function () {
