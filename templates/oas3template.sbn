@@ -22,7 +22,7 @@ paths:
       {{~ for parameter in operation.parameters ~}}
         - name: {{ parameter.name }}
           in: {{ lower_case parameter.kind }}
-          required: {{ parameter.is_required }}
+          required: true
           schema:
             type: {{ get_type parameter }}
             {{~ if get_format parameter ~}}
@@ -71,14 +71,10 @@ components:
   {{~ for class in api.data_model.common_classes ~}}
     {{ class.name }}:
       type: object
-      {{~ if class.has_required_properties ~}}
       required:
         {{~ for property in class.common_properties ~}}
-        {{~ if property.is_required ~}}
         - {{ snake_case property.name }}
         {{~ end ~}}
-        {{~ end ~}}
-      {{~ end ~}}
       properties:
       {{~ for property in class.common_properties ~}}
         {{ snake_case property.name }}:

@@ -1,9 +1,0 @@
-namespace {{ name_space }}
-{
-    public enum {{ enum.name }}
-    {
-        {{~ for value in enum.values ~}}
-        {{ value }}{{ if !for.last }}, {{ end }}
-        {{~ end ~}}
-    }
-}
