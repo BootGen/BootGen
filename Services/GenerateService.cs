@@ -5,7 +5,6 @@ using System.IO.Compression;
 using System.Linq;
 using BootGen;
 using Newtonsoft.Json.Linq;
-using WebProject.Generator;
 
 namespace WebProject.Services
 {
@@ -104,9 +103,9 @@ namespace WebProject.Services
         private static BootGen.Project InitProject(GenerateRequest request, IDisk disk)
         {
             DataModel dataModel = new DataModel();
-            var collection = new ResourceCollection(dataModel);
             var jObject = JObject.Parse(request.Data, new JsonLoadSettings { CommentHandling = CommentHandling.Load });
-            collection.Load(jObject);
+            dataModel.Load(jObject);
+            var collection = new ResourceCollection(dataModel);
             var userClass = dataModel.Classes.FirstOrDefault(c => c.Name == "User");
             userClass.Properties.Add(new Property {
                 Name = "PasswordHash",

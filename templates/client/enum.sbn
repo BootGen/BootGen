@@ -1,5 +1,0 @@
-export enum {{ enum.name }} {
-    {{~ for value in enum.values ~}}
-    {{ value }},
-    {{~ end ~}}
-}

@@ -5,7 +5,7 @@ namespace {{ name_space }}
 {
     public class {{ class.name }}
     {
-        {{~ for property in class.server_properties ~}}
+        {{~ for property in class.properties ~}}
         {{~ if property.is_server_only ~}}
         [JsonIgnore]
         {{~ end ~}}
