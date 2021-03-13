@@ -118,6 +118,7 @@ namespace WebProject.Services
             {
                 ControllerFolder = "Controllers",
                 ServiceFolder = "Services",
+                ModelFolder = "Models",
                 ClientFolder = "ClientApp/src",
                 Disk = disk,
                 ResourceCollection = collection,
