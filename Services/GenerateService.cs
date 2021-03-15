@@ -47,7 +47,7 @@ namespace WebProject.Services
                     ResponseData = new GenerateResponse
                     {
                         Success = false,
-                        ErrorMessage = "Unknown error",
+                        ErrorMessage = e.Message,
                         GeneratedFiles = new List<GeneratedFile>()
                     }
                 };
@@ -103,7 +103,7 @@ namespace WebProject.Services
         private static BootGen.Project InitProject(GenerateRequest request, IDisk disk)
         {
             DataModel dataModel = new DataModel();
-            var jObject = JObject.Parse(request.Data, new JsonLoadSettings { CommentHandling = CommentHandling.Load });
+            var jObject = JObject.Parse(request.Data, new JsonLoadSettings { CommentHandling = CommentHandling.Load, DuplicatePropertyNameHandling = DuplicatePropertyNameHandling.Error });
             dataModel.Load(jObject);
             var collection = new ResourceCollection(dataModel);
             var userClass = dataModel.Classes.FirstOrDefault(c => c.Name == "User");
