@@ -7,6 +7,7 @@ namespace WebProject
     {
         public bool Success { get; set; }
         public string ErrorMessage { get; set; }
+        public int? ErrorLine { get; set; }
         public List<GeneratedFile> GeneratedFiles { get; set; }
     }
 }

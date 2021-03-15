@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Text.RegularExpressions;
 using BootGen;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace WebProject.Services
@@ -48,11 +50,19 @@ namespace WebProject.Services
                     {
                         Success = false,
                         ErrorMessage = e.Message,
+                        ErrorLine = e is JsonReaderException ? GetLine(e) : null,
                         GeneratedFiles = new List<GeneratedFile>()
                     }
                 };
             }
         }
+
+        private int? GetLine(Exception e)
+        {
+            var lineStr = Regex.Match(Regex.Match(e.Message, @"line \d+").Value, @"\d+").Value;
+            return int.Parse(lineStr);
+        }
+
         public ServiceResponse<Stream> Download(GenerateRequest request)
         {
             var tempRoot = "temp";
@@ -84,9 +94,8 @@ namespace WebProject.Services
                     ResponseData = ms
                 };
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                Console.WriteLine(e);
                 return new ServiceResponse<Stream>
                 {
                     StatusCode = 500,
@@ -107,6 +116,12 @@ namespace WebProject.Services
             dataModel.Load(jObject);
             var collection = new ResourceCollection(dataModel);
             var userClass = dataModel.Classes.FirstOrDefault(c => c.Name == "User");
+            if (userClass == null)
+                throw new Exception("The model must contain a user class.");
+            if (userClass.Properties.Any(p => p.Name == "PasswordHash" || p.Name == "Password"))
+                throw new Exception("You must not explicitly set passwords for users. A password hash will be automatically added to the user class.");
+            if (!userClass.Properties.Any(p => p.Name == "Email" && p.BuiltInType == BuiltInType.String))
+                throw new Exception("The user class must contain a string property named 'email'.");
             userClass.Properties.Add(new Property {
                 Name = "PasswordHash",
                 PropertyType = PropertyType.ServerOnly,
