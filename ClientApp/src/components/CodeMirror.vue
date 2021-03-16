@@ -1,21 +1,29 @@
 <template>
   <v-container fluid class="cm">
-    <codemirror :id="cmId" v-model="activeProject.json" :options="cmOptions" @scroll="onScroll"/>
+    <codemirror v-if="activeProject" :id="cmId" v-model="activeProject.json" :options="cmOptions" @scroll="onScroll" />
+    <codemirror v-if="activeFile" :id="cmId" v-model="activeFile.content" :options="cmOptions" @scrollCursorIntoView="cursorIntoView()" />
   </v-container>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
 import { jsonError } from '../utils/PrettyPrint';
-import { codemirror } from 'vue-codemirror'
-import 'codemirror/lib/codemirror.css'
-import "codemirror/mode/javascript/javascript.js";
+import { codemirror } from 'vue-codemirror';
 import 'codemirror/theme/material.css';
+import 'codemirror/lib/codemirror.css';
+import "codemirror/mode/clike/clike.js";
+import "codemirror/mode/yaml/yaml.js";
+import "codemirror/mode/vue/vue.js";
+import "codemirror/mode/javascript/javascript.js";
 import { Project } from "../models/Project";
+import { GeneratedFile } from "../models/GeneratedFile";
 
 export default Vue.extend({
   props: {
     cmId: String,
+    activeFile: {
+      type: Object as () => GeneratedFile
+    },
     activeProject: {
 			type: Object as () => Project
 		},
@@ -27,6 +35,20 @@ export default Vue.extend({
     codemirror,
   },
   watch: {
+    activeFile: {
+      handler(activeFile: GeneratedFile) {
+        const type = activeFile.name.split('.')[1];
+        if(type === "cs"){
+          this.cmOptions.mode = 'text/x-csharp';
+        }else if(type === "ts"){
+          this.cmOptions.mode = 'text/typescript';
+        }else if(type === "vue"){
+          this.cmOptions.mode = 'text/x-vue';
+        }else{
+          this.cmOptions.mode = 'text/x-yaml';
+        }
+      }
+    },
     error: {
       handler(error: {line: number; message: string}) {
         if(error.line === -1){
@@ -37,6 +59,11 @@ export default Vue.extend({
       }
     }
   },
+  created: function(){
+    if(this.activeFile){
+      this.cmOptions.readOnly = true;
+    }
+  },
   data: function () {
     return {
       cmOptions: {
@@ -45,13 +72,14 @@ export default Vue.extend({
         mode: 'text/javascript',
         lineNumbers: true,
         line: true,
+        readOnly: false,
       },
       minLine: 5000000,
       maxLine: -1,
     }
   },
   methods: {
-    onScroll: function() {
+    onScroll: function(){
       this.unsetHighlight();
       const elementById = document.getElementById(this.cmId);
       if(!elementById){
@@ -100,6 +128,9 @@ export default Vue.extend({
         elementById.getElementsByClassName("CodeMirror-line")[line].setAttribute("style", `background-color:${color};`);
       }
     },
+    cursorIntoView: function(){
+      this.$emit("cursor-into-view");
+    }
   },
 });
 </script>

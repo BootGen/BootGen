@@ -83,8 +83,50 @@
       </v-col>
 
       <v-col cols="12" md="6" class="pa-0">
-        <file-reader :json="this.activeProject.json" :jsonName="this.activeProject.name" :files="generatedFiles"></file-reader>
+        <base-material-generator-card>
+          <template v-slot:heading>
+            <div class="d-flex display-1 font-weight-light align-center justify-space-between pa-2">
+              <div class="text-break" v-if="activeFile.path && activeFile.path !== ''">
+                <span v-for="(part, i) in activeFile.path.split('/')" :key="i" @click="openFolder(i+1)">
+                  {{ part }}/
+                </span>
+                <span @click="openFolder(activeFile.path.split('/').length)">
+                  {{ activeFile.name }}
+                </span>
+              </div>
+              <div v-else>
+                <span @click="openFolder(0)">
+                  {{ activeFile.name }}
+                </span>
+              </div>
+              <div class="d-flex">
+                <v-tooltip bottom>
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-btn color="white" class="mr-2" elevation="1" @click="download" fab small v-bind="attrs" v-on="on">
+                      <v-icon color="primary">mdi-download</v-icon>
+                    </v-btn>
+                  </template>
+                  <span>Download</span>
+                </v-tooltip>
+                <v-tooltip bottom>
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-btn color="white" @click="setDrawer()" elevation="1" fab small v-bind="attrs" v-on="on">
+                      <v-icon color="primary" v-if="drawer">mdi-folder-open</v-icon>
+                      <v-icon color="primary" v-else>mdi-folder</v-icon>
+                    </v-btn>
+                  </template>
+                  <span>Files</span>
+                </v-tooltip>
+                <v-col class="d-flex fileSelector" v-if="drawer">
+                  <tree-view :files="generatedFiles" :openPath="openPath" @select-file="selectFile"></tree-view>
+                </v-col>
+              </div>
+            </div>
+          </template>
+          <code-mirror cmId="cm1" :activeFile="activeFile" :error="error" @set-snackbar="setSnackbar" @cursor-into-view="closeDrawer"></code-mirror>
+        </base-material-generator-card>
       </v-col>
+
     </v-row>
     <snackbar v-if="snackbar.visible" :snackbar="snackbar"></snackbar>
   </v-container>
@@ -93,8 +135,8 @@
 <script lang="ts">
 import Vue from "vue";
 import CodeMirror from "../components/CodeMirror.vue";
+import TreeView from "../components/TreeView.vue";
 import { prettyPrint, formatJson, jsonError } from "../utils/PrettyPrint";
-import FileReader from "../components/FileReader.vue";
 import FileExplorer from "../components/FileExplorer.vue";
 import HelpDialog from "../components/HelpDialog.vue";
 import HeadBar from "../components/HeadBar.vue";
@@ -105,12 +147,12 @@ import axios from 'axios';
 
 export default Vue.extend({
   components: {
-    FileReader,
     FileExplorer,
     HelpDialog,
     HeadBar,
     Snackbar,
     CodeMirror,
+    TreeView,
   },
   created: async function(){
     this.initialProject.json = (await axios.get("example_input.json", {responseType: "text"})).data;
@@ -125,6 +167,7 @@ export default Vue.extend({
       initialProject: {id: -1, ownerId: -1, name: "", json: "{}"},
       previousJson: Array<string>(),
       activeProject: {id: -1, ownerId: -1, name: "", json: ""},
+      activeFile: {} as GeneratedFile,
       snackbar: {
         dismissible: true,
         visible: false,
@@ -135,6 +178,8 @@ export default Vue.extend({
       },
       projectName: "",
       error: {line: -1, message: ""},
+      drawer: false,
+      openPath: "",
     };
   },
   methods: {
@@ -153,7 +198,25 @@ export default Vue.extend({
       if(formatJson(prevJson) !== formatJson(this.activeProject.json)){
         this.previousJson.push(this.activeProject.json);
       }
+      this.setActiveFile();
       this.callPrettyPrint();
+    },
+    setActiveFile: function(){
+      if(!this.activeFile.name){
+        for(let i = 0; i < this.generatedFiles.length; i++){
+          if(this.generatedFiles[i].name === "restapi.yml" && this.generatedFiles[i].path === ""){
+            this.activeFile = this.generatedFiles[i];
+            break;
+          }
+        }
+      }else{
+        for(let i = 0; i < this.generatedFiles.length; i++){
+          if(this.generatedFiles[i].name === this.activeFile.name && this.generatedFiles[i].path === this.activeFile.path){
+            this.activeFile = this.generatedFiles[i];
+            break;
+          }
+        }
+      }
     },
     callPrettyPrint: function(){
       const result = prettyPrint(this.activeProject.json);
@@ -167,14 +230,14 @@ export default Vue.extend({
     newProject: async function(){
       this.activeProject = {...this.initialProject};
       this.previousJson = [];
-      this.generate(this.activeProject.json);
+      await this.generate(this.activeProject.json);
     },
     setJson: async function(json: string) {
       const error = jsonError(json);
       if(error === false){
         this.error = {line: -1, message: ""};
         this.setSnackbar();
-        this.generate(json);
+        await this.generate(json);
       }else{
         this.error = error;
         this.setSnackbar("orange darken-2", error.message, true, -1);
@@ -225,7 +288,7 @@ export default Vue.extend({
           this.setSnackbar("success", "Project updated successfully!", true, 5000);
           await this.$store.dispatch("projects/updateProject", this.activeProject);
         }
-        this.generate(this.activeProject.json);
+        await this.generate(this.activeProject.json);
       }else{
         this.setSnackbar("error", "This name is incorrect!", true, 5000);
       }
@@ -233,7 +296,7 @@ export default Vue.extend({
     undo: async function (){
       this.activeProject.json = this.previousJson[this.previousJson.length-2];
       this.previousJson.pop();
-      this.generate(this.activeProject.json);
+      await this.generate(this.activeProject.json);
       this.setSnackbar("info", "Everything restored to its previous generated state", true, 5000);
     },
     undoAll: async function(){
@@ -247,6 +310,37 @@ export default Vue.extend({
     },
     changeProjectName: function(name: string){
       this.projectName = name;
+    },
+    download: function() {
+      let nameSpace = "Test"
+      if(this.activeProject.name !== ""){
+        nameSpace = this.activeProject.name;
+      }
+      this.$store.dispatch("download", {data: this.activeProject.json, nameSpace: this.camalize(nameSpace)});
+    },
+    openFolder: function(idx: number){
+      this.openPath = "";
+      for(let i = 0; i < idx; i++){
+        if(this.activeFile.path.split('/')[i]){
+          this.openPath += `${this.activeFile.path.split('/')[i]}/`;
+        }
+      }
+      this.openPath = this.openPath.slice(0, -1);
+      this.drawer = true;
+    },
+    selectFile: function(data: GeneratedFile){
+      this.activeFile = data;
+      this.closeDrawer();
+    },
+    setDrawer: function(){
+      this.drawer = !this.drawer;
+      if(!this.drawer){
+        this.openPath = "";
+      }
+    },
+    closeDrawer: function(){
+      this.drawer = false;
+      this.openPath = "";
     },
     camalize: function(str: string) {
       return str.replace(/(?:^\w|[A-Z]|\b\w)/g, function(word, index) {
@@ -282,5 +376,17 @@ export default Vue.extend({
     .icons button{
       margin-top: 5px;
     }
+  }
+  .fileSelector {
+    max-height: calc(100vh - 230px);
+    overflow: auto;
+    position: absolute;
+    background:#412fb3;
+    top: 60px;
+    right: 0px;
+    width: fit-content;
+    border-radius: 3px;
+    word-wrap: break-word!important;
+    z-index: 1;
   }
 </style>
