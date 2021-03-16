@@ -33,10 +33,9 @@ export function formatJson(json: string): string{
   json = json.split("\r").join("");
   json = json.replace(/( )*(}|]|{|\[|,)/g, "$2");
   json = json.replace(/( {2})*/g, "");
-  json = json.replace(/(: *)/g, ": ");
+  json = json.replace(/(": *)/g, "\": ");
   json = json.split("'").join("\"");
-  json = json.split("\t").join("");
-  json = json.split("\n").join("");
+  json = json.replace(/[\n\t]/g, "");
   json = json.split("#>comment<").join("#>comment<\n");
   json = json.split("{").join("{\n");
   json = json.split("}").join("}\n");
