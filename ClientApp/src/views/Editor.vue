@@ -184,6 +184,11 @@ export default Vue.extend({
   },
   methods: {
     generate: async function(json: string){
+      const jsonLength = this.getJsonLength(json);
+      if(jsonLength > 2000){
+        this.setSnackbar("orange darken-2", `Exceeded character limit: ${jsonLength} / 2000`, true, -1);
+        return;
+      }
       let nameSpace = "Test"
       if(this.activeProject.name !== ""){
         nameSpace = this.activeProject.name;
@@ -200,6 +205,12 @@ export default Vue.extend({
       }
       this.setActiveFile();
       this.callPrettyPrint();
+    },
+    getJsonLength: function(json: string): number{
+      json = json.replace(/ {2}/g, "");
+      json = json.replace(/": /g, "\":");
+      json = json.replace(/[\n\t\r]/g, "");
+      return json.length;
     },
     setActiveFile: function(){
       if(!this.activeFile.name){
