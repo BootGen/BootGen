@@ -11,6 +11,8 @@
         <v-list-item-content class="align-end">
         {{~ if property.name == "Id" ~}}
           {{'{{'}} {{ camel_case class.name }}.{{ camel_case property.name }} {{'}}'}}
+        {{~ else if property.name == "Created" || property.name == "Updated" ~}}
+          {{'{{'}} dateFormat({{ camel_case class.name }}.{{ camel_case property.name }}) {{'}}'}}
         {{~ else ~}}
           <v-text-field v-model="{{ camel_case class.name }}.{{ camel_case property.name }}" dense></v-text-field>
         {{~ end ~}}
@@ -37,6 +39,9 @@ export default Vue.extend({
     cancel: async function () {
       this.$emit("close");
     },
+    dateFormat: function(date: Date){
+      return `${date.toLocaleDateString("en-US")}, ${date.toLocaleTimeString("en-US")}`;
+    }
   },
 });
 </script>

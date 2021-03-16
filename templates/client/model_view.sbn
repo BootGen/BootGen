@@ -5,12 +5,21 @@
         <v-btn @click="$emit('edit')"><v-icon>mdi-pencil</v-icon></v-btn>
       </v-list-item>
     {{~ for property in class.common_properties ~}}
+      {{~ if property.name == "Created" || property.name == "Updated" ~}}
+      <v-list-item>
+        <v-list-item-content>{{ camel_case property.name }}:</v-list-item-content>
+        <v-list-item-content class="align-end">
+          {{'{{'}} dateFormat({{ camel_case class.name }}.{{ camel_case property.name }}) {{'}}'}}
+        </v-list-item-content>
+      </v-list-item>
+      {{~ else ~}}
       <v-list-item>
         <v-list-item-content>{{ camel_case property.name }}:</v-list-item-content>
         <v-list-item-content class="align-end">
           {{'{{'}} {{ camel_case class.name }}.{{ camel_case property.name }} {{'}}'}}
         </v-list-item-content>
       </v-list-item>
+      {{~ end ~}}
     {{~ end ~}}
     </v-list>
   </v-card>
@@ -20,6 +29,11 @@
 import Vue from "vue";
 
 export default Vue.extend({
-  props: ['{{ camel_case class.name }}']
+  props: ['{{ camel_case class.name }}'],
+  methods: {
+    dateFormat: function(date: Date){
+      return `${date.toLocaleDateString("en-US")}, ${date.toLocaleTimeString("en-US")}`;
+    }
+  }
 });
 </script>
