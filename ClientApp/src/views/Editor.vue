@@ -78,7 +78,7 @@
               </div>
             </div>
           </template>
-          <code-mirror cmId="cm0" :activeProject="activeProject" :error="error" @set-snackbar="setSnackbar"></code-mirror>
+          <code-mirror cmId="cm0" :content="activeProject.json" mode="json" :readOnly="false" :error="error" @change-content="changeProjectContent" @set-snackbar="setSnackbar" @cursor-into-view="closeDrawer"></code-mirror>
         </base-material-generator-card>
       </v-col>
 
@@ -123,7 +123,7 @@
               </div>
             </div>
           </template>
-          <code-mirror cmId="cm1" :activeFile="activeFile" :error="error" @set-snackbar="setSnackbar" @cursor-into-view="closeDrawer"></code-mirror>
+          <code-mirror cmId="cm1" :content="activeFile.content" :mode="getMode()" :readOnly="true" @set-snackbar="setSnackbar" @cursor-into-view="closeDrawer"></code-mirror>
         </base-material-generator-card>
       </v-col>
 
@@ -183,6 +183,14 @@ export default Vue.extend({
     };
   },
   methods: {
+    changeProjectContent: function(content: string){
+      this.activeProject.json = content;
+    },
+    getMode: function(){
+      if(this.activeFile.name){
+        return this.activeFile.name.split('.')[1];
+      }
+    },
     generate: async function(json: string){
       const jsonLength = this.getJsonLength(json);
       if(jsonLength > 2000){

@@ -1,7 +1,7 @@
 <template>
   <v-container fluid class="cm">
-    <codemirror v-if="activeProject" :id="cmId" v-model="activeProject.json" :options="cmOptions" @scroll="onScroll" />
-    <codemirror v-if="activeFile" :id="cmId" v-model="activeFile.content" :options="cmOptions" @scrollCursorIntoView="cursorIntoView()" />
+    <codemirror v-if="mode == 'json'" :id="cmId" v-model="cmContent" @changes="changeContent" return-object :options="cmOptions" @scroll="onScroll"  @scrollCursorIntoView="cursorIntoView()" />
+    <codemirror v-else :id="cmId" :value="content" :options="cmOptions" @scrollCursorIntoView="cursorIntoView()" />
   </v-container>
 </template>
 
@@ -15,18 +15,13 @@ import "codemirror/mode/clike/clike.js";
 import "codemirror/mode/yaml/yaml.js";
 import "codemirror/mode/vue/vue.js";
 import "codemirror/mode/javascript/javascript.js";
-import { Project } from "../models/Project";
-import { GeneratedFile } from "../models/GeneratedFile";
 
 export default Vue.extend({
   props: {
     cmId: String,
-    activeFile: {
-      type: Object as () => GeneratedFile
-    },
-    activeProject: {
-			type: Object as () => Project
-		},
+    content: String,
+    mode: String,
+    readOnly: Boolean,
     error: {
       type: Object as () => { line: number; message: string }
     }
@@ -35,14 +30,20 @@ export default Vue.extend({
     codemirror,
   },
   watch: {
-    activeFile: {
-      handler(activeFile: GeneratedFile) {
-        const type = activeFile.name.split('.')[1];
-        if(type === "cs"){
+    content: {
+      handler(content: string){
+        this.cmContent = content;
+      }
+    },
+    mode: {
+      handler(mode: string) {
+        if(mode === "json"){
+          this.cmOptions.mode = 'text/javascript';
+        }if(mode === "cs"){
           this.cmOptions.mode = 'text/x-csharp';
-        }else if(type === "ts"){
+        }else if(mode === "ts"){
           this.cmOptions.mode = 'text/typescript';
-        }else if(type === "vue"){
+        }else if(mode === "vue"){
           this.cmOptions.mode = 'text/x-vue';
         }else{
           this.cmOptions.mode = 'text/x-yaml';
@@ -60,12 +61,11 @@ export default Vue.extend({
     }
   },
   created: function(){
-    if(this.activeFile){
-      this.cmOptions.readOnly = true;
-    }
+    this.cmOptions.readOnly = this.readOnly;
   },
   data: function () {
     return {
+      cmContent: "",
       cmOptions: {
         theme: 'material',
         tabSize: 2,
@@ -98,7 +98,7 @@ export default Vue.extend({
             this.maxLine = lineNum;
         }
       }
-      const error = jsonError(this.activeProject.json);
+      const error = jsonError(this.content);
       if(error !== false){
         this.highlightLine(error.line, "red");
         this.$emit("set-snackbar", "orange darken-2", error.message, true, -1);
@@ -130,7 +130,10 @@ export default Vue.extend({
     },
     cursorIntoView: function(){
       this.$emit("cursor-into-view");
-    }
+    },
+    changeContent: function(e: any){
+      this.$emit("change-content", this.cmContent);
+    },
   },
 });
 </script>
