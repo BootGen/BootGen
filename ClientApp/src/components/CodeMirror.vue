@@ -22,9 +22,7 @@ export default Vue.extend({
     content: String,
     mode: String,
     readOnly: Boolean,
-    error: {
-      type: Object as () => { line: number; message: string }
-    }
+    errorLine: Number
   },
   components: {
     codemirror,
@@ -50,12 +48,12 @@ export default Vue.extend({
         }
       }
     },
-    error: {
-      handler(error: {line: number; message: string}) {
-        if(error.line === -1){
+    errorLine: {
+      handler(errorLine: number) {
+        if(errorLine === -1){
           this.unsetHighlight();
         }else{
-          this.highlightLine(error.line, "red");
+          this.highlightLine(errorLine, "red");
         }
       }
     }

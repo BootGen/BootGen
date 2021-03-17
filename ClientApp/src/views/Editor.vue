@@ -70,7 +70,7 @@
               </div>
             </div>
           </template>
-          <code-mirror cmId="cm0" :content="activeProject.json" mode="json" :readOnly="false" :error="error" @change-content="changeProjectContent" @set-snackbar="setSnackbar" @cursor-into-view="closeDrawer"></code-mirror>
+          <code-mirror cmId="cm0" :content="activeProject.json" mode="json" :readOnly="false" :errorLine="errorLine" @change-content="changeProjectContent" @set-snackbar="setSnackbar" @cursor-into-view="closeDrawer"></code-mirror>
         </base-material-generator-card>
       </v-col>
 
@@ -168,7 +168,7 @@ export default Vue.extend({
         timeout: 5000,
       },
       projectName: "",
-      error: {line: -1, message: ""},
+      errorLine: -1,
       drawer: false,
       openPath: "",
       failedGenerate: true,
@@ -199,6 +199,13 @@ export default Vue.extend({
         nameSpace = this.activeProject.name;
       }
       const generate = await this.$store.dispatch("generate", {data: json, nameSpace: this.camalize(nameSpace)});
+      if(generate.errorMessage){
+        this.setSnackbar("orange darken-2", generate.errorMessage, true, -1);
+        if(generate.errorLine !== ""){
+          this.errorLine = generate.errorLine-1;
+        }
+        return;
+      }
       this.generatedFiles = generate.generatedFiles;
       this.failedGenerate = false;
       this.activeProject.json = json;
@@ -243,8 +250,8 @@ export default Vue.extend({
       if(typeof(result) === "string"){
         this.activeProject.json = result;
       }else{
-        this.error = result;
-        this.setSnackbar("orange darken-2", this.error.message, true, -1);
+        this.errorLine = result.line;
+        this.setSnackbar("orange darken-2", result.message, true, -1);
       }
     },
     newProject: async function(){
@@ -255,11 +262,11 @@ export default Vue.extend({
     setJson: async function(json: string) {
       const error = jsonError(json);
       if(error === false){
-        this.error = {line: -1, message: ""};
+        this.errorLine = -1;
         this.setSnackbar();
         await this.generate(json);
       }else{
-        this.error = error;
+        this.errorLine = error.line;
         this.setSnackbar("orange darken-2", error.message, true, -1);
       }
     },
