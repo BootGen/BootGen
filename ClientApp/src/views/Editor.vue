@@ -94,7 +94,7 @@
               <div class="d-flex">
                 <v-tooltip bottom>
                   <template v-slot:activator="{ on, attrs }">
-                    <v-btn color="white" class="mr-2" elevation="1" @click="download" fab small v-bind="attrs" v-on="on">
+                    <v-btn color="white" class="mr-2" elevation="1" :disabled="failedGenerate" @click="download" fab small v-bind="attrs" v-on="on">
                       <v-icon color="primary">mdi-download</v-icon>
                     </v-btn>
                   </template>
@@ -171,6 +171,7 @@ export default Vue.extend({
       error: {line: -1, message: ""},
       drawer: false,
       openPath: "",
+      failedGenerate: true,
     };
   },
   methods: {
@@ -199,6 +200,7 @@ export default Vue.extend({
       }
       const generate = await this.$store.dispatch("generate", {data: json, nameSpace: this.camalize(nameSpace)});
       this.generatedFiles = generate.generatedFiles;
+      this.failedGenerate = false;
       this.activeProject.json = json;
       let prevJson = "";
       if(this.undoStack[this.undoStack.length-1] === "Ungenerated change"){
@@ -262,6 +264,11 @@ export default Vue.extend({
       }
     },
     setSnackbar: function(type = "", text = "", visible = false, timeout = -1){
+      if(type === ""){
+        this.failedGenerate = false;
+      }else if(type === "orange darken-2"){
+        this.failedGenerate = true;
+      }
       this.snackbar.dismissible = true,
       this.snackbar.timeout = timeout;
       this.snackbar.type = type;
