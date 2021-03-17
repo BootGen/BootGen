@@ -4,6 +4,7 @@ import { config, findById, findObjectsById, patchArray, setArray, setItem } from
 import { State } from '.';
 import { Project } from '@/models/Project'
 import { User } from '@/models/User'
+import { GeneratedFile } from '@/models/GeneratedFile';
 
 export function projectToDto(project: Project): Project {
   return {
@@ -16,6 +17,8 @@ export function projectToDto(project: Project): Project {
 
 export interface ProjectsState {
   items: Array<Project>;
+  lastProject: Project;
+  lastGeneratedFiles: Array<GeneratedFile>;
 }
 
 type Context = ActionContext<ProjectsState, State>;
@@ -28,7 +31,9 @@ interface ProjectUserPair {
 export default {
   namespaced: true,
   state: () => ({
-    items: Array<Project>()
+    items: Array<Project>(),
+    lastProject: {} as Project,
+    lastGeneratedFiles: Array<GeneratedFile>()
   }),
   mutations: {
     setProjects: function(state: ProjectsState, projects: Array<Project>) {
@@ -39,6 +44,12 @@ export default {
     },
     setProject: function(state: ProjectsState, project: Project) {
       setItem(state.items, project);
+    },
+    setLastProject: function(state: ProjectsState, project: Project){
+      state.lastProject = project;
+    },
+    setLastGeneratedFiles: function(state: ProjectsState, files: Array<GeneratedFile>){
+      state.lastGeneratedFiles = files;
     }
   },
   actions: {

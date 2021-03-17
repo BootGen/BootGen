@@ -147,8 +147,16 @@ export default Vue.extend({
   },
   created: async function(){
     this.initialProject.json = (await axios.get("example_input.json", {responseType: "text"})).data;
-    this.activeProject = {...this.initialProject};
-    await this.setJson(this.activeProject.json);
+    if(this.$store.state.projects.lastProject.json){
+      this.activeProject = {...this.$store.state.projects.lastProject};
+      this.generatedFiles = [...this.$store.state.projects.lastGeneratedFiles];
+      this.undoStack.push(this.activeProject.json);
+      this.failedGenerate = false;
+      this.setActiveFile();
+    }else{
+      this.activeProject = {...this.initialProject};
+      await this.setJson(this.activeProject.json);
+    }
   },
   data: function () {
     return {
@@ -209,6 +217,8 @@ export default Vue.extend({
       this.generatedFiles = generate.generatedFiles;
       this.failedGenerate = false;
       this.activeProject.json = json;
+      this.$store.commit("projects/setLastProject", this.activeProject);
+      this.$store.commit("projects/setLastGeneratedFiles", this.generatedFiles);
       let prevJson = "";
       if(this.undoStack[this.undoStack.length-1] === "Ungenerated change"){
         this.undoStack.pop();
