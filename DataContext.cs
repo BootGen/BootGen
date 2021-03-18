@@ -11,7 +11,7 @@ namespace WebProject
         public DbSet<User> Users { get; set; }
         public DbSet<Project> Projects { get; set; }
         protected override void OnConfiguring(DbContextOptionsBuilder options)
-            => options.UseSqlite("Data Source=web_project.db");
+            => options.UseSqlite("Data Source=editor.db");
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

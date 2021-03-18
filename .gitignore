@@ -1,4 +1,5 @@
 bin
 obj
 Migrations
-web_project.db
+*.db
+.vscode
