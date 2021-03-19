@@ -146,7 +146,7 @@ export default Vue.extend({
     TreeView,
   },
   created: async function(){
-    this.initialProject.json = (await axios.get("example_input.json", {responseType: "text"})).data;
+    this.initialProject.json = (await axios.get(`${this.$root.$data.baseUrl}/example_input.json`, {responseType: "text"})).data;
     if(this.$store.state.projects.lastProject.json){
       this.activeProject = {...this.$store.state.projects.lastProject};
       this.generatedFiles = [...this.$store.state.projects.lastGeneratedFiles];
@@ -179,7 +179,7 @@ export default Vue.extend({
       errorLine: -1,
       drawer: false,
       openPath: "",
-      failedGenerate: true,
+      failedGenerate: true
     };
   },
   methods: {

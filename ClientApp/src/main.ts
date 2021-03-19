@@ -11,7 +11,6 @@ import i18n from './i18n'
 Vue.config.productionTip = false
 
 store.dispatch('init');
-console.log(process.env);
 
 new Vue({
   router,
@@ -22,6 +21,11 @@ new Vue({
     if(store.state.auth.jwt){
       await this.$store.dispatch("profile");
       await this.$store.dispatch("projects/getProjects");
+    }
+  },
+  data: function() {
+    return {
+      baseUrl: process.env.VUE_APP_BASE_URL
     }
   },
   render: h => h(App)
