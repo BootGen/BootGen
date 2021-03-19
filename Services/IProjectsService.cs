@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 
-namespace WebProject.Services
+namespace Editor.Services
 {
     public interface IProjectsService
     {

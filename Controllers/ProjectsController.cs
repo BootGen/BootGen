@@ -7,9 +7,9 @@ using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
-using WebProject.Services;
+using Editor.Services;
 
-namespace WebProject.Controllers
+namespace Editor.Controllers
 {
     [ApiController]
     [Route("/projects")]

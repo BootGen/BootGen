@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Newtonsoft.Json.Linq;
 
-namespace WebProject
+namespace Editor
 {
     public class DataContext : DbContext
     {

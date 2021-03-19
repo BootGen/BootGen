@@ -1,6 +1,6 @@
 using System.IO;
 
-namespace WebProject.Services
+namespace Editor.Services
 {
     public interface IGenerateService
     {

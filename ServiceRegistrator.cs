@@ -1,5 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
-using WebProject.Services;
+using Editor.Services;
 
 public static class ServiceRegistrator
 {

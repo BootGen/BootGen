@@ -4,12 +4,12 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
-using WebProject.Controllers;
+using Editor.Controllers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Identity;
 
-namespace WebProject.Services
+namespace Editor.Services
 {
     public class AuthenticationService : IAuthenticationService
     {

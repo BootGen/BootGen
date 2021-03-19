@@ -15,9 +15,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
-using WebProject.Services;
+using Editor.Services;
 
-namespace WebProject
+namespace Editor
 {
     public class Startup
     {

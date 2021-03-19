@@ -8,7 +8,7 @@ using BootGen;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace WebProject.Services
+namespace Editor.Services
 {
     public class GenerateService : IGenerateService
     {
@@ -18,7 +18,7 @@ namespace WebProject.Services
             {
                 var virtualDisk = new VirtualDisk();
                 BootGen.Project project = InitProject(request, virtualDisk);
-                project.GenerateFiles("WebProject", request.NameSpace, "http://localhost:5000");
+                project.GenerateFiles("Editor", request.NameSpace, "http://localhost:5000");
                 var files = new List<GeneratedFile>();
                 foreach (var file in virtualDisk.Files)
                 {
@@ -71,12 +71,12 @@ namespace WebProject.Services
             var tempDir = $"{tempRoot}/{Guid.NewGuid().ToString()}";
             var tempFile = $"{tempRoot}/{Guid.NewGuid().ToString()}.zip";
             Directory.CreateDirectory(tempDir);
-            ZipFile.ExtractToDirectory("templates/WebProject.zip", tempDir);
+            ZipFile.ExtractToDirectory("templates/Editor.zip", tempDir);
             try
             {
                 var disk = new Disk(tempDir);
                 BootGen.Project project = InitProject(request, disk);
-                project.GenerateFiles("WebProject", "WebProject", "http://localhost:5000");
+                project.GenerateFiles("Editor", "Editor", "http://localhost:5000");
                 ZipFile.CreateFromDirectory(tempDir, tempFile);
 
                 using var reader = new BinaryReader(File.Open(tempFile, FileMode.Open));

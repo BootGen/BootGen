@@ -1,4 +1,4 @@
-namespace WebProject.Services
+namespace Editor.Services
 {
     public interface IAuthenticationService
     {

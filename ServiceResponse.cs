@@ -1,5 +1,5 @@
 
-namespace WebProject
+namespace Editor
 {
     public class ServiceResponse<T>
     {

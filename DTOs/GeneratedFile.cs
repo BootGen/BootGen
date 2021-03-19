@@ -1,7 +1,7 @@
 using System;
 using System.Text.Json.Serialization;
 using System.Collections.Generic;
-namespace WebProject
+namespace Editor
 {
     public class GeneratedFile
     {

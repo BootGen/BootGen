@@ -1,7 +1,7 @@
 using System.Linq;
 using Microsoft.AspNetCore.Identity;
 
-namespace WebProject.Services
+namespace Editor.Services
 {
     public class ProfileService : IProfileService
     {
