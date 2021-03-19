@@ -11,6 +11,7 @@ import i18n from './i18n'
 Vue.config.productionTip = false
 
 store.dispatch('init');
+console.log(process.env);
 
 new Vue({
   router,
@@ -22,11 +23,6 @@ new Vue({
       await this.$store.dispatch("profile");
       await this.$store.dispatch("projects/getProjects");
     }
-  },
-  data: function () {
-    return {
-      user: null as (User | null)
-    };
   },
   render: h => h(App)
 }).$mount('#app')

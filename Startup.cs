@@ -1,19 +1,11 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.SpaServices;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Editor.Services;
 
@@ -37,7 +29,7 @@ namespace Editor
                 options.AddDefaultPolicy(
                                 builder =>
                                 {
-                                    builder.WithOrigins("http://localhost", "http://localhost:8080")
+                                    builder.WithOrigins(Configuration["ClientUrl"])
                                     .AllowAnyHeader()
                                     .AllowAnyMethod();
                                 });
@@ -79,9 +71,7 @@ namespace Editor
             {
                 app.UseDeveloperExceptionPage();
             }
-#if !DEBUG
-            app.UseHttpsRedirection();
-#endif
+
             app.UseRouting();
 
             app.UseForwardedHeaders(new ForwardedHeadersOptions

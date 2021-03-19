@@ -8,7 +8,7 @@ import projectModule, { ProjectsState } from '@/store/ProjectModule'
 
 Vue.use(Vuex)
 
-axios.defaults.baseURL = "https://localhost:5001"
+axios.defaults.baseURL = process.env.VUE_APP_API_URL
 
 export interface State {
   auth: AuthState;
