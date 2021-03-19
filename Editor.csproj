@@ -61,5 +61,9 @@
       </ResolvedFileToPublish>
     </ItemGroup>
   </Target>
-
+  <ItemGroup> 
+    <Content Include="templates\**"> 
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory> 
+    </Content> 
+  </ItemGroup>
 </Project>

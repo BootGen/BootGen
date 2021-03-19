@@ -3,7 +3,6 @@ import App from './App.vue'
 import router from './router/index'
 import store from './store/index'
 import vuetify from './plugins/vuetify'
-import { User } from './models/User'
 import './plugins/base'
 import './plugins/vee-validate'
 
