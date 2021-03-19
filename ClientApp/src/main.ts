@@ -6,7 +6,6 @@ import vuetify from './plugins/vuetify'
 import { User } from './models/User'
 import './plugins/base'
 import './plugins/vee-validate'
-import i18n from './i18n'
 
 Vue.config.productionTip = false
 
@@ -16,7 +15,6 @@ new Vue({
   router,
   store,
   vuetify,
-  i18n,
   mounted: async function() {
     if(store.state.auth.jwt){
       await this.$store.dispatch("profile");
