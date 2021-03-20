@@ -12,13 +12,19 @@ namespace Editor.Services
 {
     public class GenerateService : IGenerateService
     {
+        public IErrorService ErrorService { get; }
+
+        public GenerateService(IErrorService errorService)
+        {
+            ErrorService = errorService;
+        }
         public ServiceResponse<GenerateResponse> Generate(GenerateRequest request)
         {
             try
             {
                 var virtualDisk = new VirtualDisk();
                 BootGen.Project project = InitProject(request, virtualDisk);
-                project.GenerateFiles("Editor", request.NameSpace, "http://localhost:5000");
+                project.GenerateFiles("WebProject", request.NameSpace, "http://localhost:5000");
                 var files = new List<GeneratedFile>();
                 foreach (var file in virtualDisk.Files)
                 {
@@ -42,7 +48,8 @@ namespace Editor.Services
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                if (!(e is JsonReaderException))
+                    ErrorService.LogException(e);
                 return new ServiceResponse<GenerateResponse>
                 {
                     StatusCode = 200,
@@ -76,8 +83,9 @@ namespace Editor.Services
                     ResponseData = CreateDownloadStream(request, tempRoot, tempFile, tempDir)
                 };
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                ErrorService.LogException(e);
                 return new ServiceResponse<Stream>
                 {
                     StatusCode = 500,
@@ -96,10 +104,10 @@ namespace Editor.Services
             if (!Directory.Exists(tempRoot))
                 Directory.CreateDirectory(tempRoot);
             Directory.CreateDirectory(tempDir);
-            ZipFile.ExtractToDirectory("templates/Editor.zip", tempDir);
+            ZipFile.ExtractToDirectory("templates/WebProject.zip", tempDir);
             var disk = new Disk(tempDir);
             BootGen.Project project = InitProject(request, disk);
-            project.GenerateFiles("Editor", "Editor", "http://localhost:5000");
+            project.GenerateFiles("WebProject", "WebProject", "http://localhost:5000");
             ZipFile.CreateFromDirectory(tempDir, tempFile);
             var reader = new BinaryReader(File.Open(tempFile, FileMode.Open));
             const int bufferSize = 4096;

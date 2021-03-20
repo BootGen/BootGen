@@ -60,6 +60,7 @@ namespace Editor
             services.AddScoped<IRegistrationService, RegistrationService>();
             services.AddScoped<IProfileService, ProfileService>();
             services.AddScoped<IGenerateService, GenerateService>();
+            services.AddScoped<IErrorService, ErrorService>();
             
             ServiceRegistrator.RegisterServices(services);
         }
