@@ -66,32 +66,14 @@ namespace Editor.Services
         public ServiceResponse<Stream> Download(GenerateRequest request)
         {
             var tempRoot = "temp";
-            if (!Directory.Exists(tempRoot))
-                Directory.CreateDirectory(tempRoot);
-            var tempDir = $"{tempRoot}/{Guid.NewGuid().ToString()}";
             var tempFile = $"{tempRoot}/{Guid.NewGuid().ToString()}.zip";
-            Directory.CreateDirectory(tempDir);
-            ZipFile.ExtractToDirectory("templates/Editor.zip", tempDir);
+            var tempDir = $"{tempRoot}/{Guid.NewGuid().ToString()}";
             try
             {
-                var disk = new Disk(tempDir);
-                BootGen.Project project = InitProject(request, disk);
-                project.GenerateFiles("Editor", "Editor", "http://localhost:5000");
-                ZipFile.CreateFromDirectory(tempDir, tempFile);
-
-                using var reader = new BinaryReader(File.Open(tempFile, FileMode.Open));
-                const int bufferSize = 4096;
-                var ms = new MemoryStream();
-                byte[] buffer = new byte[bufferSize];
-                int count;
-                while ((count = reader.Read(buffer, 0, buffer.Length)) != 0)
-                    ms.Write(buffer, 0, count);
-                ms.Position = 0;
-
                 return new ServiceResponse<Stream>
                 {
                     StatusCode = 200,
-                    ResponseData = ms
+                    ResponseData = CreateDownloadStream(request, tempRoot, tempFile, tempDir)
                 };
             }
             catch (Exception)
@@ -107,6 +89,27 @@ namespace Editor.Services
                 Directory.Delete(tempDir, true);
                 File.Delete(tempFile);
             }
+        }
+
+        private static MemoryStream CreateDownloadStream(GenerateRequest request, string tempRoot, string tempFile, string tempDir)
+        {
+            if (!Directory.Exists(tempRoot))
+                Directory.CreateDirectory(tempRoot);
+            Directory.CreateDirectory(tempDir);
+            ZipFile.ExtractToDirectory("templates/Editor.zip", tempDir);
+            var disk = new Disk(tempDir);
+            BootGen.Project project = InitProject(request, disk);
+            project.GenerateFiles("Editor", "Editor", "http://localhost:5000");
+            ZipFile.CreateFromDirectory(tempDir, tempFile);
+            var reader = new BinaryReader(File.Open(tempFile, FileMode.Open));
+            const int bufferSize = 4096;
+            var ms = new MemoryStream();
+            byte[] buffer = new byte[bufferSize];
+            int count;
+            while ((count = reader.Read(buffer, 0, buffer.Length)) != 0)
+                ms.Write(buffer, 0, count);
+            ms.Position = 0;
+            return ms;
         }
 
         private static BootGen.Project InitProject(GenerateRequest request, IDisk disk)
