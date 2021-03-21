@@ -7,11 +7,10 @@ import './plugins/base'
 import './plugins/vee-validate'
 import VueGtag from 'vue-gtag';
 
-if (process.env.NODE_ENV == 'production') {
-  Vue.use(VueGtag, {
-    config: { id: 'G-X2LQJGC8QE' }
-  }, router);
-}
+Vue.use(VueGtag, {
+  config: { id: 'G-X2LQJGC8QE' },
+  enabled: process.env.NODE_ENV == 'production'
+}, router);
 
 Vue.config.productionTip = false
 
@@ -21,13 +20,13 @@ new Vue({
   router,
   store,
   vuetify,
-  mounted: async function() {
-    if(store.state.auth.jwt){
+  mounted: async function () {
+    if (store.state.auth.jwt) {
       await this.$store.dispatch('profile');
       await this.$store.dispatch('projects/getProjects');
     }
   },
-  data: function() {
+  data: function () {
     return {
       baseUrl: process.env.VUE_APP_BASE_URL
     }
