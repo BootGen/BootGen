@@ -8,8 +8,12 @@ import './plugins/vee-validate'
 import VueGtag from 'vue-gtag';
 
 Vue.use(VueGtag, {
-  config: { id: 'G-X2LQJGC8QE' },
-  enabled: process.env.NODE_ENV == 'production'
+  config: {
+    id: 'G-X2LQJGC8QE',
+    debug: {
+      sendHitTask: process.env.NODE_ENV === 'production'
+    }
+  },
 }, router);
 
 Vue.config.productionTip = false
