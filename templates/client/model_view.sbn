@@ -27,9 +27,14 @@
 
 <script lang="ts">
 import Vue from "vue";
+import { {{ class.name }} } from "../models/{{ class.name }}";
 
 export default Vue.extend({
-  props: ['{{ camel_case class.name }}'],
+  props: {
+    {{ camel_case class.name }}: {
+      type: Object as () => {{ class.name }}
+    }
+  },
   methods: {
     dateFormat: function(date: Date){
       return `${date.toLocaleDateString("en-US")}, ${date.toLocaleTimeString("en-US")}`;

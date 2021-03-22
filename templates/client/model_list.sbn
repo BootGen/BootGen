@@ -11,7 +11,7 @@
             md="6"
             lg="4"
           >
-            <{{ camel_case class.name }}-edit :{{ camel_case class.name }}="item" @close="closeEdit(item)" v-if="item === edited{{ class.name }}"></{{ camel_case class.name }}-edit>
+            <{{ camel_case class.name }}-edit :{{ camel_case class.name }}="item" @close="edited{{ class.name }} = null" v-if="item === edited{{ class.name }}"></{{ camel_case class.name }}-edit>
             <{{ camel_case class.name }}-view :{{ camel_case class.name }}="item" @edit="edited{{ class.name }} = item" v-else></{{ camel_case class.name }}-view>
           </v-col>
         </v-row>
@@ -36,11 +36,6 @@ export default Vue.extend({
   created: async function () {
     this.{{ camel_case class.name.plural }} = await this.$store.dispatch("{{ camel_case class.name.plural }}/get{{ class.name.plural }}");
   },
-  methods: {
-    closeEdit: async function(item: {{ class.name }}){
-      this.edited{{ class.name }} = null;
-      item = await this.$store.dispatch("{{ camel_case class.name.plural }}/get{{ class.name }}", item.id);
-    }
-  }
+  methods: {}
 });
 </script>
