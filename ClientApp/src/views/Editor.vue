@@ -28,7 +28,7 @@
                 <help-dialog v-if="openHelp" @close-help="openHelp = false"></help-dialog>
                 <v-tooltip bottom>
                   <template v-slot:activator="{ on, attrs }">
-                    <v-btn class="mr-2" color="white" elevation="1" fab small @click="undo" v-bind="attrs" v-on="on" :disabled="undoStack.length < 2">
+                    <v-btn class="mr-2" color="white" elevation="1" fab small @click="undo" v-bind="attrs" v-on="on" :disabled="undoStack.length < 2 && undoStackFrame.content == ''">
                       <v-icon color="primary">mdi-undo</v-icon>
                     </v-btn>
                     </template>
@@ -134,6 +134,7 @@ import HeadBar from "../components/HeadBar.vue";
 import Snackbar from "../components/Snackbar.vue";
 import { Project } from "../models/Project";
 import { GeneratedFile } from "../models/GeneratedFile";
+import {CRC32 as crc32} from 'crc_32_ts';
 import axios from 'axios';
 
 export default Vue.extend({
@@ -158,6 +159,14 @@ export default Vue.extend({
       await this.setJson(this.activeProject.json);
     }
   },
+  computed: {
+    isPristine: function(){
+      if(crc32.str(this.undoStack[this.undoStack.length-1]) === this.undoStackFrame.crc32){
+        return true;
+      }
+      return false;
+    },
+  },
   data: function () {
     return {
       openExplorer: false,
@@ -165,6 +174,7 @@ export default Vue.extend({
       generatedFiles: Array<GeneratedFile>(),
       initialProject: {id: -1, ownerId: -1, name: "", json: "{}"},
       undoStack: Array<string>(),
+      undoStackFrame: {crc32: -1, content: ""},
       activeProject: {id: -1, ownerId: -1, name: "", json: ""},
       activeFile: {} as GeneratedFile,
       snackbar: {
@@ -185,8 +195,11 @@ export default Vue.extend({
   methods: {
     changeProjectContent: function(content: string){
       if(formatJson(content) !== formatJson(this.activeProject.json)){
-        if(this.undoStack.length > 0 && this.undoStack[this.undoStack.length-1] !== "Ungenerated change"){
-          this.undoStack.push("Ungenerated change");
+        if(this.undoStack.length > 0 && this.undoStackFrame.content === ""){
+          this.undoStackFrame = {
+            crc32: crc32.str(this.undoStack[this.undoStack.length-1]),
+            content: this.undoStack[this.undoStack.length-1]
+          }
         }
       }
       this.activeProject.json = content;
@@ -222,9 +235,7 @@ export default Vue.extend({
       this.$store.commit("projects/setLastProject", this.activeProject);
       this.$store.commit("projects/setLastGeneratedFiles", this.generatedFiles);
       let prevJson = "";
-      if(this.undoStack[this.undoStack.length-1] === "Ungenerated change"){
-        this.undoStack.pop();
-      }
+      this.undoStackFrame = {crc32: -1, content: ""};
       if(this.undoStack.length > 0){
         prevJson = this.undoStack[this.undoStack.length-1];
       }
@@ -272,6 +283,7 @@ export default Vue.extend({
     newProject: async function(){
       this.activeProject = {...this.initialProject};
       this.undoStack = [];
+      this.undoStackFrame = {crc32: -1, content: ""};
       await this.generate(this.activeProject.json);
     },
     setJson: async function(json: string) {
@@ -317,6 +329,7 @@ export default Vue.extend({
         this.setJson(this.activeProject.json);
       }
       this.undoStack = [];
+      this.undoStackFrame = {crc32: -1, content: ""};
       this.openExplorer = false;
     },
     existsProjectName: function(): Project | null{
@@ -350,9 +363,15 @@ export default Vue.extend({
       }
     },
     undo: async function (){
-      this.undoStack.pop();
-      this.activeProject.json = this.undoStack[this.undoStack.length-1];
-      await this.generate(this.activeProject.json);
+      if(this.isPristine){
+        this.activeProject.json = this.undoStackFrame.content;
+        this.undoStackFrame = {crc32: -1, content: ""};
+        this.callPrettyPrint();
+      }else{
+        this.undoStack.pop();
+        this.activeProject.json = this.undoStack[this.undoStack.length-1];
+        await this.generate(this.activeProject.json);
+      }
       this.setSnackbar("info", "Everything restored to its previous generated state", 5000);
     },
     changeProjectName: function(name: string){

@@ -42,6 +42,7 @@ export function formatJson(json: string): string{
   json = json.split("[").join("[\n");
   json = json.split("]").join("]\n");
   json = json.split(",").join(",\n");
+  json = json.split("\n ").join("\n");
   json = json.split("\n,").join(",");
   json = json.split("\"}").join("\"\n}");
   json = json.split("\"]").join("\"\n]");
