@@ -94,8 +94,27 @@ namespace Editor.Services
             }
             finally
             {
-                Directory.Delete(tempDir, true);
-                File.Delete(tempFile);
+                TryToDeleteDirectory(tempDir);
+                TryToDeleteFile(tempFile);
+            }
+        }
+
+        private void TryToDeleteFile(string path)
+        {
+            try
+            {
+                File.Delete(path);
+            } catch (Exception e) {
+                ErrorService.LogException(e);
+            }
+        }
+        private void TryToDeleteDirectory(string path)
+        {
+            try
+            {
+                Directory.Delete(path, true);
+            } catch (Exception e) {
+                ErrorService.LogException(e);
             }
         }
 
