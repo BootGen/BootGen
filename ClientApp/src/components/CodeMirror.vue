@@ -99,9 +99,9 @@ export default Vue.extend({
       const error = jsonError(this.content);
       if(error !== false){
         this.highlightLine(error.line, "red");
-        this.$emit("set-snackbar", "orange darken-2", error.message, true, -1);
+        this.$emit("on-error", error.message);
       }else{
-        this.$emit("set-snackbar");
+        this.$emit("on-error");
       }
     },
     unsetHighlight: function (){

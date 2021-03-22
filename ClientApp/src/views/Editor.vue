@@ -70,7 +70,7 @@
               </div>
             </div>
           </template>
-          <code-mirror cmId="cm0" :content="activeProject.json" mode="json" :readOnly="false" :errorLine="errorLine" @change-content="changeProjectContent" @set-snackbar="setSnackbar" @cursor-into-view="closeDrawer"></code-mirror>
+          <code-mirror cmId="cm0" :content="activeProject.json" mode="json" :readOnly="false" :errorLine="errorLine" @change-content="changeProjectContent" @on-error="cmError" @cursor-into-view="closeDrawer"></code-mirror>
         </base-material-generator-card>
       </v-col>
 
@@ -115,7 +115,7 @@
               </div>
             </div>
           </template>
-          <code-mirror cmId="cm1" :content="activeFile.content" :mode="getMode()" :readOnly="true" @set-snackbar="setSnackbar" @cursor-into-view="closeDrawer"></code-mirror>
+          <code-mirror cmId="cm1" :content="activeFile.content" :mode="getMode()" :readOnly="true" @on-error="cmError" @cursor-into-view="closeDrawer"></code-mirror>
         </base-material-generator-card>
       </v-col>
     </v-row>
@@ -199,7 +199,8 @@ export default Vue.extend({
     generate: async function(json: string){
       const jsonLength = this.getJsonLength(json);
       if(jsonLength > 2000){
-        this.setSnackbar("orange darken-2", `Exceeded character limit: ${jsonLength} / 2000`, true, -1);
+        this.failedGenerate = true;
+        this.setSnackbar("orange darken-2", `Exceeded character limit: ${jsonLength} / 2000`, -1);
         return;
       }
       let nameSpace = "Test"
@@ -208,7 +209,8 @@ export default Vue.extend({
       }
       const generate = await this.$store.dispatch("generate", {data: json, nameSpace: this.camalize(nameSpace)});
       if(generate.errorMessage){
-        this.setSnackbar("orange darken-2", generate.errorMessage, true, -1);
+        this.failedGenerate = true;
+        this.setSnackbar("orange darken-2", generate.errorMessage, -1);
         if(generate.errorLine !== ""){
           this.errorLine = generate.errorLine-1;
         }
@@ -259,9 +261,12 @@ export default Vue.extend({
       const result = prettyPrint(this.activeProject.json);
       if(typeof(result) === "string"){
         this.activeProject.json = result;
+        this.failedGenerate = false;
+        this.hideSnackbar();
       }else{
         this.errorLine = result.line;
-        this.setSnackbar("orange darken-2", result.message, true, -1);
+        this.failedGenerate = true;
+        this.setSnackbar("orange darken-2", result.message, -1);
       }
     },
     newProject: async function(){
@@ -273,24 +278,33 @@ export default Vue.extend({
       const error = jsonError(json);
       if(error === false){
         this.errorLine = -1;
-        this.setSnackbar();
+        this.failedGenerate = false;
+        this.hideSnackbar();
         await this.generate(json);
       }else{
         this.errorLine = error.line;
-        this.setSnackbar("orange darken-2", error.message, true, -1);
+        this.failedGenerate = true;
+        this.setSnackbar("orange darken-2", error.message, -1);
       }
     },
-    setSnackbar: function(type = "", text = "", visible = false, timeout = -1){
-      if(type === ""){
-        this.failedGenerate = false;
-      }else if(type === "orange darken-2"){
-        this.failedGenerate = true;
-      }
+    setSnackbar: function(type: string, text: string, timeout: number){
       this.snackbar.dismissible = true,
       this.snackbar.timeout = timeout;
       this.snackbar.type = type;
       this.snackbar.text = text;
-      this.snackbar.visible = visible;
+      this.snackbar.visible = true;
+    },
+    hideSnackbar: function(){
+      this.snackbar.visible = false;
+    },
+    cmError: function(error: string){
+      if(error){
+        this.failedGenerate = true;
+        this.setSnackbar("orange darken-2", error, -1);
+      }else{
+        this.failedGenerate = false;
+        this.hideSnackbar();
+      }
     },
     selectProject: function(project: Project){
       let select = true;
@@ -320,26 +334,26 @@ export default Vue.extend({
       if(this.activeProject.name){
         const exists = this.existsProjectName();
         if(!exists && this.activeProject.id === -1){
-          this.setSnackbar("success", "The new project was successfully created!", true, 5000);
+          this.setSnackbar("success", "The new project was successfully created!", 5000);
           this.activeProject.id = 0;
           this.activeProject.ownerId = this.$store.state.auth.user.id;
           this.activeProject = await this.$store.dispatch("projects/addProject", this.activeProject);
         }else if(exists && exists.id !== this.activeProject.id){
-          this.setSnackbar("error", "This name is already in use, please enter another name!", true, 5000);
+          this.setSnackbar("error", "This name is already in use, please enter another name!", 5000);
         }else{   
-          this.setSnackbar("success", "Project updated successfully!", true, 5000);
+          this.setSnackbar("success", "Project updated successfully!", 5000);
           await this.$store.dispatch("projects/updateProject", this.activeProject);
         }
         await this.generate(this.activeProject.json);
       }else{
-        this.setSnackbar("error", "This name is incorrect!", true, 5000);
+        this.setSnackbar("error", "This name is incorrect!", 5000);
       }
     },
     undo: async function (){
       this.undoStack.pop();
       this.activeProject.json = this.undoStack[this.undoStack.length-1];
       await this.generate(this.activeProject.json);
-      this.setSnackbar("info", "Everything restored to its previous generated state", true, 5000);
+      this.setSnackbar("info", "Everything restored to its previous generated state", 5000);
     },
     changeProjectName: function(name: string){
       this.projectName = name;
