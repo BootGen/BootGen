@@ -10,7 +10,7 @@ namespace Editor.Controllers
 {
     [ApiController]
     [Route("registration")]
-    public class RegistrationController : BaseController
+    public class RegistrationController : ControllerBase
     {
         private IRegistrationService service;
         public RegistrationController(IRegistrationService service)

@@ -14,7 +14,7 @@ namespace Editor.Controllers
     [ApiController]
     [Route("/users")]
     [Authorize]
-    public class UsersController : BaseController
+    public class UsersController : ControllerBase
     {
         private IUsersService service;
         public UsersController(IUsersService service)

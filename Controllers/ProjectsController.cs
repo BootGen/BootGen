@@ -13,7 +13,7 @@ namespace Editor.Controllers
 {
     [ApiController]
     [Route("/projects")]
-    public class ProjectsController : BaseController
+    public class ProjectsController : ControllerBase
     {
         private IProjectsService service;
         public ProjectsController(IProjectsService service)

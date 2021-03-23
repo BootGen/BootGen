@@ -10,7 +10,7 @@ namespace Editor.Controllers
 {
     [ApiController]
     [Route("authentication")]
-    public class AuthenticationController : BaseController
+    public class AuthenticationController : ControllerBase
     {
         private IAuthenticationService service;
         public AuthenticationController(IAuthenticationService service)

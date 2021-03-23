@@ -12,37 +12,37 @@ namespace Editor.Services
 {
     public class UsersService : IUsersService
     {
+        private readonly ApplicationDbContext dbContext;
+
+        public UsersService(ApplicationDbContext dbContext)
+        {
+            this.dbContext = dbContext;
+        }
 
         public ServiceResponse<List<User>> GetUsers()
         {
-            using (var db = new DataContext())
+            var query = dbContext.Users;
+            return new ServiceResponse<List<User>>
             {
-                var query = db.Users;
-                return new ServiceResponse<List<User>>
-                {
-                    StatusCode = 200,
-                    ResponseData = query.ToList()
-                };
-            }
+                StatusCode = 200,
+                ResponseData = query.ToList()
+            };
         }
 
         public ServiceResponse<User> GetUser(int userId)
         {
-            using (var db = new DataContext())
-            {
-                var item = db.Users
-                             .Where(item => item.Id == userId).FirstOrDefault();
-                if (item == null)
-                    return new ServiceResponse<User>
-                    {
-                        StatusCode = 404
-                    };
+            var item = dbContext.Users
+                         .Where(item => item.Id == userId).FirstOrDefault();
+            if (item == null)
                 return new ServiceResponse<User>
                 {
-                    StatusCode = 200,
-                    ResponseData = item
+                    StatusCode = 404
                 };
-            }
+            return new ServiceResponse<User>
+            {
+                StatusCode = 200,
+                ResponseData = item
+            };
         }
     }
 }

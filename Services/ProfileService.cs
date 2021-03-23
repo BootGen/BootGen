@@ -7,6 +7,12 @@ namespace Editor.Services
     {
         public User CurrentUser { get; set; }
 
+        private readonly ApplicationDbContext dbContext;
+
+        public ProfileService(ApplicationDbContext dbContext)
+        {
+            this.dbContext = dbContext;
+        }
         public ServiceResponse<ChangePasswordResponse> ChangePassword(ChangePasswordData data)
         {
             var passwordHasher = new PasswordHasher<User>();
@@ -19,12 +25,9 @@ namespace Editor.Services
                     ResponseData = new ChangePasswordResponse { Value = false }
                 };
             }
-            using (var db = new DataContext())
-            {
-                CurrentUser.PasswordHash = passwordHasher.HashPassword(CurrentUser, data.NewPassword);
-                db.Update(CurrentUser);
-                db.SaveChanges();
-            }
+            CurrentUser.PasswordHash = passwordHasher.HashPassword(CurrentUser, data.NewPassword);
+            dbContext.Update(CurrentUser);
+            dbContext.SaveChanges();
             return new ServiceResponse<ChangePasswordResponse>
             {
                 StatusCode = 200,
@@ -34,21 +37,18 @@ namespace Editor.Services
 
         public ServiceResponse<ProfileResponse> CheckProfile(User user)
         {
-            using (var db = new DataContext())
+            bool isEmailInUse = dbContext.Users.Where(u => u.Id != CurrentUser.Id && u.Email == user.Email).Any();
+            bool isUserNameInUse = dbContext.Users.Where(u => u.Id != CurrentUser.Id && u.UserName == user.UserName).Any();
+            return new ServiceResponse<ProfileResponse>
             {
-                bool isEmailInUse = db.Users.Where(u => u.Id != CurrentUser.Id && u.Email == user.Email).Any();
-                bool isUserNameInUse = db.Users.Where(u => u.Id != CurrentUser.Id && u.UserName == user.UserName).Any();
-                return new ServiceResponse<ProfileResponse>
+                StatusCode = 200,
+                ResponseData = new ProfileResponse
                 {
-                    StatusCode = 200,
-                    ResponseData = new ProfileResponse
-                    {
-                        Success = !isUserNameInUse && !isEmailInUse,
-                        IsUserNameInUse = isUserNameInUse,
-                        IsEmailInUse = isEmailInUse
-                    }
-                };
-            }
+                    Success = !isUserNameInUse && !isEmailInUse,
+                    IsUserNameInUse = isUserNameInUse,
+                    IsEmailInUse = isEmailInUse
+                }
+            };
         }
 
         public ServiceResponse<User> Profile()
@@ -65,13 +65,10 @@ namespace Editor.Services
             var response = CheckProfile(user);
             if (response.ResponseData.Success)
             {
-                using (var db = new DataContext())
-                {
-                    CurrentUser.Email = user.Email;
-                    CurrentUser.UserName = user.UserName;
-                    db.Update(CurrentUser);
-                    db.SaveChanges();
-                }
+                CurrentUser.Email = user.Email;
+                CurrentUser.UserName = user.UserName;
+                dbContext.Update(CurrentUser);
+                dbContext.SaveChanges();
             }
             return response;
         }

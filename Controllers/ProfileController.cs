@@ -14,7 +14,7 @@ namespace Editor.Controllers
     public class ProfileController : BaseController
     {
         private IProfileService service;
-        public ProfileController(IProfileService service)
+        public ProfileController(ApplicationDbContext dbContext, IProfileService service): base(dbContext)
         {
             this.service = service;
         }

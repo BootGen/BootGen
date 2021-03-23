@@ -13,20 +13,19 @@ namespace Editor.Services
 {
     public class AuthenticationService : IAuthenticationService
     {
-        private IConfiguration _config;
+        private readonly IConfiguration config;
+        private readonly ApplicationDbContext dbContext;
+
         public User CurrentUser { get; set; }
 
-        public AuthenticationService(IConfiguration config)
+        public AuthenticationService(IConfiguration config, ApplicationDbContext dbContext)
         {
-            _config = config;
+            this.config = config;
+            this.dbContext = dbContext;
         }
         public ServiceResponse<LoginResponse> Login(AuthenticationData data)
         {
-            User user = null;
-            using (var db = new DataContext())
-            {
-                user = db.Users.Where(u => u.Email == data.Email).FirstOrDefault();
-            }
+            User user = dbContext.Users.Where(u => u.Email == data.Email).FirstOrDefault();
             if (user != null && new PasswordHasher<User>().VerifyHashedPassword(user, user.PasswordHash, data.Password) != PasswordVerificationResult.Failed)
             {
                 return new ServiceResponse<LoginResponse>
@@ -47,7 +46,7 @@ namespace Editor.Services
 
         private string GenerateJSONWebToken(User user)
         {
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["Jwt:Key"]));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
             List<Claim> claims = new List<Claim>
             {
@@ -55,8 +54,8 @@ namespace Editor.Services
                 new Claim(ClaimTypes.Name, user.UserName)
             };
 
-            var token = new JwtSecurityToken(_config["Jwt:Issuer"],
-              _config["Jwt:Issuer"],
+            var token = new JwtSecurityToken(config["Jwt:Issuer"],
+              config["Jwt:Issuer"],
               claims,
               expires: DateTime.Now.AddMinutes(120),
               signingCredentials: credentials);

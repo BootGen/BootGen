@@ -4,16 +4,20 @@ namespace Editor.Services
 {
     public class ErrorService : IErrorService
     {
+        private readonly ApplicationDbContext dbContext;
+
+        public ErrorService(ApplicationDbContext dbContext)
+        {
+            this.dbContext = dbContext;
+        }
         public void LogException(Exception e)
         {
-                using (var db = new DataContext())
-                {
-                    db.Errors.Add(new Error {
-                        Message = e.Message,
-                        StackTrace = e.StackTrace
-                    });
-                    db.SaveChanges();
-                }
+            dbContext.Errors.Add(new Error
+            {
+                Message = e.Message,
+                StackTrace = e.StackTrace
+            });
+            dbContext.SaveChanges();
         }
     }
 }

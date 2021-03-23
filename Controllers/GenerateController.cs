@@ -10,7 +10,7 @@ namespace Editor.Controllers
 {
     [ApiController]
     [Route("generate")]
-    public class GenerateController : BaseController
+    public class GenerateController : ControllerBase
     {
         private IGenerateService service;
         public GenerateController(IGenerateService service)

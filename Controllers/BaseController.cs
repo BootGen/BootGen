@@ -6,6 +6,13 @@ namespace Editor.Controllers
 {
     public abstract class BaseController : ControllerBase
     {
+        private readonly ApplicationDbContext dbContext;
+
+        protected BaseController(ApplicationDbContext dbContext)
+        {
+            this.dbContext = dbContext;
+        }
+
         protected User CurrentUser
         {
             get
@@ -14,10 +21,7 @@ namespace Editor.Controllers
                 if (string.IsNullOrEmpty(value))
                     return null;
                 int id = int.Parse(value);
-                using (var db = new DataContext())
-                {
-                    return db.Users.Where(u => u.Id == id).FirstOrDefault();
-                }
+                return dbContext.Users.Where(u => u.Id == id).FirstOrDefault();
             }
         }
     }

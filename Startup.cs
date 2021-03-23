@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Editor.Services;
+using Microsoft.EntityFrameworkCore;
 
 namespace Editor
 {
@@ -61,6 +62,7 @@ namespace Editor
             services.AddScoped<IProfileService, ProfileService>();
             services.AddScoped<IGenerateService, GenerateService>();
             services.AddScoped<IErrorService, ErrorService>();
+            services.AddDbContext<ApplicationDbContext>(options => options.UseSqlite(Configuration.GetConnectionString("SQLite")));
             
             ServiceRegistrator.RegisterServices(services);
         }
