@@ -94,7 +94,7 @@
               <div class="d-flex">
                 <v-tooltip bottom>
                   <template v-slot:activator="{ on, attrs }">
-                    <v-btn color="white" class="mr-2" elevation="1" :disabled="failedGenerate" @click="download" fab small v-bind="attrs" v-on="on">
+                    <v-btn color="white" class="mr-2" elevation="1" :disabled="!isPristine" @click="download" fab small v-bind="attrs" v-on="on">
                       <v-icon color="primary">mdi-download</v-icon>
                     </v-btn>
                   </template>
@@ -153,7 +153,6 @@ export default Vue.extend({
     if(this.$store.state.projects.lastProject.json){
       this.activeProject = {...this.$store.state.projects.lastProject};
       this.generatedFiles = [...this.$store.state.projects.lastGeneratedFiles];
-      this.failedGenerate = false;
       this.setActiveFile();
     }else{
       this.activeProject = {...this.initialProject};
@@ -195,7 +194,6 @@ export default Vue.extend({
       errorLine: -1,
       drawer: false,
       openPath: "",
-      failedGenerate: true
     };
   },
   methods: {
@@ -220,7 +218,6 @@ export default Vue.extend({
     generate: async function(json: string){
       const jsonLength = this.getJsonLength(json);
       if(jsonLength > 2000){
-        this.failedGenerate = true;
         this.setSnackbar("orange darken-2", `Exceeded character limit: ${jsonLength} / 2000`, -1);
         return;
       }
@@ -230,7 +227,6 @@ export default Vue.extend({
       }
       const generate = await this.$store.dispatch("generate", {data: json, nameSpace: this.camalize(nameSpace)});
       if(generate.errorMessage){
-        this.failedGenerate = true;
         this.setSnackbar("orange darken-2", generate.errorMessage, -1);
         if(generate.errorLine !== ""){
           this.errorLine = generate.errorLine-1;
@@ -238,7 +234,6 @@ export default Vue.extend({
         return;
       }
       this.generatedFiles = generate.generatedFiles;
-      this.failedGenerate = false;
       this.activeProject.json = json;
       this.$store.commit("projects/setLastProject", this.activeProject);
       this.$store.commit("projects/setLastGeneratedFiles", this.generatedFiles);
@@ -285,11 +280,9 @@ export default Vue.extend({
       const result = prettyPrint(this.activeProject.json);
       if(typeof(result) === "string"){
         this.activeProject.json = result;
-        this.failedGenerate = false;
         this.hideSnackbar();
       }else{
         this.errorLine = result.line;
-        this.failedGenerate = true;
         this.setSnackbar("orange darken-2", result.message, -1);
       }
     },
@@ -297,17 +290,16 @@ export default Vue.extend({
       this.activeProject = {...this.initialProject};
       this.undoStack = new UndoStack();
       await this.generate(this.activeProject.json);
+      this.undoStack.push(this.activeProject.json);
     },
     setJson: async function(json: string) {
       const error = jsonError(json);
       if(error === false){
         this.errorLine = -1;
-        this.failedGenerate = false;
         this.hideSnackbar();
         await this.generate(json);
       }else{
         this.errorLine = error.line;
-        this.failedGenerate = true;
         this.setSnackbar("orange darken-2", error.message, -1);
       }
     },
@@ -323,10 +315,8 @@ export default Vue.extend({
     },
     cmError: function(error: string){
       if(error){
-        this.failedGenerate = true;
         this.setSnackbar("orange darken-2", error, -1);
       }else{
-        this.failedGenerate = false;
         this.hideSnackbar();
       }
     },
@@ -341,6 +331,10 @@ export default Vue.extend({
         this.setJson(this.activeProject.json);
       }
       this.undoStack = new UndoStack();
+      const prettyJson = prettyPrint(project.json);
+      if(typeof(prettyJson) === "string"){
+        this.undoStack.push(prettyJson);
+      }
       this.openExplorer = false;
     },
     existsProjectName: function(): Project | null{
