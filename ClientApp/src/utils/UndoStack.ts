@@ -8,6 +8,9 @@ export interface UndoStackFrame {
 
 export class UndoStack {
     private data = Array<UndoStackFrame>();
+    public length(): number{
+        return this.data.length
+    }
     public top(): UndoStackFrame|null {
         if (this.data.length == 0)
             return null;

@@ -28,7 +28,7 @@
                 <help-dialog v-if="openHelp" @close-help="openHelp = false"></help-dialog>
                 <v-tooltip bottom>
                   <template v-slot:activator="{ on, attrs }">
-                    <v-btn class="mr-2" color="white" elevation="1" fab small @click="undo" v-bind="attrs" v-on="on" :disabled="undoStack.length < 2 && undoStackFrame.content == ''">
+                    <v-btn class="mr-2" color="white" elevation="1" fab small @click="undo" v-bind="attrs" v-on="on" :disabled="undoStack.length() < 2">
                       <v-icon color="primary">mdi-undo</v-icon>
                     </v-btn>
                     </template>
@@ -128,6 +128,7 @@ import Vue from "vue";
 import CodeMirror from "../components/CodeMirror.vue";
 import TreeView from "../components/TreeView.vue";
 import { prettyPrint, formatJson, jsonError } from "../utils/PrettyPrint";
+import { UndoStack } from "../utils/UndoStack";
 import FileExplorer from "../components/FileExplorer.vue";
 import HelpDialog from "../components/HelpDialog.vue";
 import HeadBar from "../components/HeadBar.vue";
@@ -147,22 +148,28 @@ export default Vue.extend({
     TreeView,
   },
   created: async function(){
+    this.undoStack = new UndoStack;
     this.initialProject.json = (await axios.get(`${this.$root.$data.baseUrl}/example_input.json`, {responseType: "text"})).data;
     if(this.$store.state.projects.lastProject.json){
       this.activeProject = {...this.$store.state.projects.lastProject};
       this.generatedFiles = [...this.$store.state.projects.lastGeneratedFiles];
-      this.undoStack.push(this.activeProject.json);
       this.failedGenerate = false;
       this.setActiveFile();
     }else{
       this.activeProject = {...this.initialProject};
       await this.setJson(this.activeProject.json);
     }
+    this.undoStack.push(this.activeProject.json);
   },
   computed: {
     isPristine: function(){
-      if(crc32.str(this.undoStack[this.undoStack.length-1]) === this.undoStackFrame.crc32){
-        return true;
+      if(this.undoStack){
+        const top = this.undoStack.top();
+        if(top){
+          if(top.crc32 === crc32.str(this.activeProject.json)){
+            return true;
+          }
+        }
       }
       return false;
     },
@@ -173,8 +180,7 @@ export default Vue.extend({
       openHelp: false,
       generatedFiles: Array<GeneratedFile>(),
       initialProject: {id: -1, ownerId: -1, name: "", json: "{}"},
-      undoStack: Array<string>(),
-      undoStackFrame: {crc32: -1, content: ""},
+      undoStack: null as (UndoStack | null),
       activeProject: {id: -1, ownerId: -1, name: "", json: ""},
       activeFile: {} as GeneratedFile,
       snackbar: {
@@ -194,11 +200,13 @@ export default Vue.extend({
   },
   methods: {
     changeProjectContent: function(content: string){
-      if(formatJson(content) !== formatJson(this.activeProject.json)){
-        if(this.undoStack.length > 0 && this.undoStackFrame.content === ""){
-          this.undoStackFrame = {
-            crc32: crc32.str(this.undoStack[this.undoStack.length-1]),
-            content: this.undoStack[this.undoStack.length-1]
+      if(this.undoStack){
+        const top = this.undoStack.top();
+        if(top){
+          if(formatJson(content) !== formatJson(this.activeProject.json)){
+            if(this.undoStack.length() > 0 && crc32.str(this.activeProject.json) === top.crc32){
+              this.undoStack.push(this.activeProject.json);
+            }
           }
         }
       }
@@ -235,12 +243,17 @@ export default Vue.extend({
       this.$store.commit("projects/setLastProject", this.activeProject);
       this.$store.commit("projects/setLastGeneratedFiles", this.generatedFiles);
       let prevJson = "";
-      this.undoStackFrame = {crc32: -1, content: ""};
-      if(this.undoStack.length > 0){
-        prevJson = this.undoStack[this.undoStack.length-1];
-      }
-      if(formatJson(prevJson) !== formatJson(this.activeProject.json)){
-        this.undoStack.push(this.activeProject.json);
+      if(this.undoStack){
+        const top = this.undoStack.top();
+        if(top){
+          if(this.undoStack.length() > 0){
+            prevJson = top.content;
+          }
+          if(formatJson(prevJson) !== formatJson(this.activeProject.json)){
+            this.undoStack.pop();
+            this.undoStack.push(this.activeProject.json);
+          }
+        }
       }
       this.setActiveFile();
       this.callPrettyPrint();
@@ -282,8 +295,7 @@ export default Vue.extend({
     },
     newProject: async function(){
       this.activeProject = {...this.initialProject};
-      this.undoStack = [];
-      this.undoStackFrame = {crc32: -1, content: ""};
+      this.undoStack = new UndoStack();
       await this.generate(this.activeProject.json);
     },
     setJson: async function(json: string) {
@@ -328,8 +340,7 @@ export default Vue.extend({
         this.activeProject = project;
         this.setJson(this.activeProject.json);
       }
-      this.undoStack = [];
-      this.undoStackFrame = {crc32: -1, content: ""};
+      this.undoStack = new UndoStack();
       this.openExplorer = false;
     },
     existsProjectName: function(): Project | null{
@@ -363,14 +374,17 @@ export default Vue.extend({
       }
     },
     undo: async function (){
-      if(this.isPristine){
-        this.activeProject.json = this.undoStackFrame.content;
-        this.undoStackFrame = {crc32: -1, content: ""};
-        this.callPrettyPrint();
-      }else{
+      if(this.undoStack){
         this.undoStack.pop();
-        this.activeProject.json = this.undoStack[this.undoStack.length-1];
-        await this.generate(this.activeProject.json);
+        const top = this.undoStack.top();
+        if(top){
+          this.activeProject.json = top.content;
+          if(this.isPristine){
+            this.callPrettyPrint();
+          }else{
+            await this.generate(this.activeProject.json);
+          }
+        }
       }
       this.setSnackbar("info", "Everything restored to its previous generated state", 5000);
     },
