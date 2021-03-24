@@ -61,7 +61,7 @@
                 </v-tooltip>
                 <v-tooltip bottom>
                   <template v-slot:activator="{ on, attrs }">
-                    <v-btn class="mr-2" color="white" elevation="1" fab small :disabled="activeProject.json == ''" @click="validateAndGenerate()" v-bind="attrs" v-on="on">
+                    <v-btn class="mr-2" color="white" elevation="1" fab small :disabled="activeProject.json == '' || isPristine" @click="validateAndGenerate()" v-bind="attrs" v-on="on">
                       <v-icon color="primary">mdi-arrow-right-bold</v-icon>
                     </v-btn>
                     </template>
