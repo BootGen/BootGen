@@ -25,4 +25,7 @@ export class UndoStack {
             crc32: CRC32.str(content)
         });
     }
+    public clear() {
+        this.data = [];
+    }
 }

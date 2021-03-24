@@ -70,7 +70,7 @@
               </div>
             </div>
           </template>
-          <code-mirror cmId="cm0" :content="activeProject.json" mode="json" :readOnly="false" :errorLine="errorLine" @change-content="changeProjectContent" @on-error="cmError" @cursor-into-view="closeDrawer"></code-mirror>
+          <code-mirror cmId="cm0" v-model="activeProject.json" mode="json" :readOnly="false" :errorLine="errorLine" @on-error="cmError" @cursor-into-view="closeDrawer"></code-mirror>
         </base-material-generator-card>
       </v-col>
 
@@ -115,7 +115,7 @@
               </div>
             </div>
           </template>
-          <code-mirror cmId="cm1" :content="activeFile.content" :mode="getMode()" :readOnly="true" @on-error="cmError" @cursor-into-view="closeDrawer"></code-mirror>
+          <code-mirror cmId="cm1" :value="activeFile.content" :mode="getMode()" :readOnly="true" @on-error="cmError" @cursor-into-view="closeDrawer"></code-mirror>
         </base-material-generator-card>
       </v-col>
     </v-row>
@@ -158,7 +158,6 @@ export default Vue.extend({
       this.activeProject = {...this.initialProject};
       await this.setJson(this.activeProject.json);
     }
-    this.undoStack.push(this.activeProject.json);
   },
   computed: {
     isPristine: function(){
@@ -179,7 +178,7 @@ export default Vue.extend({
       openHelp: false,
       generatedFiles: Array<GeneratedFile>(),
       initialProject: {id: -1, ownerId: -1, name: "", json: "{}"},
-      undoStack: null as (UndoStack | null),
+      undoStack: new UndoStack(),
       activeProject: {id: -1, ownerId: -1, name: "", json: ""},
       activeFile: {} as GeneratedFile,
       snackbar: {
@@ -197,19 +196,6 @@ export default Vue.extend({
     };
   },
   methods: {
-    changeProjectContent: function(content: string){
-      if(this.undoStack){
-        const top = this.undoStack.top();
-        if(top){
-          if(formatJson(content) !== formatJson(this.activeProject.json)){
-            if(this.undoStack.length() > 0 && crc32.str(this.activeProject.json) === top.crc32){
-              this.undoStack.push(this.activeProject.json);
-            }
-          }
-        }
-      }
-      this.activeProject.json = content;
-    },
     getMode: function(){
       if(this.activeFile.name){
         return this.activeFile.name.split('.')[1];
@@ -237,21 +223,8 @@ export default Vue.extend({
       this.activeProject.json = json;
       this.$store.commit("projects/setLastProject", this.activeProject);
       this.$store.commit("projects/setLastGeneratedFiles", this.generatedFiles);
-      let prevJson = "";
-      if(this.undoStack){
-        const top = this.undoStack.top();
-        if(top){
-          if(this.undoStack.length() > 0){
-            prevJson = top.content;
-          }
-          if(formatJson(prevJson) !== formatJson(this.activeProject.json)){
-            this.undoStack.pop();
-            this.undoStack.push(this.activeProject.json);
-          }
-        }
-      }
+      this.undoStack.push(this.activeProject.json);
       this.setActiveFile();
-      this.callPrettyPrint();
     },
     getJsonLength: function(json: string): number{
       json = json.replace(/ {2}/g, "");
@@ -288,9 +261,8 @@ export default Vue.extend({
     },
     newProject: async function(){
       this.activeProject = {...this.initialProject};
-      this.undoStack = new UndoStack();
+      this.undoStack.clear();
       await this.generate(this.activeProject.json);
-      this.undoStack.push(this.activeProject.json);
     },
     setJson: async function(json: string) {
       const error = jsonError(json);
@@ -330,11 +302,7 @@ export default Vue.extend({
         this.activeProject = project;
         this.setJson(this.activeProject.json);
       }
-      this.undoStack = new UndoStack();
-      const prettyJson = prettyPrint(project.json);
-      if(typeof(prettyJson) === "string"){
-        this.undoStack.push(prettyJson);
-      }
+      this.undoStack.clear();
       this.openExplorer = false;
     },
     existsProjectName: function(): Project | null{

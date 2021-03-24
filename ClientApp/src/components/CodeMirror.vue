@@ -1,7 +1,7 @@
 <template>
   <v-container fluid class="cm">
-    <codemirror v-if="mode == 'json'" :id="cmId" v-model="cmContent" @changes="changeContent" return-object :options="cmOptions" @scroll="onScroll"  @scrollCursorIntoView="cursorIntoView()" />
-    <codemirror v-else :id="cmId" :value="content" :options="cmOptions" @scrollCursorIntoView="cursorIntoView()" />
+    <codemirror v-if="mode == 'json'" :id="cmId" :value="value" @input="onInput" return-object :options="cmOptions" @scroll="onScroll"  @scrollCursorIntoView="cursorIntoView()" />
+    <codemirror v-else :id="cmId" :value="value" :options="cmOptions" @scrollCursorIntoView="cursorIntoView()" />
   </v-container>
 </template>
 
@@ -19,7 +19,7 @@ import "codemirror/mode/javascript/javascript.js";
 export default Vue.extend({
   props: {
     cmId: String,
-    content: String,
+    value: String,
     mode: String,
     readOnly: Boolean,
     errorLine: Number
@@ -28,11 +28,6 @@ export default Vue.extend({
     codemirror,
   },
   watch: {
-    content: {
-      handler(content: string){
-        this.cmContent = content;
-      }
-    },
     mode: {
       handler(mode: string) {
         if(mode === "json"){
@@ -77,6 +72,9 @@ export default Vue.extend({
     }
   },
   methods: {
+    onInput: function(content: string) {
+      this.$emit('input', content);
+    },
     onScroll: function(){
       this.unsetHighlight();
       const elementById = document.getElementById(this.cmId);
@@ -128,10 +126,7 @@ export default Vue.extend({
     },
     cursorIntoView: function(){
       this.$emit("cursor-into-view");
-    },
-    changeContent: function(e: any){
-      this.$emit("change-content", this.cmContent);
-    },
+    }
   },
 });
 </script>
