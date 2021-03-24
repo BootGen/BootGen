@@ -58,7 +58,6 @@ export default Vue.extend({
   },
   data: function () {
     return {
-      cmContent: "",
       cmOptions: {
         theme: 'material',
         tabSize: 2,
@@ -94,7 +93,7 @@ export default Vue.extend({
             this.maxLine = lineNum;
         }
       }
-      const error = jsonError(this.content);
+      const error = jsonError(this.value);
       if(error !== false){
         this.highlightLine(error.line, "red");
         this.$emit("on-error", error.message);
