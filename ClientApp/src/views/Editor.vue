@@ -127,15 +127,15 @@
 import Vue from "vue";
 import CodeMirror from "../components/CodeMirror.vue";
 import TreeView from "../components/TreeView.vue";
-import { prettyPrint, formatJson, jsonError } from "../utils/PrettyPrint";
-import { UndoStack } from "../utils/UndoStack";
+import {validateJson, prettyPrint} from "../utils/PrettyPrint";
+import {UndoStack} from "../utils/UndoStack";
 import FileExplorer from "../components/FileExplorer.vue";
 import HelpDialog from "../components/HelpDialog.vue";
 import HeadBar from "../components/HeadBar.vue";
 import Snackbar from "../components/Snackbar.vue";
-import { Project } from "../models/Project";
-import { GeneratedFile } from "../models/GeneratedFile";
-import {CRC32 as crc32} from 'crc_32_ts';
+import {Project} from "../models/Project";
+import {GeneratedFile} from "../models/GeneratedFile";
+import {CRC32} from 'crc_32_ts';
 import axios from 'axios';
 
 export default Vue.extend({
@@ -162,7 +162,7 @@ export default Vue.extend({
     isPristine: function(){
         const top = this.undoStack.top();
         if(top){
-          if(top.crc32 === crc32.str(this.activeProject.json)){
+          if(top.crc32 === CRC32.str(this.activeProject.json)){
             return true;
           }
         }
@@ -241,14 +241,13 @@ export default Vue.extend({
       }
     },
     callPrettyPrint: function(){
-      const result = prettyPrint(this.activeProject.json);
-      if(typeof(result) === "string"){
-        this.activeProject.json = result;
-        this.hideSnackbar();
-      }else{
+      const result = validateJson(this.activeProject.json);
+      if (result.error) {
         this.errorLine = result.line;
         this.setSnackbar("orange darken-2", result.message, -1);
       }
+      this.activeProject.json = prettyPrint(this.activeProject.json);
+      this.hideSnackbar();
     },
     newProject: async function(){
       this.activeProject = {...this.initialProject};
@@ -256,8 +255,8 @@ export default Vue.extend({
       await this.generate();
     },
     validateAndGenerate: async function() {
-      const error = jsonError(this.activeProject.json);
-      if(error === false) {
+      const result = validateJson(this.activeProject.json);
+      if(!result.error) {
         this.errorLine = -1;
         this.hideSnackbar();
         this.callPrettyPrint();
@@ -268,8 +267,8 @@ export default Vue.extend({
         }
         await this.generate();
       } else {
-        this.errorLine = error.line;
-        this.setSnackbar("orange darken-2", error.message, -1);
+        this.errorLine = result.line;
+        this.setSnackbar("orange darken-2", result.message, -1);
       }
     },
     setSnackbar: function(type: string, text: string, timeout: number){

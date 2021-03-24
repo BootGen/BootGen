@@ -7,7 +7,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { jsonError } from '../utils/PrettyPrint';
+import { validateJson } from '../utils/PrettyPrint';
 import { codemirror } from 'vue-codemirror';
 import 'codemirror/theme/material.css';
 import 'codemirror/lib/codemirror.css';
@@ -93,10 +93,10 @@ export default Vue.extend({
             this.maxLine = lineNum;
         }
       }
-      const error = jsonError(this.value);
-      if(error !== false){
-        this.highlightLine(error.line, "red");
-        this.$emit("on-error", error.message);
+      const result = validateJson(this.value);
+      if(result.error){
+        this.highlightLine(result.line, "red");
+        this.$emit("on-error", result.message);
       }else{
         this.$emit("on-error");
       }
