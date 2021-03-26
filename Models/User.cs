@@ -10,5 +10,9 @@ namespace Editor
         public string Email { get; set; }
         [JsonIgnore]
         public string PasswordHash { get; set; }
+        [JsonIgnore]
+        public bool IsActive { get; set; }
+        [JsonIgnore]
+        public string ActivationToken { get; set; }
     }
 }

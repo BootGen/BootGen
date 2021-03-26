@@ -77,8 +77,7 @@ namespace Editor.Services
             {
                 var original = dbContext.Projects
                             .Where(item => item.Id == projectId).FirstOrDefault();
-                EntityEntry<Project> entityEntry;
-                entityEntry = dbContext.Projects.Update(original);
+                var entityEntry = dbContext.Projects.Update(original);
                 original.Name = project.Name;
                 original.Json = project.Json;
                 original.OwnerId = project.OwnerId;

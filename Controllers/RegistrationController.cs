@@ -1,9 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc; 
+using Microsoft.AspNetCore.Mvc;
 using Editor.Services;
 
 namespace Editor.Controllers
@@ -24,6 +19,15 @@ namespace Editor.Controllers
         {
             var response = service.Register(data);
             return new ObjectResult(response.ResponseData) { StatusCode = response.StatusCode };
+        }
+
+        [HttpPost]
+        [Route("activate")]
+        public IActionResult Activate(string activationCode)
+        {
+            if (service.Activate(activationCode))
+                return Ok();
+            return BadRequest();
         }
     }
 }

@@ -1,22 +1,14 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Editor.Services;
 
 namespace Editor.Controllers
 {
     [ApiController]
     [Route("/projects")]
-    public class ProjectsController : ControllerBase
+    public class ProjectsController : BaseController
     {
         private IProjectsService service;
-        public ProjectsController(IProjectsService service)
+        public ProjectsController(ApplicationDbContext dbContext, IProjectsService service) : base(dbContext)
         {
             this.service = service;
         }
@@ -24,7 +16,7 @@ namespace Editor.Controllers
         [HttpGet]
         public IActionResult GetProjects()
         {
-            var response = service.GetProjects();
+            var response = service.GetProjectsOfOwner(CurrentUser.Id);
             return new ObjectResult(response.ResponseData) { StatusCode = response.StatusCode };
         }
 
