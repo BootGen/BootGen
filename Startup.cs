@@ -63,6 +63,7 @@ namespace Editor
             services.AddScoped<IGenerateService, GenerateService>();
             services.AddScoped<IErrorService, ErrorService>();
             services.AddDbContext<ApplicationDbContext>(options => options.UseSqlite(Configuration.GetConnectionString("SQLite")));
+            services.AddSingleton(Configuration);
 
             ServiceRegistrator.RegisterServices(services);
         }

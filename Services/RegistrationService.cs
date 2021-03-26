@@ -1,16 +1,21 @@
 using System;
 using System.Linq;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
+using SendGrid;
+using SendGrid.Helpers.Mail;
 
 namespace Editor.Services
 {
     public class RegistrationService : IRegistrationService
     {
         private readonly ApplicationDbContext dbContext;
+        private readonly IConfiguration configuration;
 
-        public RegistrationService(ApplicationDbContext dbContext)
+        public RegistrationService(ApplicationDbContext dbContext, IConfiguration configuration)
         {
             this.dbContext = dbContext;
+            this.configuration = configuration;
         }
 
         public bool Activate(string activationToken)
@@ -55,6 +60,17 @@ namespace Editor.Services
                 newUser.PasswordHash = new PasswordHasher<User>().HashPassword(newUser, data.Password);
                 dbContext.Users.Add(newUser);
                 dbContext.SaveChanges();
+                var apiKey = configuration["SendGridApiKey"];
+                if (!string.IsNullOrWhiteSpace(apiKey)) {
+                    var client = new SendGridClient(apiKey);
+                    var from = new EmailAddress("info@bootgen.com", "BootGen");
+                    var subject = "confirm e-mail address";
+                    var to = new EmailAddress(newUser.Email, newUser.UserName);
+                    var plainTextContent = $"Hi {newUser.UserName},\nThank you for registering at bootgen.com! To confirm your e-mail address please click on the following link:\nhttps://bootgen.com/activate/{newUser.ActivationToken}\nBest Regards,\nThe BootGen Team";
+                    var htmlContent = $"<strong>Hi {newUser.UserName},</strong><br>Thank you for registering at bootgen.com! To confirm your e-mail address please click on the following link:<br><a href=\"https://bootgen.com/activate/{newUser.ActivationToken}\" target=\"_blank\">https://bootgen.com/activate/{newUser.ActivationToken}</a><br>Best Regards,<br>The BootGen Team";
+                    var msg = MailHelper.CreateSingleEmail(from, to, subject, plainTextContent, htmlContent);
+                    client.SendEmailAsync(msg);
+                }
             }
             return response;
         }
