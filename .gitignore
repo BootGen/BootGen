@@ -2,5 +2,7 @@ bin
 obj
 Migrations
 *.db
+*.db-shm
+*.db-wal
 .vscode
 temp

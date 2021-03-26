@@ -10,7 +10,7 @@ namespace Editor
     {
         public DbSet<User> Users { get; set; }
         public DbSet<Project> Projects { get; set; }
-        public DbSet<Error> Errors { get; set; }
+        public DbSet<AppError> AppErrors { get; set; }
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
