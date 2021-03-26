@@ -14,5 +14,6 @@ namespace Editor
         public string Message { get; set; }
         public string Info { get; set; }
         public string StackTrace { get; set; }
+        public DateTime TimeStamp { get; set; }
     }
 }

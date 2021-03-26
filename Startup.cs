@@ -63,17 +63,14 @@ namespace Editor
             services.AddScoped<IGenerateService, GenerateService>();
             services.AddScoped<IErrorService, ErrorService>();
             services.AddDbContext<ApplicationDbContext>(options => options.UseSqlite(Configuration.GetConnectionString("SQLite")));
-            
+
             ServiceRegistrator.RegisterServices(services);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
+            app.UseMiddleware<ErrorLoggingMiddleware>();
 
             app.UseRouting();
 
@@ -92,13 +89,13 @@ namespace Editor
             {
                 endpoints.MapControllers();
             });
-            app.UseSpa(spa =>
+            if (env.IsDevelopment())
             {
-                if (env.IsDevelopment())
+                app.UseSpa(spa =>
                 {
                     spa.UseProxyToSpaDevelopmentServer("http://localhost:8080");
-                }
-            });
+                });
+            }
         }
     }
 }

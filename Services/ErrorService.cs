@@ -14,6 +14,7 @@ namespace Editor.Services
 
         public void LogError(AppError e)
         {
+            e.TimeStamp = DateTime.Now;
             dbContext.AppErrors.Add(e);
             dbContext.SaveChanges();
         }
@@ -29,7 +30,8 @@ namespace Editor.Services
                 ColumnNumber = frame.GetFileColumnNumber(),
                 FileName = frame.GetFileName(),
                 Message = e.Message,
-                StackTrace = e.StackTrace
+                StackTrace = e.StackTrace,
+                TimeStamp = DateTime.Now
             });
             dbContext.SaveChanges();
         }
