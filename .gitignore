@@ -6,3 +6,4 @@ Migrations
 *.db-wal
 .vscode
 temp
+appsettings.json
