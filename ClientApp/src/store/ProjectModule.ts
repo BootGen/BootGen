@@ -109,16 +109,6 @@ export default {
           reject(reason);
         })
       })
-    },
-    getProjectsOfUser: function(context: Context, user: User): Promise<Array<Project>> {
-      return new Promise((resolve, reject) => {
-        axios.get(`users/${user.id}/projects`, config(context.rootState.auth.jwt)).then(response => {
-          context.commit("patchProjects", response.data);
-          resolve(findObjectsById(context.state.items, response.data));
-        }).catch(reason => {
-          reject(reason);
-        })
-      })
-    },
+    }
   }
 }

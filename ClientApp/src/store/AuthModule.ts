@@ -8,8 +8,7 @@ import { ProfileResponse } from '@/models/ProfileResponse'
 import { ChangePasswordData } from '@/models/ChangePasswordData'
 import { ChangePasswordResponse } from '@/models/ChangePasswordResponse'
 import { User } from '@/models/User'
-import { userToDto } from '@/store/UserModule'
-import { config, findById } from './util';
+import { config } from './util';
 import { State } from '.';
 
 export interface AuthState {
@@ -81,12 +80,8 @@ export default {
     profile: function (context: Context): Promise<User> {
       return new Promise((resolve, reject) => {
         axios.get("profile/profile", config(context.state.jwt)).then(response => {
-          context.commit("users/setUser", response.data);
-          const savedItem = findById<User>(context.rootState.users.items, response.data.id);
-          if (savedItem) {
-            context.commit('setUser', savedItem);
-            resolve(savedItem);
-          }
+          context.commit('setUser', response.data);
+          resolve(response.data);
         }).catch(reason => {
           reject({
             status: reason.response.status,
@@ -123,4 +118,12 @@ export default {
       });
     },
   },
+}
+
+function userToDto(user: User): User {
+  return {
+    id: user.id,
+    userName: user.userName,
+    email: user.email,
+  };
 }
