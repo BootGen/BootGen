@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { ActionContext } from 'vuex';
-import { config, findById, findObjectsById, patchArray, setArray, setItem } from './util';
+import { config, findById, patchArray, setArray, setItem } from './util';
 import { State } from '.';
 import { Project } from '@/models/Project'
 import { User } from '@/models/User'

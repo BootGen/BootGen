@@ -1,8 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc; 
 using Editor.Services;
 
@@ -20,28 +16,29 @@ namespace Editor.Controllers
         }
 
         [HttpGet]
-        [Route("profile")]
+        [Route("")]
         public IActionResult Profile()
         {
-            service.CurrentUser = CurrentUser;
-            var response = service.Profile();
-            return new ObjectResult(response.ResponseData) { StatusCode = response.StatusCode };
+            return Ok(CurrentUser);
         }
+
         [HttpPost]
-        [Route("update-profile")]
+        [Route("")]
         public IActionResult UpdateProfile([FromBody] User user)
         {
             service.CurrentUser = CurrentUser;
-            var response = service.UpdateProfile(user);
-            return new ObjectResult(response.ResponseData) { StatusCode = response.StatusCode };
+            return Ok(service.UpdateProfile(user));
         }
+
         [HttpPost]
         [Route("change-password")]
         public IActionResult ChangePassword([FromBody] ChangePasswordData data)
         {
             service.CurrentUser = CurrentUser;
-            var response = service.ChangePassword(data);
-            return new ObjectResult(response.ResponseData) { StatusCode = response.StatusCode };
+            if (service.ChangePassword(data))
+                return Ok();
+            else
+                return Unauthorized();
         }
     }
 }

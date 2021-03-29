@@ -6,7 +6,6 @@ import { LoginResponse } from '@/models/LoginResponse'
 import { RegistrationData } from '@/models/RegistrationData'
 import { ProfileResponse } from '@/models/ProfileResponse'
 import { ChangePasswordData } from '@/models/ChangePasswordData'
-import { ChangePasswordResponse } from '@/models/ChangePasswordResponse'
 import { User } from '@/models/User'
 import { config } from './util';
 import { State } from '.';
@@ -16,6 +15,15 @@ export interface AuthState {
   user: User | null;
 }
 type Context = ActionContext<AuthState, State>;
+
+function userToDto(user: User): User {
+  return {
+    id: user.id,
+    userName: user.userName,
+    email: user.email,
+  };
+}
+
 export default {
   state: {
     jwt: "",
@@ -104,10 +112,10 @@ export default {
         })
       });
     },
-    changePassword: function (context: Context, data: ChangePasswordData): Promise<ChangePasswordResponse> {
+    changePassword: function (context: Context, data: ChangePasswordData): Promise<void> {
       return new Promise((resolve, reject) => {
-        axios.post("profile/change-password", data, config(context.state.jwt)).then(response => {
-          resolve(response.data);
+        axios.post("profile/change-password", data, config(context.state.jwt)).then(() => {
+          resolve();
         }).catch(reason => {
           reject({
             status: reason.response.status,
@@ -118,12 +126,4 @@ export default {
       });
     },
   },
-}
-
-function userToDto(user: User): User {
-  return {
-    id: user.id,
-    userName: user.userName,
-    email: user.email,
-  };
 }

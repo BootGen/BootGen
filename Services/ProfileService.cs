@@ -13,57 +13,36 @@ namespace Editor.Services
         {
             this.dbContext = dbContext;
         }
-        public ServiceResponse<ChangePasswordResponse> ChangePassword(ChangePasswordData data)
+        public bool ChangePassword(ChangePasswordData data)
         {
             var passwordHasher = new PasswordHasher<User>();
             var verificationResult = passwordHasher.VerifyHashedPassword(CurrentUser, CurrentUser.PasswordHash, data.OldPassword);
             if (verificationResult == PasswordVerificationResult.Failed)
             {
-                return new ServiceResponse<ChangePasswordResponse>
-                {
-                    StatusCode = 401,
-                    ResponseData = new ChangePasswordResponse { Value = false }
-                };
+                return false;
             }
             CurrentUser.PasswordHash = passwordHasher.HashPassword(CurrentUser, data.NewPassword);
             dbContext.Update(CurrentUser);
             dbContext.SaveChanges();
-            return new ServiceResponse<ChangePasswordResponse>
-            {
-                StatusCode = 200,
-                ResponseData = new ChangePasswordResponse { Value = true }
-            };
+            return true;
         }
 
-        public ServiceResponse<ProfileResponse> CheckProfile(User user)
+        public ProfileResponse CheckProfile(User user)
         {
             bool isEmailInUse = dbContext.Users.Where(u => u.Id != CurrentUser.Id && u.Email == user.Email).Any();
             bool isUserNameInUse = dbContext.Users.Where(u => u.Id != CurrentUser.Id && u.UserName == user.UserName).Any();
-            return new ServiceResponse<ProfileResponse>
-            {
-                StatusCode = 200,
-                ResponseData = new ProfileResponse
+            return new ProfileResponse
                 {
                     Success = !isUserNameInUse && !isEmailInUse,
                     IsUserNameInUse = isUserNameInUse,
                     IsEmailInUse = isEmailInUse
-                }
-            };
+                };
         }
 
-        public ServiceResponse<User> Profile()
-        {
-            return new ServiceResponse<User>
-            {
-                StatusCode = 200,
-                ResponseData = CurrentUser
-            };
-        }
-
-        public ServiceResponse<ProfileResponse> UpdateProfile(User user)
+        public ProfileResponse UpdateProfile(User user)
         {
             var response = CheckProfile(user);
-            if (response.ResponseData.Success)
+            if (response.Success)
             {
                 CurrentUser.Email = user.Email;
                 CurrentUser.UserName = user.UserName;
