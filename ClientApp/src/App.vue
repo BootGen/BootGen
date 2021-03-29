@@ -38,15 +38,21 @@
           </v-list-item>
         </div>
       </v-list>
-      <div class="container-fluid d-flex flex-column navCookie" v-if="!cookiesAccepted">
-        <div class="container">
-          <v-icon class="pr-2" dark large>{{ snackbar.icon }}</v-icon>
-          <span>{{ snackbar.text }}</span>
+      <div class="ma-4">
+        <div class="container-fluid d-flex flex-column navCookie" v-if="!cookiesAccepted">
+          <div class="container pl-0 align-center">
+            <v-icon class="pr-2" dark large>{{ snackbar.icon }}</v-icon>
+            <span>{{ snackbar.text }}</span>
+          </div>
+          <div v-if="snackbar.buttons" class="d-flex justify-space-around pb-5">
+            <v-btn color="secondary" @click="acceptCookies()" small>accept</v-btn>
+            <v-btn color="secondary" @click="customizeCookies()" small>customize</v-btn>
+          </div>
         </div>
-        <div v-if="snackbar.buttons" class="d-flex justify-space-between pa-2">
-          <v-btn color="secondary" @click="acceptCookies()">accept</v-btn>
-          <v-btn color="secondary" @click="customizeCookies()">customize</v-btn>
-        </div>
+        <a class="repositoryLink" href="https://github.com/BootGen/Editor" target="_blank">
+          <v-icon class="pr-2">mdi-github</v-icon>
+          github.com/BootGen/Editor
+        </a>
       </div>
     </v-navigation-drawer>
 
@@ -119,7 +125,7 @@ export default {
   data: () => ({
     drawer: null,
     snackbar: {
-      dismissible: true,
+      dismissible: false,
       visible: true,
       type: "third",
       icon: "mdi-cookie-alert",
@@ -169,5 +175,12 @@ export default {
   }
   .navCookie{
     color: #fff;
+  }
+  a.repositoryLink{
+    color: #fff!important;
+    text-decoration: none;
+  }
+  a.repositoryLink:hover{
+    color: #999 !important;
   }
 </style>

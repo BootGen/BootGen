@@ -5,7 +5,7 @@
       <div>
         <v-icon class="pr-3" dark large>{{ snackbar.icon }}</v-icon>
         <span>{{ snackbar.text }}</span>
-        <div class="d-flex justify-end w-100">
+        <div class="d-flex justify-space-around">
           <v-btn class="ml-3" v-for="(btn, idx) in snackbar.buttons" :key="idx" :color="btn.color" @click="$emit(btn.name)">{{ btn.name }}</v-btn>
         </div>
       </div>
