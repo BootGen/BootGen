@@ -1,5 +1,11 @@
 <template>
   <v-container fluid class="editor">
+    <div class="loading" v-if="loading">
+      <v-progress-circular
+        indeterminate      
+        color="primary"
+      ></v-progress-circular>
+    </div>
     <v-row class="d-flex align-center ma-0 pa-0">
       <v-col lg="5" md="6" sm="8" cols="12" class="pa-0 headBar" v-if="$store.state.auth.jwt">
         <head-bar :activeProject="activeProject" @new-project="newProject" @change-project-name="changeProjectName"></head-bar>
@@ -190,15 +196,23 @@ export default Vue.extend({
       errorLine: -1,
       drawer: false,
       openPath: "",
+      loading: false,
     };
   },
   methods: {
+    startLoding: function(){
+      this.loading = true;
+    },
+    endLoading: function(){
+      setTimeout(() => (this.loading = false), 500);
+    },
     getMode: function(){
       if(this.activeFile.name){
         return this.activeFile.name.split('.')[1];
       }
     },
     generate: async function(){
+      this.startLoding();
       let nameSpace = "Test"
       if(this.activeProject.name !== ""){
         nameSpace = this.activeProject.name;
@@ -209,6 +223,7 @@ export default Vue.extend({
         if(generate.errorLine !== ""){
           this.errorLine = generate.errorLine-1;
         }
+        this.endLoading();
         return;
       }
       this.generatedFiles = generate.generatedFiles;
@@ -216,6 +231,7 @@ export default Vue.extend({
       this.$store.commit("projects/setLastGeneratedFiles", this.generatedFiles);
       this.undoStack.push(this.activeProject.json);
       this.setActiveFile();
+      this.endLoading();
     },
     getJsonLength: function(json: string): number{
       json = json.replace(/ {2}/g, "");
@@ -344,11 +360,13 @@ export default Vue.extend({
       this.projectName = name;
     },
     download: function() {
+      this.startLoding();
       let nameSpace = "Test"
       if(this.activeProject.name !== ""){
         nameSpace = this.activeProject.name;
       }
       this.$store.dispatch("download", {data: this.activeProject.json, nameSpace: this.camalize(nameSpace)});
+      this.endLoading();
     },
     openFolder: function(idx: number){
       this.openPath = "";
@@ -420,5 +438,23 @@ export default Vue.extend({
     border-radius: 3px;
     word-wrap: break-word!important;
     z-index: 1;
+  }
+  .loading{    
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.7);
+    z-index: 9999;
+  }
+  .v-progress-circular.v-progress-circular--indeterminate {
+    position: fixed;
+    margin: auto;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
   }
 </style>
