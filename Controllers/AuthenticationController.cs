@@ -23,7 +23,18 @@ namespace Editor.Controllers
         public IActionResult Login([FromBody] AuthenticationData data)
         {
             var response = service.Login(data);
-            return new ObjectResult(response.ResponseData) { StatusCode = response.StatusCode };
+            if (response.Success) {
+                return Ok(new LoginSuccess {
+                    Jwt = response.Jwt
+                });
+            }
+
+            var error = new LoginError
+            {
+                IsInactive = response.IsInactive,
+                WrongCreditentials = response.WrongCreditentials
+            };
+            return new ObjectResult(error) { StatusCode = 401 };
         }
     }
 }

@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 using System.Collections.Generic;
 namespace Editor
 {
-    public class LoginResponse
+    public class LoginSuccess
     {
         public string Jwt { get; set; }
     }

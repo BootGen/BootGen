@@ -28,6 +28,7 @@ namespace Editor
                 Id = 1,
                 UserName = "Sample User",
                 Email = "example@email.com",
+                IsActive = true
             };
             user1.PasswordHash = passwordHasher.HashPassword(user1, "password123");
             modelBuilder.Entity<User>().HasData(user1);
@@ -35,6 +36,7 @@ namespace Editor
                 Id = 2,
                 UserName = "Sample User 2",
                 Email = "example2@email.com",
+                IsActive = true
             };
             user2.PasswordHash = passwordHasher.HashPassword(user2, "password123");
             modelBuilder.Entity<User>().HasData(user2);
@@ -42,6 +44,7 @@ namespace Editor
                 Id = 3,
                 UserName = "Sample User 3",
                 Email = "example3@email.com",
+                IsActive = true
             };
             user3.PasswordHash = passwordHasher.HashPassword(user3, "password123");
             modelBuilder.Entity<User>().HasData(user3);

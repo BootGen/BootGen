@@ -4,7 +4,6 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
-using Editor.Controllers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Identity;
@@ -23,24 +22,27 @@ namespace Editor.Services
             this.config = config;
             this.dbContext = dbContext;
         }
-        public ServiceResponse<LoginResponse> Login(AuthenticationData data)
+        public LoginResponse Login(AuthenticationData data)
         {
             User user = dbContext.Users.Where(u => u.Email == data.Email).FirstOrDefault();
             if (user != null && new PasswordHasher<User>().VerifyHashedPassword(user, user.PasswordHash, data.Password) != PasswordVerificationResult.Failed)
             {
-                return new ServiceResponse<LoginResponse>
-                {
-                    StatusCode = 200,
-                    ResponseData = new LoginResponse
+                if (!user.IsActive)
+                    return new LoginResponse
                     {
-                        Jwt = GenerateJSONWebToken(user)
-                    }
+                        Success = false,
+                        IsInactive = true
+                    };
+                return new LoginResponse
+                {
+                    Success = true,
+                    Jwt = GenerateJSONWebToken(user)
                 };
             }
-            return new ServiceResponse<LoginResponse>
+            return new LoginResponse
             {
-                StatusCode = 401,
-                ResponseData = new LoginResponse()
+                Success = false,
+                WrongCreditentials = true
             };
         }
 

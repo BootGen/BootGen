@@ -2,6 +2,6 @@ namespace Editor.Services
 {
     public interface IAuthenticationService
     {
-        ServiceResponse<LoginResponse> Login(AuthenticationData data);
+        LoginResponse Login(AuthenticationData data);
     }
 }
