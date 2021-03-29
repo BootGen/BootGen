@@ -11,7 +11,6 @@
           v-bind="props"
         />
       </template>
-    
       <v-list nav>
         <div v-for="item in items" :key="item.title" link>
           <div v-if="item.children">
@@ -39,6 +38,16 @@
           </v-list-item>
         </div>
       </v-list>
+      <div class="container-fluid d-flex flex-column navCookie" v-if="!cookiesAccepted">
+        <div class="container">
+          <v-icon class="pr-2" dark large>{{ snackbar.icon }}</v-icon>
+          <span>{{ snackbar.text }}</span>
+        </div>
+        <div v-if="snackbar.buttons" class="d-flex justify-space-between pa-2">
+          <v-btn color="secondary" @click="acceptCookies()">accept</v-btn>
+          <v-btn color="secondary" @click="customizeCookies()">customize</v-btn>
+        </div>
+      </div>
     </v-navigation-drawer>
 
     <v-app-bar app color="transparent" flat height="75" class="navPosition" :data-value="$route.name !== 'Editor'">
@@ -56,13 +65,30 @@
         <router-view></router-view>
       </v-container>
     </v-main>
+    <snackbar v-if="!cookiesAccepted && !drawer" :snackbar="snackbar" @accept="acceptCookies" @customize="customizeCookies"></snackbar>
   </v-app>
 </template>
 
 <script>
- import { mapState } from 'vuex'
+import { mapState } from 'vuex'
+import Snackbar from "./components/Snackbar.vue";
 
 export default {
+  components: {
+    Snackbar,
+  },
+  mounted() {
+    if(localStorage.cookieConsentAnswered) this.cookieConsentAnswered = localStorage.cookieConsentAnswered;
+    if(localStorage.cookiesAccepted) this.cookiesAccepted = localStorage.cookiesAccepted;
+  },
+  watch:{
+    cookieConsentAnswered(answered) {
+      localStorage.cookieConsentAnswered = answered;
+    },
+    cookiesAccepted(accepted) {
+      localStorage.cookiesAccepted = accepted;
+    }
+  },
   computed: {
     ...mapState(['barColor', 'barImage']),
     items: function () {
@@ -92,7 +118,31 @@ export default {
   },
   data: () => ({
     drawer: null,
+    snackbar: {
+      dismissible: true,
+      visible: true,
+      type: "third",
+      icon: "mdi-cookie-alert",
+      text: "We use cookies to improve your experience on our website.",
+      timeout: -1,
+      buttons: [
+        {name: "accept", color: "secondary"},
+        {name: "customize", color: "secondary"}
+      ]
+    },
+    cookieConsentAnswered: false,
+    cookiesAccepted: false,
   }),
+  methods: {
+    acceptCookies: function(){
+      this.cookieConsentAnswered = true;
+      this.cookiesAccepted = true
+    },
+    customizeCookies: function(){
+      this.cookieConsentAnswered = true;
+      this.$router.push('/privacy-statement');
+    }
+  }
 };
 </script>
 
@@ -103,6 +153,11 @@ export default {
   .v-application--wrap nav{
     z-index: 999;
   }
+  .v-navigation-drawer__content{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
   main{
     padding-top: unset!important;
   }
@@ -111,5 +166,8 @@ export default {
   }
   .navPosition[data-value=false]{
     position: absolute!important;
+  }
+  .navCookie{
+    color: #fff;
   }
 </style>
