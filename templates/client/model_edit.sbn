@@ -20,7 +20,7 @@
           {{~ else if (get_type property) == "Boolean" ~}}
           <v-checkbox v-model="edited{{ class.name }}.{{ camel_case property.name }}"></v-checkbox>
           {{~ else if (get_type property) == "Date" ~}}
-          <v-text-field type="date" v-model="edited{{ class.name }}.{{ camel_case property.name }}" dense></v-text-field>
+          <v-text-field type="datetime-local" v-model="edited{{ class.name }}.{{ camel_case property.name }}" dense></v-text-field>
           {{~ else ~}}
           <v-text-field v-model="edited{{ class.name }}.{{ camel_case property.name }}" dense></v-text-field>
           {{~ end ~}}

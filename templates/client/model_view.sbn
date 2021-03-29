@@ -16,7 +16,11 @@
       <v-list-item>
         <v-list-item-content>{{ camel_case property.name }}:</v-list-item-content>
         <v-list-item-content class="align-end">
+          {{~ if (get_type property) == "Date" ~}}
+          {{'{{'}} dateFormat({{ camel_case class.name }}.{{ camel_case property.name }}) {{'}}'}}
+          {{~ else ~}}
           {{'{{'}} {{ camel_case class.name }}.{{ camel_case property.name }} {{'}}'}}
+          {{~ end ~}}
         </v-list-item-content>
       </v-list-item>
       {{~ end ~}}
