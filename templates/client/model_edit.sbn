@@ -9,6 +9,12 @@
       {{~ if (camel_case property.name) != "userId" ~}}
       <v-list-item>
         <v-list-item-content>{{ camel_case property.name }}:</v-list-item-content>
+        {{~ if (get_type property) == "Date" && (property.name) != "Created" && (property.name) != "Updated" ~}}
+        <v-list-item-content class="d-flex align-start">
+          <v-text-field type="date" v-model="{{ camel_case property.name }}.date" dense></v-text-field>
+          <v-text-field type="time" v-model="{{ camel_case property.name }}.time" dense></v-text-field>
+        </v-list-item-content>
+        {{~ else ~}}
         <v-list-item-content class="align-end">
         {{~ if property.name == "Id" ~}}
           {{'{{'}} edited{{ class.name }}.{{ camel_case property.name }} {{'}}'}}
@@ -19,13 +25,12 @@
           <v-text-field type="number" v-model="edited{{ class.name }}.{{ camel_case property.name }}" dense></v-text-field>
           {{~ else if (get_type property) == "Boolean" ~}}
           <v-checkbox v-model="edited{{ class.name }}.{{ camel_case property.name }}"></v-checkbox>
-          {{~ else if (get_type property) == "Date" ~}}
-          <v-text-field type="datetime-local" v-model="edited{{ class.name }}.{{ camel_case property.name }}" dense></v-text-field>
           {{~ else ~}}
           <v-text-field v-model="edited{{ class.name }}.{{ camel_case property.name }}" dense></v-text-field>
           {{~ end ~}}
         {{~ end ~}}
         </v-list-item-content>
+        {{~ end ~}}
         </v-list-item>
       {{~ end ~}}
       {{~ end ~}}
@@ -45,14 +50,42 @@ export default Vue.extend({
   },
   created: function () {
     this.edited{{ class.name }} = {...this.{{ camel_case class.name }}};
+    {{~ for property in class.common_properties ~}}
+    {{~ if (get_type property) == "Date" && (property.name) != "Created" && (property.name) != "Updated" ~}}
+    let {{ camel_case property.name }}Month: number | string = this.edited{{ class.name }}.{{ camel_case property.name }}.getMonth()+1;
+    let {{ camel_case property.name }}Day: number | string = this.edited{{ class.name }}.{{ camel_case property.name }}.getDate();
+    if ({{ camel_case property.name }}Month < 10) { {{ camel_case property.name }}Month = `0${ {{ camel_case property.name }}Month }` }
+    if ({{ camel_case property.name }}Day < 10) { {{ camel_case property.name }}Day = `0${ {{ camel_case property.name }}Day }` }
+    this.{{ camel_case property.name }}.date = `${ this.edited{{ class.name }}.{{ camel_case property.name }}.getFullYear() }-${ {{ camel_case property.name }}Month }-${ {{ camel_case property.name }}Day }`;
+    
+    let {{ camel_case property.name }}Hours: number | string = this.edited{{ class.name }}.{{ camel_case property.name }}.getHours();
+    let {{ camel_case property.name }}Minutes: number | string = this.edited{{ class.name }}.{{ camel_case property.name }}.getMinutes();
+    if ({{ camel_case property.name }}Hours < 10) { {{ camel_case property.name }}Hours = `0${ {{ camel_case property.name }}Hours }` }
+    if ({{ camel_case property.name }}Minutes < 10) { {{ camel_case property.name }}Minutes = `0${ {{ camel_case property.name }}Minutes }` }
+    this.{{ camel_case property.name }}.time = `${ {{ camel_case property.name }}Hours }:${ {{ camel_case property.name }}Minutes }`;
+    {{~ end ~}}
+    {{~ end ~}}
   },
   data: function () {
     return {
-      edited{{ class.name }}: null as (null | {{ class.name }})
+      edited{{ class.name }}: null as (null | {{ class.name }}),
+      {{~ for property in class.common_properties ~}}
+      {{~ if (get_type property) == "Date" && (property.name) != "Created" && (property.name) != "Updated" ~}}
+      {{ camel_case property.name }}: {date: "", time: ""},
+      {{~ end ~}}
+      {{~ end ~}}
     };
   },
   methods: {
     save: async function () {
+      {{~ for property in class.common_properties ~}}
+      {{~ if (get_type property) == "Date" && (property.name) != "Created" && (property.name) != "Updated" ~}}
+      if(this.edited{{ class.name }}){
+        const date = new Date(this.{{ camel_case property.name }}.date);
+        this.edited{{ class.name }}.{{ camel_case property.name }} = new Date(`${ date.getMonth()+1 } ${ date.getDate() } ${ date.getFullYear() } ${ this.{{ camel_case property.name }}.time }`);
+      }
+      {{~ end ~}}
+      {{~ end ~}}
       Object.assign(this.{{ camel_case class.name }}, this.edited{{ class.name }});
       await this.$store.dispatch("{{ camel_case class.name.plural }}/update{{ class.name }}", this.{{ camel_case class.name }});
       this.$emit("close");
@@ -61,7 +94,7 @@ export default Vue.extend({
       this.$emit("close");
     },
     dateFormat: function(date: Date){
-      return `${date.toLocaleDateString("en-US")}, ${date.toLocaleTimeString("en-US")}`;
+      return `${ date.toLocaleDateString("en-US") }, ${ date.toLocaleTimeString("en-US") }`;
     }
   },
 });
