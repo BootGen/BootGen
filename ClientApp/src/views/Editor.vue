@@ -67,7 +67,7 @@
                 </v-tooltip>
                 <v-tooltip bottom>
                   <template v-slot:activator="{ on, attrs }">
-                    <v-btn class="mr-2" color="white" elevation="1" fab small :disabled="activeProject.json == '' || isPristine" @click="validateAndGenerate()" v-bind="attrs" v-on="on">
+                    <v-btn class="mr-2" color="white" elevation="1" fab small :disabled="isPristine" @click="validateAndGenerate()" v-bind="attrs" v-on="on">
                       <v-icon color="primary">mdi-arrow-right-bold</v-icon>
                     </v-btn>
                     </template>
@@ -257,6 +257,7 @@ export default Vue.extend({
       }
     },
     callPrettyPrint: function(){
+      this.$gtag.event('pretty-print');
       const result = validateJson(this.activeProject.json);
       if (result.error) {
         this.errorLine = result.line;
@@ -266,11 +267,13 @@ export default Vue.extend({
       this.hideSnackbar();
     },
     newProject: async function(){
+      this.$gtag.event('create-new-project');
       this.activeProject = {...this.initialProject};
       this.undoStack.clear();
       await this.generate();
     },
     validateAndGenerate: async function() {
+      this.$gtag.event('generate');
       const result = validateJson(this.activeProject.json);
       if(!result.error) {
         this.errorLine = -1;
@@ -305,6 +308,7 @@ export default Vue.extend({
       }
     },
     selectProject: function(project: Project){
+      this.$gtag.event('select-project');
       let select = true;
       if(this.activeProject.id === -1){
         select = confirm("changes will not be saved!");
@@ -326,6 +330,7 @@ export default Vue.extend({
       return null;
     },
     save: async function (){
+      this.$gtag.event('save-project');
       if(this.projectName !== ""){
         this.activeProject.name = this.projectName;
       }
@@ -347,6 +352,7 @@ export default Vue.extend({
       }
     },
     undo: async function () {
+      this.$gtag.event('undo');
       if (this.isPristine) {
         this.undoStack.pop();
       }
@@ -357,10 +363,12 @@ export default Vue.extend({
       this.setSnackbar("info", "Everything restored to its previous generated state", 5000);
     },
     changeProjectName: function(name: string){
+      this.$gtag.event('change-project-name');
       this.projectName = name;
     },
     download: function() {
       this.startLoding();
+      this.$gtag.event('download');
       let nameSpace = "Test"
       if(this.activeProject.name !== ""){
         nameSpace = this.activeProject.name;
@@ -369,6 +377,7 @@ export default Vue.extend({
       this.endLoading();
     },
     openFolder: function(idx: number){
+      this.$gtag.event('open-folder');
       this.openPath = "";
       for(let i = 0; i < idx; i++){
         if(this.activeFile.path.split('/')[i]){
@@ -379,18 +388,23 @@ export default Vue.extend({
       this.drawer = true;
     },
     selectFile: function(data: GeneratedFile){
+      this.$gtag.event('select-file');
       this.activeFile = data;
       this.closeDrawer();
     },
     setDrawer: function(){
+      this.$gtag.event('set-drawer');
       this.drawer = !this.drawer;
       if(!this.drawer){
         this.openPath = "";
       }
     },
     closeDrawer: function(){
-      this.drawer = false;
-      this.openPath = "";
+      if(this.drawer){
+        this.$gtag.event('close-drawer');
+        this.drawer = false;
+        this.openPath = "";
+      }
     },
     camalize: function(str: string) {
       return str.replace(/(?:^\w|[A-Z]|\b\w)/g, function(word, index) {

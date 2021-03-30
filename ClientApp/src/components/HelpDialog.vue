@@ -8,7 +8,7 @@
         <v-toolbar-title>Help</v-toolbar-title>
       </v-toolbar>
       <v-tabs>
-        <v-tab v-for="item in help" :key="item.title">
+        <v-tab v-for="item in help" :key="item.title" @click="changeHelpMenu">
           <v-icon left>
             {{item.icon}}
           </v-icon>
@@ -32,7 +32,8 @@
 import Vue from "vue";
 
 export default Vue.extend({
-  components: {
+  created: function(){
+    this.$gtag.event('open-help');
   },
   data: function () {
     return {
@@ -46,8 +47,12 @@ export default Vue.extend({
   },
   methods: {
     close: function(){
+      this.$gtag.event('close-help');
       this.dialog = false;
       this.$emit("close-help");
+    },
+    changeHelpMenu: function(){
+      this.$gtag.event('change-help-menu');
     }
   },
 });

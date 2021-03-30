@@ -12,7 +12,7 @@
         />
       </template>
       <v-list nav>
-        <div v-for="item in items" :key="item.title" link>
+        <div v-for="item in items" :key="item.title" link  @click="selectNavItem()">
           <div v-if="item.children">
             <v-list-group active-class="primary white--text" :prepend-icon="item.icon">
               <template v-slot:activator>
@@ -49,7 +49,7 @@
             <v-btn color="secondary" @click="customizeCookies()" small>customize</v-btn>
           </div>
         </div>
-        <a class="repositoryLink" href="https://github.com/BootGen/Editor" target="_blank">
+        <a class="repositoryLink" href="https://github.com/BootGen/Editor" target="_blank" @click="openGithub()">
           <v-icon class="pr-2">mdi-github</v-icon>
           github.com/BootGen/Editor
         </a>
@@ -57,7 +57,7 @@
     </v-navigation-drawer>
 
     <v-app-bar app color="transparent" flat height="75" class="navPosition" :data-value="$route.name !== 'Editor'">
-      <v-btn class="mr-3" @click="drawer = !drawer" elevation="1" fab small>
+      <v-btn class="mr-3" @click="setNavDraver()" elevation="1" fab small>
         <v-icon v-if="drawer">mdi-dots-vertical</v-icon>
         <v-icon v-else>mdi-view-quilt</v-icon>
       </v-btn>
@@ -141,12 +141,24 @@ export default {
   }),
   methods: {
     acceptCookies: function(){
+      this.$gtag.event('accept-cookies');
       this.cookieConsentAnswered = true;
       this.cookiesAccepted = true
     },
     customizeCookies: function(){
+      this.$gtag.event('customize-cookies');
       this.cookieConsentAnswered = true;
       this.$router.push('/privacy-statement');
+    },
+    selectNavItem: function(){
+      this.$gtag.event('select-nav-item');
+    },
+    setNavDraver: function(){
+      this.$gtag.event('set-nav-drawer');
+      this.drawer = !this.drawer;
+    },
+    openGithub: function(){
+      this.$gtag.event('open-github');
     }
   }
 };

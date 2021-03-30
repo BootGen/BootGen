@@ -105,6 +105,7 @@ export default Vue.extend({
   },
   methods: {
     saveUser: async function () {
+      this.$gtag.event('update-profile');
       this.successMsg = "";
       const response = await this.$store.dispatch("updateProfile", this.$store.state.auth.user);
       if (response.isUserNameInUse) {

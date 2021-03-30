@@ -9,7 +9,7 @@
         </div>
         <div class="d-flex align-center justify-space-between" v-else>
           <v-toolbar-title class="font-weight-light mr-2">Editor</v-toolbar-title>
-          <div class="mr-1">for save <router-link to="/login">sign in</router-link></div>
+          <div class="mr-1" @click="toLogin()">for save <router-link to="/login">sign in</router-link></div>
         </div>
       </v-col>
     </v-row>
@@ -37,6 +37,9 @@ export default Vue.extend({
     changeName: function(name: string){
       this.$emit('change-project-name', name);
     },
+    toLogin: function(){
+      this.$gtag.event('editor-to-login');
+    }
   }
 });
 </script>

@@ -84,6 +84,7 @@ export default Vue.extend({
   },
   methods: {
     tryLogin: async function () {
+      this.$gtag.event('login');
       try {
         const response = await this.$store.dispatch("login", {
           email: this.email,

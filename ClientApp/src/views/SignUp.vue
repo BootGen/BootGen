@@ -108,6 +108,7 @@ export default Vue.extend({
   },
   methods: {
     trySignUp: async function () {
+      this.$gtag.event('sign-up');
       const response = await this.$store.dispatch("register", {
         userName: this.userName,
         email: this.email,

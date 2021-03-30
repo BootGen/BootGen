@@ -23,12 +23,11 @@ export default Vue.extend({
   },
   methods: {
     setOpt: function(){
+      this.$gtag.event('set-opt');
       if(this.cookiesAccepted){
         this.$gtag.optIn();
-        console.log(this.$gtag);
       }else{
         this.$gtag.optOut();
-        console.log(this.$gtag);
       }
     }
   },

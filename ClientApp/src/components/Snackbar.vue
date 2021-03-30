@@ -9,14 +9,17 @@
           <v-btn class="ml-3" v-for="(btn, idx) in snackbar.buttons" :key="idx" :color="btn.color" @click="$emit(btn.name)">{{ btn.name }}</v-btn>
         </div>
       </div>
-      <v-btn v-if="snackbar.dismissible" icon @click="snackbar.visible = false">
+      <v-btn v-if="snackbar.dismissible" icon @click="closeSnackbar()">
         <v-icon>mdi-close-thick</v-icon>
       </v-btn>
     </v-layout>
   </v-snackbar>
   </v-container>
 </template>
+
 <script lang="ts">
+import Vue from "vue";
+
 interface Snackbar {
 	dismissible: boolean;
 	visible: boolean;
@@ -25,11 +28,18 @@ interface Snackbar {
 	text: string;
   buttons: Array<{name: string; color: string}>;
 }
-export default {
+
+export default Vue.extend({
 	props: {
 		snackbar: {
 			type: Object as () => Snackbar
 		}
 	},
-}
+  methods: {
+    closeSnackbar: function(){
+      this.$gtag.event('close-snackbar');
+      this.snackbar.visible = false;
+    }
+  },
+});
 </script>

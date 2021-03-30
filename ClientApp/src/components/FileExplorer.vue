@@ -43,6 +43,7 @@ export default Vue.extend({
 			this.dialog = false;
 		},
     outClick: function(){
+      this.$gtag.event('close-file-explorer');
       this.$emit("close-explorer");
     }
   },
