@@ -143,7 +143,7 @@ export default {
     acceptCookies: function(){
       this.$gtag.event('accept-cookies');
       this.cookieConsentAnswered = true;
-      this.cookiesAccepted = true
+      this.cookiesAccepted = true;
     },
     customizeCookies: function(){
       this.$gtag.event('customize-cookies');
