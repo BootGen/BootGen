@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc; 
 using Editor.Services;
+using System.Threading;
 
 namespace Editor.Controllers
 {
@@ -23,6 +24,9 @@ namespace Editor.Controllers
         public IActionResult Generate([FromBody] GenerateRequest request)
         {
             var response = service.Generate(request);
+            #if DEBUG
+            Thread.Sleep(3000);
+            #endif
             return new ObjectResult(response.ResponseData) { StatusCode = response.StatusCode };
         }
 
@@ -33,6 +37,9 @@ namespace Editor.Controllers
             var result = service.Download(request);
             if (result.StatusCode != 200)
                 return BadRequest();
+            #if DEBUG
+            Thread.Sleep(3000);
+            #endif
             return File(result.ResponseData, "application/zip", "project.zip");
         }
     }
