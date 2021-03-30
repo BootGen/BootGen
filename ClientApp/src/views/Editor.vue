@@ -1,11 +1,5 @@
 <template>
   <v-container fluid class="editor">
-    <div class="loading" v-if="loading">
-      <v-progress-circular
-        indeterminate      
-        color="primary"
-      ></v-progress-circular>
-    </div>
     <v-row class="d-flex align-center ma-0 pa-0">
       <v-col lg="5" md="6" sm="8" cols="12" class="pa-0 headBar" v-if="$store.state.auth.jwt">
         <head-bar :activeProject="activeProject" @new-project="newProject" @change-project-name="changeProjectName"></head-bar>
@@ -65,10 +59,18 @@
                   </template>
                   <span>Formatting</span>
                 </v-tooltip>
+                
                 <v-tooltip bottom>
                   <template v-slot:activator="{ on, attrs }">
                     <v-btn class="mr-2" color="white" elevation="1" fab small :disabled="isPristine" @click="validateAndGenerate()" v-bind="attrs" v-on="on">
-                      <v-icon color="primary">mdi-arrow-right-bold</v-icon>
+                      <v-icon color="primary" v-if="!generateLoading">mdi-arrow-right-bold</v-icon>
+                      <div v-if="generateLoading">
+                        <v-progress-circular
+                          indeterminate  
+                          :size="35" 
+                          color="primary"
+                        ></v-progress-circular>
+                      </div>
                     </v-btn>
                     </template>
                   <span>Generate</span>
@@ -101,7 +103,14 @@
                 <v-tooltip bottom>
                   <template v-slot:activator="{ on, attrs }">
                     <v-btn color="white" class="mr-2" elevation="1" :disabled="!isPristine" @click="download" fab small v-bind="attrs" v-on="on">
-                      <v-icon color="primary">mdi-download</v-icon>
+                      <v-icon color="primary" v-if="!downLoading">mdi-download</v-icon>
+                      <div v-if="downLoading">
+                        <v-progress-circular
+                          indeterminate  
+                          :size="35" 
+                          color="primary"
+                        ></v-progress-circular>
+                      </div>
                     </v-btn>
                   </template>
                   <span>Download</span>
@@ -196,42 +205,39 @@ export default Vue.extend({
       errorLine: -1,
       drawer: false,
       openPath: "",
-      loading: false,
+      generateLoading: false,
+      downLoading: false,
     };
   },
   methods: {
-    startLoding: function(){
-      this.loading = true;
-    },
-    endLoading: function(){
-      setTimeout(() => (this.loading = false), 500);
-    },
     getMode: function(){
       if(this.activeFile.name){
         return this.activeFile.name.split('.')[1];
       }
     },
     generate: async function(){
-      this.startLoding();
-      let nameSpace = "Test"
-      if(this.activeProject.name !== ""){
-        nameSpace = this.activeProject.name;
-      }
-      const generate = await this.$store.dispatch("generate", {data: this.activeProject.json, nameSpace: this.camalize(nameSpace)});
-      if(generate.errorMessage){
-        this.setSnackbar("orange darken-2", generate.errorMessage, -1);
-        if(generate.errorLine !== ""){
-          this.errorLine = generate.errorLine-1;
+      if(!this.generateLoading){
+        this.generateLoading = true;
+        let nameSpace = "Test"
+        if(this.activeProject.name !== ""){
+          nameSpace = this.activeProject.name;
         }
-        this.endLoading();
-        return;
+        const generate = await this.$store.dispatch("generate", {data: this.activeProject.json, nameSpace: this.camalize(nameSpace)});
+        if(generate.errorMessage){
+          this.setSnackbar("orange darken-2", generate.errorMessage, -1);
+          if(generate.errorLine !== ""){
+            this.errorLine = generate.errorLine-1;
+          }
+          this.generateLoading = false;
+          return;
+        }
+        this.generatedFiles = generate.generatedFiles;
+        this.$store.commit("projects/setLastProject", this.activeProject);
+        this.$store.commit("projects/setLastGeneratedFiles", this.generatedFiles);
+        this.undoStack.push(this.activeProject.json);
+        this.setActiveFile();
+        this.generateLoading = false;
       }
-      this.generatedFiles = generate.generatedFiles;
-      this.$store.commit("projects/setLastProject", this.activeProject);
-      this.$store.commit("projects/setLastGeneratedFiles", this.generatedFiles);
-      this.undoStack.push(this.activeProject.json);
-      this.setActiveFile();
-      this.endLoading();
     },
     getJsonLength: function(json: string): number{
       json = json.replace(/ {2}/g, "");
@@ -366,15 +372,17 @@ export default Vue.extend({
       this.$gtag.event('change-project-name');
       this.projectName = name;
     },
-    download: function() {
-      this.startLoding();
-      this.$gtag.event('download');
-      let nameSpace = "Test"
-      if(this.activeProject.name !== ""){
-        nameSpace = this.activeProject.name;
+    download: async function() {
+      if(!this.downLoading){
+        this.downLoading = true;
+        this.$gtag.event('download');
+        let nameSpace = "Test"
+        if(this.activeProject.name !== ""){
+          nameSpace = this.activeProject.name;
+        }
+        await this.$store.dispatch("download", {data: this.activeProject.json, nameSpace: this.camalize(nameSpace)});
+        this.downLoading = false;
       }
-      this.$store.dispatch("download", {data: this.activeProject.json, nameSpace: this.camalize(nameSpace)});
-      this.endLoading();
     },
     openFolder: function(idx: number){
       this.$gtag.event('open-folder');
@@ -452,23 +460,5 @@ export default Vue.extend({
     border-radius: 3px;
     word-wrap: break-word!important;
     z-index: 1;
-  }
-  .loading{    
-    display: block;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0,0,0,0.7);
-    z-index: 9999;
-  }
-  .v-progress-circular.v-progress-circular--indeterminate {
-    position: fixed;
-    margin: auto;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    right: 0;
   }
 </style>
