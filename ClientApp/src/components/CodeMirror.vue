@@ -22,7 +22,23 @@ export default Vue.extend({
     value: String,
     mode: String,
     readOnly: Boolean,
-    errorLine: Number
+    linesToColor: {
+      type: Array as () => Array<{line: number; color: string}>
+    },
+  },
+  data: function () {
+    return {
+      cmOptions: {
+        theme: 'material',
+        tabSize: 2,
+        mode: 'text/javascript',
+        lineNumbers: true,
+        line: true,
+        readOnly: false,
+      },
+      minLine: 5000000,
+      maxLine: -1,
+    }
   },
   components: {
     codemirror,
@@ -43,12 +59,14 @@ export default Vue.extend({
         }
       }
     },
-    errorLine: {
-      handler(errorLine: number) {
-        if(errorLine === -1){
+    linesToColor: {
+      handler(linesToColor: {line: number; color: string}[]) {
+        if(linesToColor.length < 1){
           this.unsetHighlight();
         }else{
-          this.highlightLine(errorLine, "red");
+          linesToColor.forEach(lineToColor => {
+            this.highlightLine(lineToColor.line, lineToColor.color);
+          })
         }
       }
     }
@@ -56,28 +74,12 @@ export default Vue.extend({
   created: function(){
     this.cmOptions.readOnly = this.readOnly;
   },
-  data: function () {
-    return {
-      cmOptions: {
-        theme: 'material',
-        tabSize: 2,
-        mode: 'text/javascript',
-        lineNumbers: true,
-        line: true,
-        readOnly: false,
-      },
-      minLine: 5000000,
-      maxLine: -1,
-    }
-  },
   methods: {
     onInput: function(content: string) {
       this.$gtag.event('change-json');
       this.$emit('input', content);
     },
-    onScroll: function(){
-      this.$gtag.event('scroll-cm');
-      this.unsetHighlight();
+    setMinMaxLine: function(){
       const elementById = document.getElementById(this.cmId);
       if(!elementById){
         return;
@@ -95,13 +97,12 @@ export default Vue.extend({
             this.maxLine = lineNum;
         }
       }
-      const result = validateJson(this.value);
-      if(result.error){
-        this.highlightLine(result.line, "red");
-        this.$emit("on-error", result.message);
-      }else{
-        this.$emit("on-error");
-      }
+    },
+    onScroll: function(){
+      this.$gtag.event('scroll-cm');
+      this.unsetHighlight();
+      this.setMinMaxLine();
+      this.$emit("on-scroll");
     },
     unsetHighlight: function (){
       const elementById = document.getElementById(this.cmId);

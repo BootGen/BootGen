@@ -78,7 +78,7 @@
               </div>
             </div>
           </template>
-          <code-mirror cmId="cm0" v-model="activeProject.json" mode="json" :readOnly="false" :errorLine="errorLine" @on-error="cmError" @cursor-into-view="closeDrawer"></code-mirror>
+          <code-mirror cmId="cm0" v-model="activeProject.json" mode="json" :readOnly="false" :linesToColor="cmLinesToColor" @on-scroll="validateAndGenerate" @cursor-into-view="closeDrawer"></code-mirror>
         </base-material-generator-card>
       </v-col>
 
@@ -130,7 +130,7 @@
               </div>
             </div>
           </template>
-          <code-mirror cmId="cm1" :value="activeFile.content" :mode="getMode()" :readOnly="true" @on-error="cmError" @cursor-into-view="closeDrawer"></code-mirror>
+          <code-mirror cmId="cm1" :value="activeFile.content" :mode="getMode()" :readOnly="true" @cursor-into-view="closeDrawer"></code-mirror>
         </base-material-generator-card>
       </v-col>
     </v-row>
@@ -202,7 +202,7 @@ export default Vue.extend({
         timeout: 5000,
       },
       projectName: "",
-      errorLine: -1,
+      cmLinesToColor: Array<{line: number; color: string}>(),
       drawer: false,
       openPath: "",
       generateLoading: false,
@@ -226,7 +226,7 @@ export default Vue.extend({
         if(generate.errorMessage){
           this.setSnackbar("orange darken-2", generate.errorMessage, -1);
           if(generate.errorLine !== ""){
-            this.errorLine = generate.errorLine-1;
+            this.cmLinesToColor.push({line: generate.errorLine-1, color: "red"});
           }
           this.generateLoading = false;
           return;
@@ -266,7 +266,7 @@ export default Vue.extend({
       this.$gtag.event('pretty-print');
       const result = validateJson(this.activeProject.json);
       if (result.error) {
-        this.errorLine = result.line;
+        this.cmLinesToColor.push({line: result.line, color: "red"});
         this.setSnackbar("orange darken-2", result.message, -1);
       }
       this.activeProject.json = prettyPrint(this.activeProject.json);
@@ -280,9 +280,9 @@ export default Vue.extend({
     },
     validateAndGenerate: async function() {
       this.$gtag.event('generate');
+      this.cmLinesToColor = [];
       const result = validateJson(this.activeProject.json);
       if(!result.error) {
-        this.errorLine = -1;
         this.hideSnackbar();
         this.callPrettyPrint();
         const jsonLength = this.getJsonLength(this.activeProject.json);
@@ -292,7 +292,7 @@ export default Vue.extend({
         }
         await this.generate();
       } else {
-        this.errorLine = result.line;
+        this.cmLinesToColor.push({line: result.line, color: "red"});
         this.setSnackbar("orange darken-2", result.message, -1);
       }
     },
@@ -305,13 +305,6 @@ export default Vue.extend({
     },
     hideSnackbar: function(){
       this.snackbar.visible = false;
-    },
-    cmError: function(error: string){
-      if(error){
-        this.setSnackbar("orange darken-2", error, -1);
-      }else{
-        this.hideSnackbar();
-      }
     },
     selectProject: function(project: Project){
       this.$gtag.event('select-project');
