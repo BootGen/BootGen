@@ -1,7 +1,7 @@
 <template>
   <v-container fluid>
     <v-row class="d-flex justify-center">
-      <v-col cols="12" sm="5">
+      <v-col cols="12" md="6">
         <base-material-card>
           <template v-slot:heading>
             <div class="d-flex display-2 font-weight-light flex-column justify-space-between align-center">
@@ -94,7 +94,12 @@ export default Vue.extend({
         this.$store.state.auth.user = response.user;
         this.$router.push("profile");
       } catch (reason) {
-        this.errorMsg = "Incorrect email or password";
+        console.log("reas", reason);
+        if(reason.statusText === "Unauthorized"){
+          this.errorMsg = "You have not confirmed your e-mail address yet. Please check your e-mail account and click on the link in the message. If you do not find the confirmation e-mail, please check your spam folder."
+        }else{
+          this.errorMsg = "Incorrect email or password";
+        }
       }
     }
   },

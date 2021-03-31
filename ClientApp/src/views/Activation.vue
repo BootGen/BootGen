@@ -46,8 +46,8 @@ export default Vue.extend({
         this.$store.commit("setJwt", response.jwt);
         this.$store.state.auth.user = response.user;
         this.$router.push("profile");
-      }catch(e){
-        if(e.statusText === "Unauthorized"){
+      }catch(reason){
+        if(reason.statusText === "Unauthorized"){
           this.errorMsg = "You have not confirmed your e-mail address yet. Please check your e-mail account and click on the link in the message. If you do not find the confirmation e-mail, please check your spam folder."
         }
       }
