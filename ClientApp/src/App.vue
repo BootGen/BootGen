@@ -39,7 +39,7 @@
         </div>
       </v-list>
       <div class="ma-4">
-        <div class="container-fluid d-flex flex-column navCookie" v-if="!cookiesAccepted">
+        <div class="container-fluid d-flex flex-column navCookie" v-if="!cookieConsentAnswered && !movedPrivacyStatementSite">
           <div class="container pl-0 align-center">
             <v-icon class="pr-2" dark large>{{ snackbar.icon }}</v-icon>
             <span>{{ snackbar.text }}</span>
@@ -71,7 +71,7 @@
         <router-view></router-view>
       </v-container>
     </v-main>
-    <snackbar v-if="!cookiesAccepted && !drawer" :snackbar="snackbar" @accept="acceptCookies" @customize="customizeCookies"></snackbar>
+    <snackbar v-if="!cookieConsentAnswered && !movedPrivacyStatementSite && !drawer" :snackbar="snackbar" @accept="acceptCookies" @customize="customizeCookies"></snackbar>
   </v-app>
 </template>
 
@@ -80,10 +80,28 @@ import { mapState } from 'vuex'
 import Snackbar from "./components/Snackbar.vue";
 
 export default {
+  data: () => ({
+    drawer: null,
+    snackbar: {
+      dismissible: false,
+      visible: true,
+      type: "third",
+      icon: "mdi-cookie-alert",
+      text: "We use cookies to improve your experience on our website.",
+      timeout: -1,
+      buttons: [
+        {name: "accept", color: "secondary"},
+        {name: "customize", color: "secondary"}
+      ]
+    },
+    cookieConsentAnswered: false,
+    cookiesAccepted: false,
+    movedPrivacyStatementSite: false,
+  }),
   components: {
     Snackbar,
   },
-  mounted() {
+  mounted(){
     if(localStorage.cookieConsentAnswered) this.cookieConsentAnswered = localStorage.cookieConsentAnswered;
     if(localStorage.cookiesAccepted) this.cookiesAccepted = localStorage.cookiesAccepted;
   },
@@ -122,23 +140,6 @@ export default {
       }
     },
   },
-  data: () => ({
-    drawer: null,
-    snackbar: {
-      dismissible: false,
-      visible: true,
-      type: "third",
-      icon: "mdi-cookie-alert",
-      text: "We use cookies to improve your experience on our website.",
-      timeout: -1,
-      buttons: [
-        {name: "accept", color: "secondary"},
-        {name: "customize", color: "secondary"}
-      ]
-    },
-    cookieConsentAnswered: false,
-    cookiesAccepted: false,
-  }),
   methods: {
     acceptCookies: function(){
       this.$gtag.event('accept-cookies');
@@ -147,7 +148,7 @@ export default {
     },
     customizeCookies: function(){
       this.$gtag.event('customize-cookies');
-      this.cookieConsentAnswered = true;
+      this.movedPrivacyStatementSite = true;
       this.$router.push('/privacy-statement');
     },
     selectNavItem: function(){

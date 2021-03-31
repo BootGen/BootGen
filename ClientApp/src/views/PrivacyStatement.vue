@@ -9,7 +9,7 @@
             </div>
           </template>
           <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quidem nam architecto, molestiae dolorem eaque facere. Inventore quibusdam quidem eveniet! Fugit quibusdam voluptate temporibus earum fugiat ex quaerat! Sequi, fugiat nesciunt.</p>
-          <v-checkbox v-model="cookiesAccepted" label="Accept Google Analytics cookies" @click="setOpt"></v-checkbox>
+          <v-checkbox v-model="cookiesAccepted" label="Accept Google Analytics cookies"></v-checkbox>
           <div class="d-flex justify-end">
             <v-btn color="primary" @click="consent()">consent</v-btn>
           </div>
@@ -28,20 +28,30 @@ export default Vue.extend({
       cookiesAccepted: true,
     };
   },
-  methods: {
-    setOpt: function(){
+  watch:{
+    cookiesAccepted(accepted) {
       this.$gtag.event('set-opt');
-      if(this.cookiesAccepted){
+      if(accepted){
         localStorage.cookiesAccepted = true;
         this.$gtag.optIn();
       }else{
         localStorage.cookiesAccepted = false;
         this.$gtag.optOut();
       }
-    },
+    }
+  },
+  created: function(){
+    if(localStorage.cookiesAccepted === "false"){
+      this.cookiesAccepted = false;
+    }else{
+      localStorage.cookiesAccepted = true;
+    }
+  },
+  methods: {
     consent: function(){
       this.$gtag.event('consent-privacy-statement');
-      window.history.back();
+      localStorage.cookieConsentAnswered = true;
+      this.$router.go(-1);
     }
   },
 });
