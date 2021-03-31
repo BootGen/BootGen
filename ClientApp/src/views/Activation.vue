@@ -1,21 +1,23 @@
 <template>
   <v-container id="privacy-statement" fluid tag="section">
     <v-row justify="center">
-      <v-col cols="12">
+      <v-col cols="12" md="8">
         <base-material-card>
           <template v-slot:heading>
             <div class="display-2 font-weight-light">
-              Activation
+              Activation your account
             </div>
           </template>
           <div class="d-flex flex-column align-center">
             <h1>You're almost there!</h1>
-            <h3>Just one more step to get started</h3>
-            <p>After activating your account, click the button below to login to your account</p>
+            <h3>Just one more step to get started.</h3>
+            <p>After activating your account, click the button below to login to your account.</p>
           </div>
-          <div cols="12" md="8">
-            <v-alert class="text-left" type="error" v-if="errorMsg">{{ errorMsg }}</v-alert>
-          </div>
+          <v-row class="d-flex justify-center" >
+            <v-col cols="12" md="10">
+              <v-alert class="text-left" type="error" v-if="errorMsg">{{ errorMsg }}</v-alert>
+            </v-col>
+          </v-row>
           <div class="d-flex justify-center">
             <v-btn color="primary" @click="tryLogin">Login</v-btn>
           </div>
