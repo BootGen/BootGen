@@ -119,14 +119,15 @@ export default Vue.extend({
       }else if(response.isEmailInUse) {
         this.errorMsg = "This email is already in use!";
       }else{
-        this.errorMsg = "";
-        const response = await this.$store.dispatch("login", {
-          email: this.email,
-          password: this.password,
-        });
-        this.$store.commit("setJwt", response.jwt);
-        this.$store.state.auth.user = response.user;
-        this.$router.push("profile");
+        try{
+          await this.$store.dispatch("login", {
+            email: this.email,
+            password: this.password,
+          });
+        }catch(e){
+          this.errorMsg = "";
+          this.$router.push({ name: 'Activation', params: { email: this.email, password: this.password, } });
+        }
       }
     },
   },

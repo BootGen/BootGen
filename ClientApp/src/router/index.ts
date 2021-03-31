@@ -3,6 +3,7 @@ import VueRouter, { RouteConfig } from 'vue-router'
 import Login from '../views/Login.vue'
 import Logout from '../views/Logout.vue'
 import SignUp from '../views/SignUp.vue'
+import Activation from '../views/Activation.vue'
 import PrivacyStatement from '../views/PrivacyStatement.vue'
 import Editor from '../views/Editor.vue'
 import Profile from '../views/Profile.vue'
@@ -39,6 +40,12 @@ const loggedOutGuard = (to: any, from: any, next: any) => {
     name: 'Sign Up',
     beforeEnter: loggedOutGuard,
     component: SignUp
+  },
+  {
+    path: '/activation',
+    name: 'Activation',
+    beforeEnter: loggedOutGuard,
+    component: Activation
   },
   {
     path: '/privacy-statement',
