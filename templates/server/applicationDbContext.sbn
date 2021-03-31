@@ -6,13 +6,16 @@ using Newtonsoft.Json.Linq;
 
 namespace {{ name_space }}
 {
-    public class DataContext : DbContext
+    public class ApplicationDbContext : DbContext
     {
         {{~ for class in classes ~}}
         public DbSet<{{ class.name }}> {{ class.name.plural }} { get; set; }
         {{~ end ~}}
-        protected override void OnConfiguring(DbContextOptionsBuilder options)
-            => options.UseSqlite("Data Source={{ snake_case name_space }}.db");
+        
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+            : base(options)
+        {
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

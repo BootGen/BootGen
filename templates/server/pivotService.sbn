@@ -17,108 +17,69 @@ namespace {{ name_space }}.Services
     ~}}
     public class {{ class.name.plural }}Service : I{{ class.name.plural }}Service
     {
-        {{~ if class_a.id != class_b.id ~}}
-        public ServiceResponse<List<{{ class_a.name }}>> Get{{ name_a.plural }}Of{{ name_b }}(int {{ camel_case name_b }}Id)
+        private readonly ApplicationDbContext dbContext;
+
+        public {{ class.name.plural }}Service(ApplicationDbContext dbContext)
         {
-            using (var db = new DataContext())
-            {
-                var parent = db.{{ class_b.name.plural }}.Where(item => item.Id == {{ camel_case name_b }}Id).FirstOrDefault();
-                if (parent == null)
-                    return new ServiceResponse<List<{{ class_a.name }}>>
-                    {
-                        StatusCode = 400
-                    };
-                var result = db.{{ class.name.plural }}
+            this.dbContext = dbContext;
+        }
+
+        {{~ if class_a.id != class_b.id ~}}
+        public List<{{ class_a.name }}> Get{{ name_a.plural }}Of{{ name_b }}(int {{ camel_case name_b }}Id)
+        {
+            var parent = dbContext.{{ class_b.name.plural }}.Where(item => item.Id == {{ camel_case name_b }}Id).FirstOrDefault();
+            if (parent == null)
+                return new List<{{ class_a.name }}>();
+                return dbContext.{{ class.name.plural }}
                                 .Include("{{ name_a }}")
                                 .Where(item => item.{{ class_b.name }}Id == parent.Id)
                                 .Select(item => item.{{ class_a.name }})
                                 .ToList();
-                return new ServiceResponse<List<{{ class_a.name }}>>
-                {
-                    StatusCode = 200,
-                    ResponseData = result
-                };
-            }
         }
         {{~ end ~}}
 
-        public ServiceResponse<List<{{ class_b.name }}>> Get{{ name_b.plural }}Of{{ name_a }}(int {{ camel_case name_a }}Id)
+        public List<{{ class_b.name }}> Get{{ name_b.plural }}Of{{ name_a }}(int {{ camel_case name_a }}Id)
         {
-            using (var db = new DataContext())
-            {
-                var parent = db.{{ class_a.name.plural }}.Where(item => item.Id == {{ camel_case name_a }}Id).FirstOrDefault();
-                if (parent == null)
-                    return new ServiceResponse<List<{{ class_b.name }}>>
-                    {
-                        StatusCode = 400
-                    };
-                var result = db.{{ class.name.plural }}
-                               .Include("{{ name_b }}")
-                               .Where(item => item.{{ name_a }}Id == parent.Id)
-                               .Select(item => item.{{ name_b }})
-                               .ToList();
-                {{~ if class_a.id == class_b.id ~}}
-                result.AddRange(db.{{ class.name.plural }}
-                                  .Include("{{ name_a }}")
-                                  .Where(item => item.{{ name_b }}Id == parent.Id)
-                                  .Select(item => item.{{ name_a }}));
-                {{~ end ~}}
-                return new ServiceResponse<List<{{ class_b.name }}>>
-                {
-                    StatusCode = 200,
-                    ResponseData = result
-                };
-            }
+            var parent = dbContext.{{ class_a.name.plural }}.Where(item => item.Id == {{ camel_case name_a }}Id).FirstOrDefault();
+            if (parent == null)
+                return new List<{{ class_b.name }}>();
+            return dbContext.{{ class.name.plural }}
+                            .Include("{{ name_b }}")
+                            .Where(item => item.{{ name_a }}Id == parent.Id)
+                            .Select(item => item.{{ name_b }})
+                            .ToList();
         }
 
-        public ServiceResponse Assign(int {{ camel_case name_a }}Id, int {{ camel_case name_b }}Id)
+        public bool Assign(int {{ camel_case name_a }}Id, int {{ camel_case name_b }}Id)
         {
             try
             {
-                using (var db = new DataContext())
-                {
-                    db.{{ class.name.plural }}.Add(new {{ class.name }}{ {{ name_a }}Id = {{ camel_case name_a }}Id, {{ name_b }}Id = {{ camel_case name_b }}Id });
-                    db.SaveChanges();
-                    return new ServiceResponse
-                    {
-                        StatusCode = 200,
-                    };
-                }
+                dbContext.{{ class.name.plural }}.Add(new {{ class.name }}{ {{ name_a }}Id = {{ camel_case name_a }}Id, {{ name_b }}Id = {{ camel_case name_b }}Id });
+                dbContext.SaveChanges();
+                return true;
             } catch (DbUpdateException)
             {
-                return new ServiceResponse
-                {
-                    StatusCode = 400
-                };
+                return false;
             }
         }
 
-        public ServiceResponse Remove(int {{ camel_case name_a }}Id, int {{ camel_case name_b }}Id)
+        public bool Remove(int {{ camel_case name_a }}Id, int {{ camel_case name_b }}Id)
         {
             try
             {
-                using (var db = new DataContext())
-                {
-                    var toRemove = db.{{ class.name.plural }}
-                                    {{~ if class_a.id == class_b.id ~}}
-                                    .Where(item => item.{{ name_a }}Id == {{ camel_case name_a }}Id && item.{{ name_b }}Id == {{ camel_case name_b }}Id || item.{{ name_a }}Id == {{ camel_case name_b }}Id && item.{{ name_b }}Id == {{ camel_case name_a }}Id);
-                                    {{~ else ~}}
-                                    .Where(item => item.{{ name_a }}Id == {{ camel_case name_a }}Id && item.{{ name_b }}Id == {{ camel_case name_b }}Id);
-                                    {{~ end ~}}
-                    db.{{ class.name.plural }}.RemoveRange(toRemove);
-                    db.SaveChanges();
-                }
+                var toRemove = dbContext.{{ class.name.plural }}
+                                {{~ if class_a.id == class_b.id ~}}
+                                .Where(item => item.{{ name_a }}Id == {{ camel_case name_a }}Id && item.{{ name_b }}Id == {{ camel_case name_b }}Id || item.{{ name_a }}Id == {{ camel_case name_b }}Id && item.{{ name_b }}Id == {{ camel_case name_a }}Id);
+                                {{~ else ~}}
+                                .Where(item => item.{{ name_a }}Id == {{ camel_case name_a }}Id && item.{{ name_b }}Id == {{ camel_case name_b }}Id);
+                                {{~ end ~}}
+                dbContext.{{ class.name.plural }}.RemoveRange(toRemove);
+                dbContext.SaveChanges();
+                return true;
             } catch (DbUpdateException)
             {
-                return new ServiceResponse
-                {
-                    StatusCode = 400
-                };
+                return false;
             }
-            return new ServiceResponse
-            {
-                StatusCode = 200
-            };
         }
     }
 }

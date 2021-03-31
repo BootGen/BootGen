@@ -24,7 +24,7 @@ namespace Editor.Services
             {
                 var virtualDisk = new VirtualDisk();
                 BootGen.Project project = InitProject(request, virtualDisk);
-                project.GenerateFiles("WebProject", request.NameSpace, "http://localhost:5000");
+                project.GenerateFiles("WebProject", "WebProject", "http://localhost:5000");
                 var files = new List<GeneratedFile>();
                 foreach (var file in virtualDisk.Files)
                 {
@@ -147,8 +147,10 @@ namespace Editor.Services
             {
                 ControllerFolder = "Controllers",
                 ServiceFolder = "Services",
-                ModelFolder = "Models",
+                EntityFolder = "Entities",
                 ClientFolder = "ClientApp/src",
+                ClientExtension = "ts",
+                ClientComponentExtension = "vue",
                 Disk = disk,
                 ResourceCollection = collection,
                 Api = new Api(collection),

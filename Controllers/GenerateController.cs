@@ -25,7 +25,7 @@ namespace Editor.Controllers
         {
             var response = service.Generate(request);
             #if DEBUG
-            Thread.Sleep(3000);
+            Thread.Sleep(1500);
             #endif
             return Ok(response);
         }
@@ -38,7 +38,7 @@ namespace Editor.Controllers
             if (result == null)
                 return BadRequest();
             #if DEBUG
-            Thread.Sleep(3000);
+            Thread.Sleep(1500);
             #endif
             return File(result, "application/zip", $"{request.NameSpace}.zip");
         }
