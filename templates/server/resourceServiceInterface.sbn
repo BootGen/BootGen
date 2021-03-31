@@ -13,17 +13,17 @@ namespace {{ name_space }}.Services
     {{~ class = resource.class ~}}
     public interface I{{ service_name resource }}
     {
-        ServiceResponse<List<{{ class.name }}>> Get{{ class.name.plural }}();
-        ServiceResponse<{{ class.name }}> Get{{ class.name }}(int {{ camel_case class.name }}Id);
+        List<{{ class.name }}> Get{{ class.name.plural }}();
+        {{ class.name }} Get{{ class.name }}(int {{ camel_case class.name }}Id);
         {{~ for property in class.properties ~}}
         {{~ if property.is_parent_reference ~}}
-        ServiceResponse<List<{{ class.name }}>> Get{{ class.name.plural }}Of{{ property.name }}(int {{ camel_case property.class.name }}Id);
+        List<{{ class.name }}> Get{{ class.name.plural }}Of{{ property.name }}(int {{ camel_case property.class.name }}Id);
         {{~ end ~}}
         {{~ end ~}}
         {{~ if !resource.is_readonly ~}}
-        ServiceResponse<{{ class.name }}> Add{{ class.name }}({{ class.name }} {{ camel_case class.name }});
-        ServiceResponse<{{ class.name }}> Update{{ class.name }}(int {{ camel_case class.name }}Id, {{ class.name }} {{ camel_case class.name }});
-        ServiceResponse Delete{{ class.name }}(int {{ camel_case class.name }}Id);
+        {{ class.name }} Add{{ class.name }}({{ class.name }} {{ camel_case class.name }});
+        {{ class.name }} Update{{ class.name }}(int {{ camel_case class.name }}Id, {{ class.name }} {{ camel_case class.name }});
+        bool Delete{{ class.name }}(int {{ camel_case class.name }}Id);
         {{~ end ~}}
     }
 }

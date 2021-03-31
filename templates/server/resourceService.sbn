@@ -13,67 +13,37 @@ namespace {{ name_space }}.Services
     public class {{ service_name resource }} : I{{ service_name resource }}
     {
         {{~ class = resource.class ~}}
+        private readonly ApplicationDbContext dbContext;
 
-        public ServiceResponse<List<{{ class.name }}>> Get{{ class.name.plural }}()
+        public {{ service_name resource }}(ApplicationDbContext dbContext)
         {
-            using (var db = new DataContext())
-            {
-                var query = db.{{ class.name.plural }}{{ for property in (get_properties_to_load class) }}
-                                .Include("{{ property }}"){{ end }};
-                return new ServiceResponse<List<{{ class.name }}>>
-                {
-                    StatusCode = 200,
-                    ResponseData = query.ToList()
-                };
-            }
+            this.dbContext = dbContext;
+        }
+
+        public List<{{ class.name }}> Get{{ class.name.plural }}()
+        {
+            return dbContext.{{ class.name.plural }}.ToList();
         }
 
         {{~ for property in class.properties ~}}
         {{~ if property.is_parent_reference ~}}
-        public ServiceResponse<List<{{ class.name }}>> Get{{ class.name.plural }}Of{{ property.name }}(int {{ camel_case property.class.name }}Id)
+        public List<{{ class.name }}> Get{{ class.name.plural }}Of{{ property.name }}(int {{ camel_case property.class.name }}Id)
         {
-            using (var db = new DataContext())
-            {
-                {{~
-                parent = resource.parent_resource
-                ~}}
-                var query = db.{{ class.name.plural }}{{ for prop in (get_properties_to_load class) }}
-                                .Include("{{ prop }}"){{ end }}{{ if parent }}
-                                .Where(item => item.{{ property.name }} == {{ camel_case property.class.name }}Id){{ end }};
-                return new ServiceResponse<List<{{ class.name }}>>
-                {
-                    StatusCode = 200,
-                    ResponseData = query.ToList()
-                };
-            }
+            var query = dbContext.{{ class.name.plural }}
+                                 .Where(item => item.{{ property.name }}Id == {{ camel_case property.class.name }}Id);
+            return query.ToList();
         }
 
         {{~ end ~}}
         {{~ end ~}}
-        public ServiceResponse<{{ class.name }}> Get{{ class.name }}(int {{ camel_case class.name }}Id)
+        public {{ class.name }} Get{{ class.name }}(int {{ camel_case class.name }}Id)
         {
-            using (var db = new DataContext())
-            {
-                var item = db.{{ class.name.plural }}
-                             {{~ for property in (get_properties_to_load class) ~}}
-                             .Include("{{ property }}")
-                             {{~ end ~}}
-                             .Where(item => item.Id == {{ camel_case class.name }}Id).FirstOrDefault();
-                if (item == null)
-                    return new ServiceResponse<{{ class.name }}>
-                    {
-                        StatusCode = 404
-                    };
-                return new ServiceResponse<{{ class.name }}>
-                {
-                    StatusCode = 200,
-                    ResponseData = item
-                };
-            }
+            return dbContext.{{ class.name.plural }}
+                            .Where(item => item.Id == {{ camel_case class.name }}Id).FirstOrDefault();
         }
         {{~ if !resource.is_readonly ~}}
 
-        public ServiceResponse<{{ class.name }}> Add{{ class.name }}({{ class.name }} {{ camel_case class.name }})
+        public {{ class.name }} Add{{ class.name }}({{ class.name }} {{ camel_case class.name }})
         {
             {{~ if resource.has_timestamps ~}}
             {{ camel_case class.name }}.Created = DateTime.Now;
@@ -85,91 +55,54 @@ namespace {{ name_space }}.Services
             {{~ if parent ~}}
             {{ camel_case class.name }}.{{ parent_id_name resource }} = {{ camel_case parent.class.name }}Id;
             {{~ end ~}}
-            EntityEntry<{{ class.name }}> entityEntry;
             try
             {
-                using (var db = new DataContext())
-                {
-                    entityEntry = db.{{ class.name.plural }}.Add({{ camel_case class.name }});
-                    db.SaveChanges();
-                }
+                var entityEntry = dbContext.{{ class.name.plural }}.Add({{ camel_case class.name }});
+                dbContext.SaveChanges();
+                return entityEntry.Entity;
             } catch (DbUpdateException)
             {
-                return new ServiceResponse<{{ class.name }}>
-                {
-                    StatusCode = 400
-                };
-            }
-            return new ServiceResponse<{{ class.name }}>
-            {
-                StatusCode = 200,
-                ResponseData = entityEntry.Entity
-            };
-        }
-
-        public ServiceResponse<{{ class.name }}> Update{{ class.name }}(int {{ camel_case class.name }}Id, {{ class.name }} {{ camel_case class.name }})
-        {
-            try
-            {
-                using (var db = new DataContext())
-                {
-                    var original = db.{{ class.name.plural }}
-                                {{~ for property in (get_properties_to_load class) ~}}
-                                .Include("{{ property }}")
-                                {{~ end ~}}
-                                .Where(item => item.Id == {{ camel_case class.name }}Id).FirstOrDefault();
-                    EntityEntry<{{ class.name }}> entityEntry;
-                    entityEntry = db.{{ class.name.plural }}.Update(original);
-                    {{~ for property in class.common_properties ~}}
-                    {{~ if !property.is_client_readonly ~}}
-                    original.{{property.name}} = {{ camel_case class.name }}.{{property.name}};
-                    {{~ end ~}}
-                    {{~ end ~}}
-                    {{~ if resource.has_timestamps ~}}
-                    original.Updated = DateTime.Now;
-                    {{~ end ~}}
-                    db.SaveChanges();
-                    return new ServiceResponse<{{ class.name }}>
-                    {
-                        StatusCode = 200,
-                        ResponseData = entityEntry.Entity
-                    };
-                }
-            } catch (DbUpdateException)
-            {
-                return new ServiceResponse<{{ class.name }}>
-                {
-                    StatusCode = 400
-                };
+                return null;
             }
         }
 
-        public ServiceResponse Delete{{ class.name }}(int {{ camel_case class.name }}Id)
+        public {{ class.name }} Update{{ class.name }}(int {{ camel_case class.name }}Id, {{ class.name }} {{ camel_case class.name }})
         {
             try
             {
-                using (var db = new DataContext())
-                {
-                    var item = db.{{ class.name.plural }}.Where(item => item.Id == {{ camel_case class.name }}Id).FirstOrDefault();
-                    if (item == null)
-                        return new ServiceResponse
-                        {
-                            StatusCode = 400
-                        };
-                    db.{{ class.name.plural }}.Remove(item);
-                    db.SaveChanges();
-                }
+                var original = dbContext.{{ class.name.plural }}
+                                        .Where(item => item.Id == {{ camel_case class.name }}Id).FirstOrDefault();
+                dbContext.{{ class.name.plural }}.Update(original);
+                {{~ for property in class.common_properties ~}}
+                {{~ if !property.is_client_readonly ~}}
+                original.{{property.name}} = {{ camel_case class.name }}.{{property.name}};
+                {{~ end ~}}
+                {{~ end ~}}
+                {{~ if resource.has_timestamps ~}}
+                original.Updated = DateTime.Now;
+                {{~ end ~}}
+                dbContext.SaveChanges();
+                return original;
             } catch (DbUpdateException)
             {
-                return new ServiceResponse
-                {
-                    StatusCode = 400
-                };
+                return null;
             }
-            return new ServiceResponse
+        }
+
+        public bool Delete{{ class.name }}(int {{ camel_case class.name }}Id)
+        {
+            try
             {
-                StatusCode = 200
-            };
+                var item = dbContext.{{ class.name.plural }}.Where(item => item.Id == {{ camel_case class.name }}Id).FirstOrDefault();
+                if (item == null)
+                    return false;
+                dbContext.{{ class.name.plural }}.Remove(item);
+                dbContext.SaveChanges();
+                return true;
+            } catch (DbUpdateException)
+            {
+                return false;
+            }
         }
         {{~ end ~}}
     }
