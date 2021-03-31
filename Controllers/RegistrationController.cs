@@ -17,8 +17,7 @@ namespace Editor.Controllers
         [Route("register")]
         public IActionResult Register([FromBody] RegistrationData data)
         {
-            var response = service.Register(data);
-            return new ObjectResult(response.ResponseData) { StatusCode = response.StatusCode };
+            return Ok(service.Register(data));
         }
 
         [HttpPost]

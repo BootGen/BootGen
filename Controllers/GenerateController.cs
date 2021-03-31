@@ -27,7 +27,7 @@ namespace Editor.Controllers
             #if DEBUG
             Thread.Sleep(3000);
             #endif
-            return new ObjectResult(response.ResponseData) { StatusCode = response.StatusCode };
+            return Ok(response);
         }
 
         [HttpPost]
@@ -35,12 +35,12 @@ namespace Editor.Controllers
         public IActionResult Download([FromBody] GenerateRequest request)
         {
             var result = service.Download(request);
-            if (result.StatusCode != 200)
+            if (result == null)
                 return BadRequest();
             #if DEBUG
             Thread.Sleep(3000);
             #endif
-            return File(result.ResponseData, "application/zip", "project.zip");
+            return File(result, "application/zip", $"{request.NameSpace}.zip");
         }
     }
 }

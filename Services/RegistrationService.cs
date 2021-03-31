@@ -30,26 +30,22 @@ namespace Editor.Services
             return true;
         }
 
-        public ServiceResponse<ProfileResponse> CheckRegistration(RegistrationData data)
+        public ProfileResponse CheckRegistration(RegistrationData data)
         {
             bool isEmailInUse = dbContext.Users.Where(u => u.Email == data.Email).Any();
             bool isUserNameInUse = dbContext.Users.Where(u => u.UserName == data.UserName).Any();
-            return new ServiceResponse<ProfileResponse>
-            {
-                StatusCode = 200,
-                ResponseData = new ProfileResponse
+            return new ProfileResponse
                 {
                     Success = !isUserNameInUse && !isEmailInUse,
                     IsUserNameInUse = isUserNameInUse,
                     IsEmailInUse = isEmailInUse
-                }
-            };
+                };
         }
 
-        public ServiceResponse<ProfileResponse> Register(RegistrationData data)
+        public ProfileResponse Register(RegistrationData data)
         {
             var response = CheckRegistration(data);
-            if (response.ResponseData.Success)
+            if (response.Success)
             {
                 User newUser = new User {
                     UserName = data.UserName,

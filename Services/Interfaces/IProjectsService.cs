@@ -10,9 +10,13 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace Editor.Services
 {
-    public interface IUsersService
+    public interface IProjectsService
     {
-        ServiceResponse<List<User>> GetUsers();
-        ServiceResponse<User> GetUser(int userId);
+        User CurrentUser { get; set; }
+        List<Project> GetProjects();
+        Project GetProject(int projectId);
+        Project AddProject(Project project);
+        Project UpdateProject(int projectId, Project project);
+        bool DeleteProject(int projectId);
     }
 }

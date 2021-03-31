@@ -18,7 +18,7 @@ namespace Editor.Services
         {
             ErrorService = errorService;
         }
-        public ServiceResponse<GenerateResponse> Generate(GenerateRequest request)
+        public GenerateResponse Generate(GenerateRequest request)
         {
             try
             {
@@ -36,31 +36,23 @@ namespace Editor.Services
                     });
                 }
 
-                return new ServiceResponse<GenerateResponse>
-                {
-                    StatusCode = 200,
-                    ResponseData = new GenerateResponse
+                return new GenerateResponse
                     {
                         Success = true,
                         GeneratedFiles = files
-                    }
-                };
+                    };
             }
             catch (Exception e)
             {
                 if (!(e is JsonReaderException))
                     ErrorService.LogException(e);
-                return new ServiceResponse<GenerateResponse>
-                {
-                    StatusCode = 200,
-                    ResponseData = new GenerateResponse
+                return new GenerateResponse
                     {
                         Success = false,
                         ErrorMessage = e.Message,
                         ErrorLine = e is JsonReaderException ? GetLine(e) : null,
                         GeneratedFiles = new List<GeneratedFile>()
-                    }
-                };
+                    };
             }
         }
 
@@ -70,27 +62,19 @@ namespace Editor.Services
             return int.Parse(lineStr);
         }
 
-        public ServiceResponse<Stream> Download(GenerateRequest request)
+        public Stream Download(GenerateRequest request)
         {
             var tempRoot = "temp";
             var tempFile = $"{tempRoot}/{Guid.NewGuid().ToString()}.zip";
             var tempDir = $"{tempRoot}/{Guid.NewGuid().ToString()}";
             try
             {
-                return new ServiceResponse<Stream>
-                {
-                    StatusCode = 200,
-                    ResponseData = CreateDownloadStream(request, tempRoot, tempFile, tempDir)
-                };
+                return CreateDownloadStream(request, tempRoot, tempFile, tempDir);
             }
             catch (Exception e)
             {
                 ErrorService.LogException(e);
-                return new ServiceResponse<Stream>
-                {
-                    StatusCode = 500,
-                    ResponseData = null
-                };
+                return null;
             }
             finally
             {

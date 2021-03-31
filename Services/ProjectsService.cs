@@ -7,120 +7,74 @@ namespace Editor.Services
 {
     public class ProjectsService : IProjectsService
     {
+        public User CurrentUser { get; set; }
         private readonly ApplicationDbContext dbContext;
 
         public ProjectsService(ApplicationDbContext dbContext)
         {
             this.dbContext = dbContext;
         }
-        public ServiceResponse<List<Project>> GetProjects()
+        public List<Project> GetProjects()
         {
-            var query = dbContext.Projects;
-            return new ServiceResponse<List<Project>>
-            {
-                StatusCode = 200,
-                ResponseData = query.ToList()
-            };
+            return dbContext.Projects.Where(p => p.OwnerId == CurrentUser.Id).ToList();
         }
 
-        public ServiceResponse<List<Project>> GetProjectsOfOwner(int userId)
+        public Project GetProject(int projectId)
         {
-            var query = dbContext.Projects;
-            return new ServiceResponse<List<Project>>
-            {
-                StatusCode = 200,
-                ResponseData = query.ToList()
-            };
+            return dbContext.Projects
+                         .Where(p => p.Id == projectId && p.OwnerId == CurrentUser.Id)
+                         .FirstOrDefault();
         }
 
-        public ServiceResponse<Project> GetProject(int projectId)
+        public Project AddProject(Project project)
         {
-            var item = dbContext.Projects
-                         .Where(item => item.Id == projectId).FirstOrDefault();
-            if (item == null)
-                return new ServiceResponse<Project>
-                {
-                    StatusCode = 404
-                };
-            return new ServiceResponse<Project>
-            {
-                StatusCode = 200,
-                ResponseData = item
-            };
-        }
-
-        public ServiceResponse<Project> AddProject(Project project)
-        {
-            EntityEntry<Project> entityEntry;
             try
             {
-                entityEntry = dbContext.Projects.Add(project);
+                var entityEntry = dbContext.Projects.Add(project);
                 dbContext.SaveChanges();
+                return entityEntry.Entity;
             }
             catch (DbUpdateException)
             {
-                return new ServiceResponse<Project>
-                {
-                    StatusCode = 400
-                };
+                return null;
             }
-            return new ServiceResponse<Project>
-            {
-                StatusCode = 200,
-                ResponseData = entityEntry.Entity
-            };
         }
 
-        public ServiceResponse<Project> UpdateProject(int projectId, Project project)
+        public Project UpdateProject(int projectId, Project project)
         {
             try
             {
-                var original = dbContext.Projects
-                            .Where(item => item.Id == projectId).FirstOrDefault();
+                var original = GetProject(projectId);
+                if (original == null)
+                    return null;
                 var entityEntry = dbContext.Projects.Update(original);
                 original.Name = project.Name;
                 original.Json = project.Json;
                 original.OwnerId = project.OwnerId;
                 dbContext.SaveChanges();
-                return new ServiceResponse<Project>
-                {
-                    StatusCode = 200,
-                    ResponseData = entityEntry.Entity
-                };
+                return entityEntry.Entity;
             }
             catch (DbUpdateException)
             {
-                return new ServiceResponse<Project>
-                {
-                    StatusCode = 400
-                };
+                return null;
             }
         }
 
-        public ServiceResponse DeleteProject(int projectId)
+        public bool DeleteProject(int projectId)
         {
             try
             {
                 var item = dbContext.Projects.Where(item => item.Id == projectId).FirstOrDefault();
                 if (item == null)
-                    return new ServiceResponse
-                    {
-                        StatusCode = 400
-                    };
+                    return false;
                 dbContext.Projects.Remove(item);
                 dbContext.SaveChanges();
+                return true;
             }
             catch (DbUpdateException)
             {
-                return new ServiceResponse
-                {
-                    StatusCode = 400
-                };
+                return false;
             }
-            return new ServiceResponse
-            {
-                StatusCode = 200
-            };
         }
     }
 }

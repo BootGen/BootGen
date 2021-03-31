@@ -61,11 +61,10 @@ namespace Editor
             services.AddScoped<IRegistrationService, RegistrationService>();
             services.AddScoped<IProfileService, ProfileService>();
             services.AddScoped<IGenerateService, GenerateService>();
+            services.AddScoped<IProjectsService, ProjectsService>();
             services.AddScoped<IErrorService, ErrorService>();
             services.AddDbContext<ApplicationDbContext>(options => options.UseSqlite(Configuration.GetConnectionString("SQLite")));
             services.AddSingleton(Configuration);
-
-            ServiceRegistrator.RegisterServices(services);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
