@@ -210,6 +210,9 @@ export default Vue.extend({
     };
   },
   methods: {
+    delay: function(ms: number) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    },
     getMode: function(){
       if(this.activeFile.name){
         return this.activeFile.name.split('.')[1];
@@ -222,7 +225,11 @@ export default Vue.extend({
         if(this.activeProject.name !== ""){
           nameSpace = this.activeProject.name;
         }
-        const generate = await this.$store.dispatch("generate", {data: this.activeProject.json, nameSpace: this.camalize(nameSpace)});
+        const [delay, generateResult] = await Promise.all([
+          this.delay(3000),
+          await this.$store.dispatch("generate", {data: this.activeProject.json, nameSpace: this.camalize(nameSpace)})
+        ]);
+        const generate = generateResult;
         if(generate.errorMessage){
           this.setSnackbar("orange darken-2", generate.errorMessage, -1);
           if(generate.errorLine !== ""){
@@ -373,7 +380,10 @@ export default Vue.extend({
         if(this.activeProject.name !== ""){
           nameSpace = this.activeProject.name;
         }
-        await this.$store.dispatch("download", {data: this.activeProject.json, nameSpace: this.camalize(nameSpace)});
+        await Promise.all([
+          this.delay(3000), this.$store.dispatch("download",
+          {data: this.activeProject.json, nameSpace: this.camalize(nameSpace)})
+        ]);
         this.downLoading = false;
       }
     },
