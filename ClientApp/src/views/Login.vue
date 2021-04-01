@@ -94,8 +94,7 @@ export default Vue.extend({
         this.$store.state.auth.user = response.user;
         this.$router.push("profile");
       } catch (reason) {
-        console.log("reas", reason);
-        if(reason.statusText === "Unauthorized"){
+        if(reason.data.isInactive){
           this.errorMsg = "You have not confirmed your e-mail address yet. Please check your e-mail account and click on the link in the message. If you do not find the confirmation e-mail, please check your spam folder."
         }else{
           this.errorMsg = "Incorrect email or password";
