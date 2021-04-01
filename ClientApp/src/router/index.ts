@@ -42,7 +42,7 @@ const loggedOutGuard = (to: any, from: any, next: any) => {
     component: SignUp
   },
   {
-    path: '/activation',
+    path: '/activation/:activationToken',
     name: 'Activation',
     beforeEnter: loggedOutGuard,
     component: Activation

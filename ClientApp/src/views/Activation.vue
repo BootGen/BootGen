@@ -36,6 +36,9 @@ export default Vue.extend({
       errorMsg: ""
     };
   },
+  created: function() {
+    console.log(this.$route);
+  },
   methods: {
     tryLogin: async function(){
       try{
