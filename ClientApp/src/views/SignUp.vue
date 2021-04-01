@@ -1,16 +1,21 @@
 <template>
   <v-container fluid>
     <v-row class="d-flex justify-center">
-      <v-col cols="12" sm="5">
+      <v-col cols="12" md="6">
         <base-material-card>
           <template v-slot:heading>
             <div class="d-flex display-2 font-weight-light flex-column justify-space-between align-center">
-              <span>Sing Up</span>
+              <span>Registration</span>
               <v-icon class="pa-2">mdi-account-plus</v-icon>
             </div>
           </template>
-
-          <v-form>
+          <div v-if="registration" class="d-flex flex-column align-center">
+            <v-icon color="green" size="70">mdi-check-circle-outline</v-icon>
+            <p class="display-2 text-center">Registration was <span class="green--text">successful.</span></p>
+            <p class="display-1 text-center">Thank you for choosing us!</p>
+            <p class="caption text-center">Please check your e-mail account and click on the link in the message. If you do not find the confirmation e-mail, please check your spam folder.</p>
+          </div>
+          <v-form v-else>
             <v-container class="py-0">
               <v-row>
                 <v-col cols="12">
@@ -103,7 +108,8 @@ export default Vue.extend({
       password: "",
       confirmPassword: "",
       userName: "",
-      errorMsg: ""
+      errorMsg: "",
+      registration: false,
     };
   },
   methods: {
@@ -119,6 +125,7 @@ export default Vue.extend({
       }else if(response.isEmailInUse) {
         this.errorMsg = "This email is already in use!";
       }else{
+        this.registration = true;
         try{
           await this.$store.dispatch("login", {
             email: this.email,
@@ -126,7 +133,6 @@ export default Vue.extend({
           });
         }catch(e){
           this.errorMsg = "";
-          this.$router.push({ name: 'Activation', params: { email: this.email, password: this.password, } });
         }
       }
     },
