@@ -86,6 +86,19 @@ export default {
         })
       });
     },
+    activate: function (context: Context, activationToken: string): Promise<boolean> {
+      return new Promise((resolve, reject) => {
+        axios.post(`registration/activate?activationToken=${activationToken}`).then(response => {
+          resolve(response.data);
+        }).catch(reason => {
+          reject({
+            status: reason.response.status,
+            statusText: reason.response.statusText,
+            message: reason.message
+          });
+        })
+      });
+    },
     profile: function (context: Context): Promise<User> {
       return new Promise((resolve, reject) => {
         axios.get("profile/profile", config(context.state.jwt)).then(response => {

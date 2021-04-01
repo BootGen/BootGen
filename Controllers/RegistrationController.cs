@@ -22,9 +22,9 @@ namespace Editor.Controllers
 
         [HttpPost]
         [Route("activate")]
-        public IActionResult Activate(string activationCode)
+        public IActionResult Activate(string activationToken)
         {
-            if (service.Activate(activationCode))
+            if (service.Activate(activationToken))
                 return Ok();
             return BadRequest();
         }

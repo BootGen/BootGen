@@ -5,21 +5,24 @@
         <base-material-card>
           <template v-slot:heading>
             <div class="display-2 font-weight-light">
-              Activation your account
+              Activation
             </div>
           </template>
-          <div class="d-flex flex-column align-center">
-            <h1>You're almost there!</h1>
-            <h3>Just one more step to get started.</h3>
-            <p>After activating your account, click the button below to login to your account.</p>
+          <div v-if="waitForResponse" class="d-flex flex-column align-center">
+            <v-progress-circular
+              indeterminate  
+              :size="70" 
+              color="primary"
+            ></v-progress-circular>
+            <p class="display-3">Please wait for the result!</p>
           </div>
-          <v-row class="d-flex justify-center" >
-            <v-col cols="12" md="10">
-              <v-alert class="text-left" type="error" v-if="errorMsg">{{ errorMsg }}</v-alert>
-            </v-col>
-          </v-row>
-          <div class="d-flex justify-center">
-            <v-btn color="primary" @click="tryLogin">Login</v-btn>
+          <div v-else-if="activeted" class="d-flex flex-column align-center">
+            <v-icon color="green" size="70">mdi-check-circle-outline</v-icon>
+            <p class="display-3">Activation was <span class="green--text">successful.</span></p>
+          </div>
+          <div v-else class="d-flex flex-column align-center">
+            <v-icon color="red" size="70">mdi-close-circle-outline</v-icon>
+            <p class="display-3">Activation <span class="red--text">failed.</span></p>
           </div>
         </base-material-card>
       </v-col>
@@ -33,28 +36,21 @@ import Vue from "vue";
 export default Vue.extend({
   data: function () {
     return {
-      errorMsg: ""
+      waitForResponse: true,
+      activeted: false,
     };
   },
-  created: function() {
-    console.log(this.$route);
-  },
-  methods: {
-    tryLogin: async function(){
+  created: async function() {
+    
       try{
-        const response = await this.$store.dispatch("login", {
-          email: this.$route.params.email,
-          password: this.$route.params.password,
-        });
-        this.$store.commit("setJwt", response.jwt);
-        this.$store.state.auth.user = response.user;
-        this.$router.push("profile");
+        await this.$store.dispatch("activate", this.$route.params.activationToken);
+        this.activeted = true;
+        this.waitForResponse = false;
       }catch(reason){
-        if(reason.statusText === "Unauthorized"){
-          this.errorMsg = "You have not confirmed your e-mail address yet. Please check your e-mail account and click on the link in the message. If you do not find the confirmation e-mail, please check your spam folder."
-        }
+        this.activeted = false;
+        this.waitForResponse = false;
       }
-    }
   },
+  methods: {},
 });
 </script>
