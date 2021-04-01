@@ -67,6 +67,7 @@ export default {
           reject({
             status: reason.response.status,
             statusText: reason.response.statusText,
+            data: reason.response.data,
             message: reason.message
           });
         })
