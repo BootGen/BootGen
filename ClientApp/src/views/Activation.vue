@@ -10,8 +10,8 @@
           </template>
           <div v-if="waitForResponse" class="d-flex flex-column align-center">
             <v-progress-circular
-              indeterminate  
-              :size="70" 
+              indeterminate
+              :size="70"
               color="primary"
             ></v-progress-circular>
             <p class="display-3">Please wait for the result!</p>
@@ -32,6 +32,7 @@
 
 <script lang="ts">
 import Vue from "vue";
+import api from "@/api"
 
 export default Vue.extend({
   data: function () {
@@ -41,12 +42,12 @@ export default Vue.extend({
     };
   },
   created: async function() {
-    
-      try{
-        await this.$store.dispatch("activate", this.$route.params.activationToken);
+
+      try {
+        await api.activate(this.$route.params.activationToken);
         this.activeted = true;
         this.waitForResponse = false;
-      }catch(reason){
+      } catch(reason) {
         this.activeted = false;
         this.waitForResponse = false;
       }

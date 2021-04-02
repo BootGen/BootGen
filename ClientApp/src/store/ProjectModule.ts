@@ -1,19 +1,9 @@
-import axios from 'axios'
 import { ActionContext } from 'vuex';
-import { config, findById, patchArray, setArray, setItem } from './util';
+import { findById, patchArray, setArray, setItem } from './util';
 import { State } from '.';
 import { Project } from '@/models/Project'
-import { User } from '@/models/User'
 import { GeneratedFile } from '@/models/GeneratedFile';
-
-export function projectToDto(project: Project): Project {
-  return {
-    id: project.id,
-    name: project.name,
-    json: project.json,
-    ownerId: project.ownerId,
-  };
-}
+import api from '@/api'
 
 export interface ProjectsState {
   items: Array<Project>;
@@ -22,11 +12,6 @@ export interface ProjectsState {
 }
 
 type Context = ActionContext<ProjectsState, State>;
-
-interface ProjectUserPair {
-  project: Project;
-  user: User;
-}
 
 export default {
   namespaced: true,
@@ -53,62 +38,29 @@ export default {
     }
   },
   actions: {
-    getProjects: function(context: Context): Promise<Array<Project>> {
-      return new Promise((resolve, reject) => {
-        axios.get(`projects`, config(context.rootState.auth.jwt)).then(response => {
-          context.commit("setProjects", response.data);
-          resolve(context.state.items);
-        }).catch(reason => {
-          reject(reason);
-        })
-      })
+    getProjects: async function(context: Context): Promise<Array<Project>> {
+      const projects = await api.getProjects(context.rootState.auth.jwt);
+      context.commit("setProjects", projects);
+      return context.state.items;
     },
-    getProject: function(context: Context, id: number): Promise<Project> {
-      return new Promise((resolve, reject) => {
-        axios.get(`projects/${id}`, config(context.rootState.auth.jwt)).then(response => {
-          context.commit("setProject", response.data);
-          const savedItem = findById<Project>(context.state.items, response.data.id);
-          if (savedItem)
-            resolve(savedItem);
-        }).catch(reason => {
-          reject(reason);
-        })
-      })
+    getProject: async function(context: Context, id: number): Promise<Project | undefined> {
+      const project = await api.getProject(id, context.rootState.auth.jwt);
+      context.commit("setProject", project);
+      return findById<Project>(context.state.items, project.id);
     },
-    addProject: function(context: Context, project: Project): Promise<Project> {
-      return new Promise((resolve, reject) => {
-        axios.post(`projects`, projectToDto(project), config(context.rootState.auth.jwt)).then(response => {
-          context.commit("setProject", response.data);
-          const savedItem = findById<Project>(context.state.items, response.data.id);
-          if (savedItem)
-            resolve(savedItem);
-        }).catch(reason => {
-          reject(reason);
-        })
-      })
+    addProject: async function(context: Context, project: Project): Promise<Project> {
+      project = await api.addProject(project, context.rootState.auth.jwt);
+      context.commit("setProject", project);
+      return findById<Project>(context.state.items, project.id) as Project;
     },
-    updateProject: function(context: Context, project: Project): Promise<Project> {
-      return new Promise((resolve, reject) => {
-        axios.put(`projects/${project.id}`, projectToDto(project), config(context.rootState.auth.jwt)).then(response => {
-          context.commit("setProject", response.data);
-          const savedItem = findById<Project>(context.state.items, response.data.id);
-          if (savedItem)
-            resolve(savedItem);
-        }).catch(reason => {
-          reject(reason);
-        })
-      })
+    updateProject: async function(context: Context, project: Project): Promise<Project> {
+      project = await api.updateProject(project, context.rootState.auth.jwt);
+      context.commit("setProject", project);
+      return findById<Project>(context.state.items, project.id) as Project;
     },
-    deleteProject: function(context: Context, project: Project): Promise<void> {
+    deleteProject: async function(context: Context, project: Project): Promise<void> {
       context.commit("setProjects", context.state.items.filter((i: Project) => i !== project));
-
-      return new Promise((resolve, reject) => {
-        axios.delete(`projects/${project.id}`, config(context.rootState.auth.jwt)).then(() => {
-          resolve()
-        }).catch(reason => {
-          reject(reason);
-        })
-      })
+      await api.deleteProject(project, context.rootState.auth.jwt);
     }
   }
 }

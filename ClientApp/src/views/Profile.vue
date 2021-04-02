@@ -75,6 +75,7 @@
 import Vue from "vue";
 import { required, min } from "vee-validate/dist/rules";
 import { extend, ValidationObserver, ValidationProvider } from "vee-validate";
+import api from "@/api"
 
 extend("required", {
   ...required,
@@ -107,7 +108,7 @@ export default Vue.extend({
     saveUser: async function () {
       this.$gtag.event('update-profile');
       this.successMsg = "";
-      const response = await this.$store.dispatch("updateProfile", this.$store.state.auth.user);
+      const response = await api.updateProfile(this.$store.state.auth.user, this.$store.state.auth.jwt);
       if (response.isUserNameInUse) {
         this.errorMsg = "This user name already exists!";
       } else if (response.isEmailInUse) {

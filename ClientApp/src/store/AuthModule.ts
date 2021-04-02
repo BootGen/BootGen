@@ -7,22 +7,14 @@ import { RegistrationData } from '@/models/RegistrationData'
 import { ProfileResponse } from '@/models/ProfileResponse'
 import { ChangePasswordData } from '@/models/ChangePasswordData'
 import { User } from '@/models/User'
-import { config } from './util';
 import { State } from '.';
+import api from '@/api'
 
 export interface AuthState {
   jwt: string;
   user: User | null;
 }
 type Context = ActionContext<AuthState, State>;
-
-function userToDto(user: User): User {
-  return {
-    id: user.id,
-    userName: user.userName,
-    email: user.email,
-  };
-}
 
 export default {
   state: {
@@ -51,93 +43,21 @@ export default {
           localStorage.setItem("jwt", jwt);
         } else {
           localStorage.removeItem("jwt");
-        } 
+        }
       } catch {
         console.log("Local storage is not available.")
       }
     },
-    login: function (context: Context, data: AuthenticationData): Promise<LoginResponse> {
-      return new Promise((resolve, reject) => {
-        axios.post("authentication/login", data).then(response => {
-          context.commit("setJwt", response.data.jwt);
-          context.dispatch("profile").then(() => {
-            resolve(response.data);
-          });
-        }).catch(reason => {
-          reject({
-            status: reason.response.status,
-            statusText: reason.response.statusText,
-            data: reason.response.data,
-            message: reason.message
-          });
-        })
-      });
+    login: async function (context: Context, data: AuthenticationData): Promise<LoginResponse> {
+      const response = await api.login(data);
+      context.commit("setJwt", response.jwt);
+      await context.dispatch("profile");
+      return response;
     },
-    register: function (context: Context, data: RegistrationData): Promise<ProfileResponse> {
-      return new Promise((resolve, reject) => {
-        axios.post("registration/register", data).then(response => {
-          resolve(response.data);
-        }).catch(reason => {
-          reject({
-            status: reason.response.status,
-            statusText: reason.response.statusText,
-            message: reason.message
-          });
-        })
-      });
-    },
-    activate: function (context: Context, activationToken: string): Promise<boolean> {
-      return new Promise((resolve, reject) => {
-        axios.post(`registration/activate?activationToken=${activationToken}`).then(response => {
-          resolve(response.data);
-        }).catch(reason => {
-          reject({
-            status: reason.response.status,
-            statusText: reason.response.statusText,
-            message: reason.message
-          });
-        })
-      });
-    },
-    profile: function (context: Context): Promise<User> {
-      return new Promise((resolve, reject) => {
-        axios.get("profile/profile", config(context.state.jwt)).then(response => {
-          context.commit('setUser', response.data);
-          resolve(response.data);
-        }).catch(reason => {
-          reject({
-            status: reason.response.status,
-            statusText: reason.response.statusText,
-            message: reason.message
-          });
-        })
-      });
-    },
-    updateProfile: function (context: Context, user: User): Promise<ProfileResponse> {
-      return new Promise((resolve, reject) => {
-        axios.post("profile/update-profile", userToDto(user), config(context.state.jwt)).then(response => {
-          resolve(response.data);
-        }).catch(reason => {
-          reject({
-            status: reason.response.status,
-            statusText: reason.response.statusText,
-            message: reason.message
-          });
-        })
-      });
-    },
-    changePassword: function (context: Context, data: ChangePasswordData): Promise<void> {
-      return new Promise((resolve, reject) => {
-        axios.post("profile/change-password", data, config(context.state.jwt)).then(() => {
-          resolve();
-        }).catch(reason => {
-          reject({
-            status: reason.response.status,
-            statusText: reason.response.statusText,
-            message: reason.message
-          });
-        })
-      });
-    },
+    profile: async function (context: Context): Promise<User> {
+      const user = await api.profile(context.state.jwt);
+      context.commit('setUser', user);
+      return user;
+    }
   },
 }

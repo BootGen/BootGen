@@ -97,6 +97,7 @@
 import Vue from "vue";
 import { required, min } from "vee-validate/dist/rules";
 import { extend, ValidationObserver, ValidationProvider } from "vee-validate";
+import api from "@/api";
 
 extend("required", {
   ...required,
@@ -137,11 +138,10 @@ export default Vue.extend({
       this.successMsg = "";
       this.errorMsg = "";
       try {
-            await this.$store.dispatch("changePassword", {
-                user: this.$store.state.auth.user,
-                oldPassword: this.oldPassword,
-                newPassword: this.newPassword,
-            });
+            await api.changePassword({
+              oldPassword: this.oldPassword,
+              newPassword: this.newPassword,
+            }, this.$store.state.auth.jwt);
             this.successMsg = "Your password is successfuly changed."
       } catch {
         this.errorMsg = "Wrong password."

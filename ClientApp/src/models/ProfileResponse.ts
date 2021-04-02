@@ -1,6 +1,6 @@
 
 export interface ProfileResponse {
-    success: Boolean;
-    isUserNameInUse: Boolean;
-    isEmailInUse: Boolean;
+    success: boolean;
+    isUserNameInUse: boolean;
+    isEmailInUse: boolean;
 }

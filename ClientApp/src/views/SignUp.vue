@@ -20,7 +20,7 @@
               <v-row>
                 <v-col cols="12">
                   <ValidationObserver v-slot="{ invalid }">
-                    <v-col cols="12" class="text-center"> 
+                    <v-col cols="12" class="text-center">
                       <ValidationProvider v-slot="{ errors }" name="user name" rules="required">
                         <v-text-field
                           v-model="userName"
@@ -42,7 +42,7 @@
                           v-model="password"
                           :error-messages="errors"
                           placeholder="Password"
-                          type="password" 
+                          type="password"
                           prepend-icon="mdi-form-textbox-password"
                         ></v-text-field>
                       </ValidationProvider>
@@ -51,7 +51,7 @@
                           v-model="confirmPassword"
                           :error-messages="errors"
                           placeholder="Confirm Password"
-                          type="password" 
+                          type="password"
                           prepend-icon="mdi-form-textbox-password"
                         ></v-text-field>
                       </ValidationProvider>
@@ -71,9 +71,9 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { required, email, min, is } from 'vee-validate/dist/rules';
+import { required, email, min } from 'vee-validate/dist/rules';
 import { extend, ValidationObserver, ValidationProvider } from 'vee-validate';
-
+import api from "@/api"
 extend('required', {
   ...required,
   message: '{_field_} can not be empty',
@@ -115,7 +115,7 @@ export default Vue.extend({
   methods: {
     trySignUp: async function () {
       this.$gtag.event('sign-up');
-      const response = await this.$store.dispatch("register", {
+      const response = await api.register({
         userName: this.userName,
         email: this.email,
         password: this.password,
