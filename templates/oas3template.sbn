@@ -7,14 +7,102 @@ info:
 servers:
   - url: {{ api.base_url }}
 paths:
+  /authentication/login:
+    post:
+      summary: login with email and password
+      operationId: login
+      responses:
+        '200':
+          description: successful login
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LoginSuccess'
+        '401':
+          description: login error
+  /registration/register:
+    post:
+      summary: register with email and password
+      operationId: register
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+                $ref: '#/components/schemas/RegistrationData'
+      responses:
+        '200':
+          description: response to registration request
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProfileResponse'
+  /profile:
+    get:
+      summary: get current user
+      security:
+      - bearerAuth: []
+      operationId: profile
+      responses:
+        '200':
+          description: successful login
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+    post:
+      summary: update profile
+      security:
+      - bearerAuth: []
+      operationId: updateProfile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+                $ref: '#/components/schemas/User'
+      responses:
+        '200':
+          description: response to update profile request
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProfileResponse'
+  /profile/change-password:
+    post:
+      summary: change password
+      security:
+      - bearerAuth: []
+      operationId: changePassword
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+                $ref: '#/components/schemas/ChangePasswordData'
+      responses:
+        '200':
+          description: response to update profile request
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ChangePasswordResponse'
   {{~ for route in api.routes ~}}
   {{ route.path }}:
   {{~ for operation in route.operations ~}}
     {{ string.downcase operation.verb }}:
-      {{~ if operation.authenticate ~}}
       security:
       - bearerAuth: []
-      {{~ end ~}}
       summary: {{ operation.summary }}
       operationId: {{ operation.name }}
       {{~ if operation.has_parameters ~}}
@@ -68,6 +156,56 @@ components:
       scheme: bearer
       bearerFormat: JWT 
   schemas:
+    LoginSuccess:
+      type: object
+      required:
+        - jwt
+      properties:
+        jwt:
+          type: string
+    RegistrationData:
+      type: object
+      required:
+        - userName
+        - email
+        - password
+      properties:
+        userName:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+    ProfileResponse:
+      type: object
+      required:
+        - success
+        - isUserNameInUse
+        - isEmailInUse
+      properties:
+        success:
+          type: boolean
+        isUserNameInUse:
+          type: boolean
+        isEmailInUse:
+          type: boolean
+    ChangePasswordData:
+      type: object
+      required:
+        - oldPassword
+        - newPassword
+      properties:
+        oldPassword:
+          type: string
+        newPassword:
+          type: string
+    ChangePasswordResponse:
+      type: object
+      required:
+        - success
+      properties:
+        success:
+          type: boolean
   {{~ for class in api.data_model.common_classes ~}}
     {{ class.name }}:
       type: object

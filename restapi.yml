@@ -21,7 +21,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/LoginSuccess'
         '401':
-          description: successful login
+          description: login error
           content:
             application/json:
               schema:
@@ -65,6 +65,8 @@ paths:
   /profile:
     get:
       summary: get current user
+      security:
+      - bearerAuth: []
       operationId: profile
       responses:
         '200':
@@ -77,6 +79,8 @@ paths:
                   $ref: '#/components/schemas/User'
     post:
       summary: update profile
+      security:
+      - bearerAuth: []
       operationId: updateProfile
       requestBody:
         required: true
@@ -96,6 +100,8 @@ paths:
   /profile/change-password:
     post:
       summary: change password
+      security:
+      - bearerAuth: []
       operationId: changePassword
       requestBody:
         required: true
