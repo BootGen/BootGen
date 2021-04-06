@@ -219,11 +219,11 @@ components:
       type: object
       required:
         - isInactive
-        - wrongCreditentials
+        - wrongCredentials
       properties:
         isInactive:
           type: boolean
-        wrongCreditentials:
+        wrongCredentials:
           type: boolean
     RegistrationData:
       type: object

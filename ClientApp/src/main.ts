@@ -42,7 +42,7 @@ new Vue({
 
 
 Vue.config.errorHandler = (error: Error, vm: Vue, info: string) => {
-  const t = error as TypeError;
+  console.error(error);
   const err: AppError = {
     kind: "Vue",
     type: error?.name,
@@ -54,7 +54,7 @@ Vue.config.errorHandler = (error: Error, vm: Vue, info: string) => {
 };
 
 window.onerror = function(event: Event | string, source?: string, lineno?: number, colno?: number, error?: Error) {
-  console.log(event, source, lineno, colno, error);
+  console.error(error);
   const err: AppError = {
     kind: "JavaScript",
     type: error?.name,

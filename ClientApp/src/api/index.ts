@@ -5,7 +5,7 @@ import {ProfileResponse} from "@/models/ProfileResponse";
 import {ChangePasswordData} from "@/models/ChangePasswordData";
 import {RegistrationData} from "@/models/RegistrationData";
 import {AuthenticationData} from "@/models/AuthenticationData";
-import {LoginResponse} from "@/models/LoginResponse";
+import {LoginSuccess} from "@/models/LoginSuccess";
 
 const dateFormat = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/;
 
@@ -45,7 +45,7 @@ function projectToDto(project: Project): Project {
 }
 
 const api = {
-  login: async function (data: AuthenticationData): Promise<LoginResponse> {
+  login: async function (data: AuthenticationData): Promise<LoginSuccess> {
     const response = await axios.post("authentication/login", data);
     return response.data;
   },

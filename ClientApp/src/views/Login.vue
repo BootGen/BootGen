@@ -15,7 +15,7 @@
               <v-row>
                 <v-col cols="12">
                   <ValidationObserver v-slot="{ invalid }">
-                    <v-col cols="12" class="text-center"> 
+                    <v-col cols="12" class="text-center">
                       <ValidationProvider v-slot="{ errors }" name="email" rules="required|email">
                       <v-text-field
                         label="E-mail"
@@ -29,10 +29,10 @@
                           label="Password"
                           v-model="password"
                           :error-messages="errors"
-                          type="password" 
+                          type="password"
                           prepend-icon="mdi-form-textbox-password"
                         ></v-text-field>
-                      </ValidationProvider> 
+                      </ValidationProvider>
                       <p>email: example@email.com | pass: password123</p>
                       <v-alert class="text-left" type="error" v-if="errorMsg">{{ errorMsg }}</v-alert>
                       <v-btn color="primary" large @click="tryLogin" :disabled="invalid">Sign in</v-btn>
@@ -52,6 +52,7 @@
 import Vue from "vue";
 import { required, email, min, is } from 'vee-validate/dist/rules';
 import { extend, ValidationObserver, ValidationProvider } from 'vee-validate';
+import {LoginError} from "@/models/LoginError";
 
 extend('required', {
   ...required,
@@ -92,9 +93,10 @@ export default Vue.extend({
         });
         this.$store.commit("setJwt", response.jwt);
         this.$store.state.auth.user = response.user;
-        this.$router.push("profile");
+        await this.$router.push("profile");
       } catch (reason) {
-        if(reason.data.isInactive){
+        const error: LoginError = reason.response.data;
+        if(error.isInactive){
           this.errorMsg = "You have not confirmed your e-mail address yet. Please check your e-mail account and click on the link in the message. If you do not find the confirmation e-mail, please check your spam folder."
         }else{
           this.errorMsg = "Incorrect email or password";

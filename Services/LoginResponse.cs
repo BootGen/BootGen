@@ -5,6 +5,6 @@ namespace Editor.Services
         public bool Success { get; set; }
         public string Jwt { get; set; }
         public bool IsInactive { get; set; }
-        public bool WrongCreditentials { get; set; }
+        public bool WrongCredentials { get; set; }
     }
 }

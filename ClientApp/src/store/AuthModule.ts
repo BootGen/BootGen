@@ -1,11 +1,7 @@
 
-import axios from 'axios'
 import { ActionContext } from 'vuex';
 import { AuthenticationData } from '@/models/AuthenticationData'
-import { LoginResponse } from '@/models/LoginResponse'
-import { RegistrationData } from '@/models/RegistrationData'
-import { ProfileResponse } from '@/models/ProfileResponse'
-import { ChangePasswordData } from '@/models/ChangePasswordData'
+import { LoginSuccess } from '@/models/LoginSuccess'
 import { User } from '@/models/User'
 import { State } from '.';
 import api from '@/api'
@@ -48,7 +44,7 @@ export default {
         console.log("Local storage is not available.")
       }
     },
-    login: async function (context: Context, data: AuthenticationData): Promise<LoginResponse> {
+    login: async function (context: Context, data: AuthenticationData): Promise<LoginSuccess> {
       const response = await api.login(data);
       context.commit("setJwt", response.jwt);
       await context.dispatch("profile");
