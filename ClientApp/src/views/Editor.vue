@@ -59,15 +59,15 @@
                   </template>
                   <span>Formatting</span>
                 </v-tooltip>
-                
+
                 <v-tooltip bottom>
                   <template v-slot:activator="{ on, attrs }">
                     <v-btn class="mr-2" color="white" elevation="1" fab small :disabled="isPristine" @click="validateAndGenerate()" v-bind="attrs" v-on="on">
                       <v-icon color="primary" v-if="!generateLoading">mdi-arrow-right-bold</v-icon>
                       <div v-if="generateLoading">
                         <v-progress-circular
-                          indeterminate  
-                          :size="35" 
+                          indeterminate
+                          :size="35"
                           color="primary"
                         ></v-progress-circular>
                       </div>
@@ -106,8 +106,8 @@
                       <v-icon color="primary" v-if="!downLoading">mdi-download</v-icon>
                       <div v-if="downLoading">
                         <v-progress-circular
-                          indeterminate  
-                          :size="35" 
+                          indeterminate
+                          :size="35"
                           color="primary"
                         ></v-progress-circular>
                       </div>
@@ -152,6 +152,8 @@ import {Project} from "../models/Project";
 import {GeneratedFile} from "../models/GeneratedFile";
 import {CRC32} from 'crc_32_ts';
 import axios from 'axios';
+import api from '../api'
+import {GenerateResponse} from "../models/GenerateResponse";
 
 export default Vue.extend({
   components: {
@@ -225,20 +227,16 @@ export default Vue.extend({
         if(this.activeProject.name !== ""){
           nameSpace = this.activeProject.name;
         }
-        const [delay, generateResult] = await Promise.all([
-          this.delay(3000),
-          await this.$store.dispatch("generate", {data: this.activeProject.json, nameSpace: this.camalize(nameSpace)})
-        ]);
-        const generate = generateResult;
-        if(generate.errorMessage){
-          this.setSnackbar("orange darken-2", generate.errorMessage, -1);
-          if(generate.errorLine !== ""){
-            this.cmLinesToColor.push({line: generate.errorLine-1, color: "red"});
+        const generateResult: GenerateResponse = await api.generate({data: this.activeProject.json, nameSpace: this.camalize(nameSpace)});
+        if(generateResult.errorMessage){
+          this.setSnackbar("orange darken-2", generateResult.errorMessage, -1);
+          if(generateResult.errorLine !== null){
+            this.cmLinesToColor.push({line: generateResult.errorLine-1, color: "red"});
           }
           this.generateLoading = false;
           return;
         }
-        this.generatedFiles = generate.generatedFiles;
+        this.generatedFiles = generateResult.generatedFiles;
         this.$store.commit("projects/setLastProject", this.activeProject);
         this.$store.commit("projects/setLastGeneratedFiles", this.generatedFiles);
         this.undoStack.push(this.activeProject.json);
@@ -381,8 +379,8 @@ export default Vue.extend({
           nameSpace = this.activeProject.name;
         }
         await Promise.all([
-          this.delay(3000), this.$store.dispatch("download",
-          {data: this.activeProject.json, nameSpace: this.camalize(nameSpace)})
+          this.delay(3000),
+          api.download({data: this.activeProject.json, nameSpace: this.camalize(nameSpace)})
         ]);
         this.downLoading = false;
       }

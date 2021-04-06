@@ -47,7 +47,7 @@ export default Vue.extend({
         await api.activate(this.$route.params.activationToken);
         this.activeted = true;
         this.waitForResponse = false;
-      } catch(reason) {
+      } catch {
         this.activeted = false;
         this.waitForResponse = false;
       }

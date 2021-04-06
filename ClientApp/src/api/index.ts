@@ -6,6 +6,8 @@ import {ChangePasswordData} from "@/models/ChangePasswordData";
 import {RegistrationData} from "@/models/RegistrationData";
 import {AuthenticationData} from "@/models/AuthenticationData";
 import {LoginSuccess} from "@/models/LoginSuccess";
+import {GenerateRequest} from "@/models/GenerateRequest";
+import {GenerateResponse} from "@/models/GenerateResponse";
 
 const dateFormat = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/;
 
@@ -88,6 +90,21 @@ const api = {
   deleteProject: async function(project: Project, jwt: string): Promise<void> {
     const response = await axios.delete(`projects/${project.id}`, config(jwt));
     return response.data;
+  },
+  generate: async function(request: GenerateRequest): Promise<GenerateResponse> {
+    const response = await axios.post("generate/generate", request);
+    return response.data;
+  },
+  download: async function(request: GenerateRequest): Promise<void> {
+    const response = await axios.post("generate/download", request, {responseType: 'blob'});
+    console.log(response);
+    const fileURL = window.URL.createObjectURL(new Blob([response.data]));
+    const fileLink = document.createElement('a');
+    fileLink.href = fileURL;
+    fileLink.target = "_blank";
+    fileLink.setAttribute('download', `${request.nameSpace}.zip`);
+    document.body.appendChild(fileLink);
+    fileLink.click();
   }
 }
 

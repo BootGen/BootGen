@@ -2,7 +2,6 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import axios from 'axios'
 import authModule, { AuthState } from '@/store/AuthModule'
-import generateModule from '@/store/GenerateModule'
 import projectModule, { ProjectsState } from '@/store/ProjectModule'
 
 Vue.use(Vuex)
@@ -18,6 +17,5 @@ export default new Vuex.Store<State>({
   modules: {
     auth: authModule,
     projects: projectModule,
-    generate: generateModule,
   }
 })

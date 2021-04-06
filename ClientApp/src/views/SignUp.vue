@@ -124,14 +124,14 @@ export default Vue.extend({
         this.errorMsg = "This user name is already in use!";
       }else if(response.isEmailInUse) {
         this.errorMsg = "This email is already in use!";
-      }else{
+      } else {
         this.registration = true;
-        try{
+        try {
           await this.$store.dispatch("login", {
             email: this.email,
             password: this.password,
           });
-        }catch(e){
+        } catch {
           this.errorMsg = "";
         }
       }
