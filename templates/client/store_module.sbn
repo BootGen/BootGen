@@ -1,5 +1,5 @@
 import { ActionContext } from 'vuex';
-import { config, findById, findObjectsById, patchArray, setArray, setItem } from './util';
+import { findById, patchArray, setArray, setItem } from './util';
 import { State } from '.';
 import { {{resource.class.name}} } from '@/models/{{resource.class.name}}'
 {{~ for r in resource.alternate_resources ~}}
