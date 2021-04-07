@@ -50,6 +50,7 @@ namespace Editor.Services
                 User newUser = new User {
                     UserName = data.UserName,
                     Email = data.Email,
+                    Newsletter = data.Newsletter,
                     IsActive = false,
                     ActivationToken = Guid.NewGuid().ToString()
                 };

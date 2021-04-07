@@ -8,6 +8,7 @@ namespace Editor
         public int Id { get; set; }
         public string UserName { get; set; }
         public string Email { get; set; }
+        public bool Newsletter { get; set; }
         [JsonIgnore]
         public string PasswordHash { get; set; }
         [JsonIgnore]

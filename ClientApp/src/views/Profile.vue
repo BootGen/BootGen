@@ -32,6 +32,7 @@
                         :error-messages="errors"
                       ></v-text-field>
                     </ValidationProvider>
+                    <v-checkbox v-model="$store.state.auth.user.newsletter" label="Sign me up for the newsletter!"></v-checkbox>
                     <v-alert type="error" v-if="errorMsg">{{ errorMsg }}</v-alert>
                     <v-alert type="success" v-if="successMsg">{{ successMsg }}</v-alert>
                     <v-col cols="12" class="text-right">
@@ -75,7 +76,7 @@
 import Vue from "vue";
 import { required, min } from "vee-validate/dist/rules";
 import { extend, ValidationObserver, ValidationProvider } from "vee-validate";
-import api from "@/api"
+import api from "../api"
 
 extend("required", {
   ...required,

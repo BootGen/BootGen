@@ -231,6 +231,7 @@ components:
         - userName
         - email
         - password
+        - newsletter
       properties:
         userName:
           type: string
@@ -238,6 +239,8 @@ components:
           type: string
         password:
           type: string
+        newsletter:
+          type: boolean
     ProfileResponse:
       type: object
       required:
@@ -257,6 +260,7 @@ components:
         - id
         - userName
         - email
+        - newsletter
       properties:
         id:
           type: integer
@@ -266,6 +270,8 @@ components:
           type: string
         email:
           type: string
+        newsletter:
+          type: boolean
     ChangePasswordData:
       type: object
       required:
