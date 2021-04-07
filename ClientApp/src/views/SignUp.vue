@@ -128,8 +128,6 @@ export default Vue.extend({
       }else if(response.isEmailInUse) {
         this.errorMsg = "This email is already in use!";
       }else{
-        console.log(response);
-        console.log()
         this.registration = true;
         try{
           await this.$store.dispatch("login", {
