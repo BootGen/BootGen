@@ -60,24 +60,24 @@ const api = {
   },
   {{~ for resource in resources ~}}
   get{{ resource.name.plural }}: async function(jwt: string): Promise<Array<{{ camel_case resource.class.name }}>> {
-    const response = await axios.get('{{ camel_case resource.name.plural }}', config(jwt));
+    const response = await axios.get('{{ kebab_case resource.name.plural }}', config(jwt));
     return response.data;
   },
   get{{ resource.name }}: async function(id: number, jwt: string): Promise<{{ camel_case resource.class.name }}> {
-    const response = await axios.get(`{{ camel_case resource.name.plural }}/${id}`, config(jwt));
+    const response = await axios.get(`{{ kebab_case resource.name.plural }}/${id}`, config(jwt));
     return response.data;
   },
   {{~ if !resource.is_readonly ~}}
   add{{ resource.name }}: async function({{ camel_case resource.name }}: {{ camel_case resource.class.name }}, jwt: string): Promise<{{ camel_case resource.class.name }}> {
-    const response = await axios.post(`{{ camel_case resource.name.plural }}`, {{ camel_case resource.class.name }}ToDto({{ camel_case resource.name }}), config(jwt));
+    const response = await axios.post(`{{ kebab_case resource.name.plural }}`, {{ camel_case resource.class.name }}ToDto({{ camel_case resource.name }}), config(jwt));
     return response.data;
   },
   update{{ resource.name }}: async function({{ camel_case resource.name }}: {{ camel_case resource.class.name }}, jwt: string): Promise<{{ camel_case resource.class.name }}> {
-    const response = await axios.put(`{{ camel_case resource.name.plural }}/${ {{ camel_case resource.name }}.id }`, {{ camel_case resource.class.name }}ToDto({{ camel_case resource.name }}), config(jwt));
+    const response = await axios.put(`{{ kebab_case resource.name.plural }}/${ {{ camel_case resource.name }}.id }`, {{ camel_case resource.class.name }}ToDto({{ camel_case resource.name }}), config(jwt));
     return response.data;
   },
   delete{{ resource.name }}: async function({{ camel_case resource.name }}: {{ camel_case resource.class.name }}, jwt: string): Promise<void> {
-    const response = await axios.delete(`{{ camel_case resource.name.plural }}/${ {{ camel_case resource.name }}.id }`, config(jwt));
+    const response = await axios.delete(`{{ kebab_case resource.name.plural }}/${ {{ camel_case resource.name }}.id }`, config(jwt));
     return response.data;
   },
   {{~ end ~}}
@@ -85,16 +85,16 @@ const api = {
     parent = alternate.parent_resource
   ~}}
   get{{ resource.name.plural }}Of{{ parent.name }}: function({{camel_case parent.name}}: {{parent.class.name}}, jwt: string): Promise<Array<{{alternate.class.name}}>> {
-    const response = await axios.get({{path_template alternate}}, config(jwt));
+    const response = await axios.get(`{{ kebab_case parent.name.plural }}/${ {{ camel_case parent.name }}.id }/{{ kebab_case alternate.name.plural }}`, config(jwt));
     return response.data;
   },
   add{{ resource.name }}To{{ parent.name }}: function({{camel_case resource.name}}: {{resource.class.name}}, {{camel_case parent.name}}: {{parent.class.name}}, jwt: string): Promise<{{alternate.class.name}}> {
-    const response = await axios.post({{path_template alternate}}, {{ camel_case resource.class.name}}ToDto({{ camel_case resource.name}}), config(jwt));
+    const response = await axios.post(`{{ kebab_case parent.name.plural }}/${ {{ camel_case parent.name }}.id }/{{ kebab_case alternate.name.plural }}`, {{ camel_case resource.class.name}}ToDto({{ camel_case resource.name}}), config(jwt));
     return response.data;
   },
   {{~ if alternate.pivot ~}}
   delete{{ resource.name }}Of{{ parent.name }}: function({{camel_case alternate.name}}: {{alternate.class.name}}, {{camel_case parent.name}}: {{parent.class.name}}, jwt: string): Promise<void> {
-    const response = await axios.delete({{item_path_template alternate}}, config(jwt)).then(() => {
+    const response = await axios.delete(`{{ kebab_case parent.name.plural }}/${ {{ camel_case parent.name }}.id }/{{ kebab_case alternate.name.plural }}/${ {{ camel_case alternate.name }}.id }`, config(jwt)).then(() => {
     return response.data;
   },
   {{~ end ~}}
