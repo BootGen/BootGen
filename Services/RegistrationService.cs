@@ -62,8 +62,8 @@ namespace Editor.Services
                     var from = new EmailAddress("info@bootgen.com", "BootGen");
                     var subject = "confirm e-mail address";
                     var to = new EmailAddress(newUser.Email, newUser.UserName);
-                    var plainTextContent = $"Hi {newUser.UserName},\nThank you for registering at bootgen.com! To confirm your e-mail address please click on the following link:\nhttps://bootgen.com/activate/{newUser.ActivationToken}\nBest Regards,\nThe BootGen Team";
-                    var htmlContent = $"<strong>Hi {newUser.UserName},</strong><br>Thank you for registering at bootgen.com! To confirm your e-mail address please click on the following link:<br><a href=\"https://bootgen.com/activate/{newUser.ActivationToken}\" target=\"_blank\">https://bootgen.com/activate/{newUser.ActivationToken}</a><br>Best Regards,<br>The BootGen Team";
+                    var plainTextContent = $"Hi {newUser.UserName},\nThank you for registering at bootgen.com! To confirm your e-mail address please click on the following link:\nhttps://bootgen.com/activation/{newUser.ActivationToken}\nBest Regards,\nThe BootGen Team";
+                    var htmlContent = $"<strong>Hi {newUser.UserName},</strong><br>Thank you for registering at bootgen.com! To confirm your e-mail address please click on the following link:<br><a href=\"https://bootgen.com/activation/{newUser.ActivationToken}\" target=\"_blank\">https://bootgen.com/activation/{newUser.ActivationToken}</a><br>Best Regards,<br>The BootGen Team";
                     var msg = MailHelper.CreateSingleEmail(from, to, subject, plainTextContent, htmlContent);
                     client.SendEmailAsync(msg);
                 }
