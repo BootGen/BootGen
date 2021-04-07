@@ -62,12 +62,12 @@
 
                 <v-tooltip bottom>
                   <template v-slot:activator="{ on, attrs }">
-                    <v-btn class="mr-2" color="white" elevation="1" fab small :disabled="isPristine" @click="validateAndGenerate()" v-bind="attrs" v-on="on">
+                    <v-btn class="mr-2" color="white" elevation="1" fab small :disabled="isPristine || generateLoading" @click="validateAndGenerate()" v-bind="attrs" v-on="on">
                       <v-icon color="primary" v-if="!generateLoading">mdi-arrow-right-bold</v-icon>
                       <div v-if="generateLoading">
                         <v-progress-circular
                           indeterminate
-                          :size="35"
+                          :size="25"
                           color="primary"
                         ></v-progress-circular>
                       </div>
@@ -102,12 +102,12 @@
               <div class="d-flex">
                 <v-tooltip bottom>
                   <template v-slot:activator="{ on, attrs }">
-                    <v-btn color="white" class="mr-2" elevation="1" :disabled="!isPristine" @click="download" fab small v-bind="attrs" v-on="on">
+                    <v-btn color="white" class="mr-2" elevation="1" :disabled="!isPristine || downLoading" @click="download" fab small v-bind="attrs" v-on="on">
                       <v-icon color="primary" v-if="!downLoading">mdi-download</v-icon>
                       <div v-if="downLoading">
                         <v-progress-circular
                           indeterminate
-                          :size="35"
+                          :size="25"
                           color="primary"
                         ></v-progress-circular>
                       </div>
