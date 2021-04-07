@@ -11,15 +11,17 @@ using {{ name_space }}.Services;
 
 namespace {{ name_space }}.Controllers
 {
+    {{~
+        controller_name = resource.name.plural + 'Controller'
+        service_name = 'I' + resource.name.plural + 'Service'
+    ~}}
     [ApiController]
-    [Route("{{ resource.route.path }}")]
-    {{~ if resource.authenticate ~}}
+    [Route("{{ kebab_case resource.name.plural }}")]
     [Authorize]
-    {{~ end ~}}
-    public class {{ controller_name resource }} : ControllerBase
+    public class {{ controller_name }} : ControllerBase
     {
-        private I{{ service_name resource }} service;
-        public {{ controller_name resource }}(I{{ service_name resource }} service)
+        private {{ service_name }} service;
+        public {{ controller_name }}({{ service_name }} service)
         {
             this.service = service;
         }

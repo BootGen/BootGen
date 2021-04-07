@@ -1,6 +1,8 @@
-{{~ for refered in (referred_classes class) ~}}
-{{~ if refered != class.name.singular ~}}
-import { {{ refered }} } from './{{ refered }}';
+{{~ for property in class.common_properties ~}}
+{{~ if property.class ~}}
+{{~ if property.class.name != class.name ~}}
+import { {{ property.class.name }} } from './{{ property.class.name }}';
+{{~ end ~}}
 {{~ end ~}}
 {{~ end ~}}
 

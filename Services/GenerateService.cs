@@ -138,7 +138,7 @@ namespace Editor.Services
                 throw new Exception("The user class must contain a string property named 'email'.");
             userClass.Properties.Add(new Property {
                 Name = "PasswordHash",
-                PropertyType = PropertyType.ServerOnly,
+                IsServerOnly = true,
                 BuiltInType = BuiltInType.String
             });
             var seedStore = new SeedDataStore(collection);
@@ -153,7 +153,6 @@ namespace Editor.Services
                 ClientComponentExtension = "vue",
                 Disk = disk,
                 ResourceCollection = collection,
-                Api = new Api(collection),
                 SeedStore = seedStore,
                 TemplateRoot = "templates"
             };

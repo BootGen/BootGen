@@ -6,7 +6,7 @@ public static class ServiceRegistrator
         public static void RegisterServices(IServiceCollection services)
         {
             {{~ for resource in resources ~}}
-            services.AddScoped<I{{ service_name resource }}, {{ service_name resource }}>();
+            services.AddScoped<I{{ resource.name.plural }}Service, {{ resource.name.plural }}Service>();
             {{~ end ~}}
             {{~ for pivot in pivots ~}}
             services.AddScoped<I{{ pivot.name.plural }}Service, {{ pivot.name.plural }}Service>();

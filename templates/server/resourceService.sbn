@@ -10,12 +10,12 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace {{ name_space }}.Services
 {
-    public class {{ service_name resource }} : I{{ service_name resource }}
+    public class {{ resource.name.plural }}Service : I{{ resource.name.plural }}Service
     {
         {{~ class = resource.class ~}}
         private readonly ApplicationDbContext dbContext;
 
-        public {{ service_name resource }}(ApplicationDbContext dbContext)
+        public {{ resource.name.plural }}Service(ApplicationDbContext dbContext)
         {
             this.dbContext = dbContext;
         }

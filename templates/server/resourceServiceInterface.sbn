@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 namespace {{ name_space }}.Services
 {
     {{~ class = resource.class ~}}
-    public interface I{{ service_name resource }}
+    public interface I{{ resource.name.plural }}Service
     {
         List<{{ class.name }}> Get{{ class.name.plural }}();
         {{ class.name }} Get{{ class.name }}(int {{ camel_case class.name }}Id);

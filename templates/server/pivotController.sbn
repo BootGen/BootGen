@@ -10,16 +10,21 @@ using {{ name_space }}.Services;
 
 namespace {{ name_space }}.Controllers
 {
+    {{~
+        parent = resource.parent_resource
+        controller_name = parent.name.plural + resource.name.plural + 'Controller'
+        service_name = 'I' + resource.name.plural + 'Service'
+    ~}}
     [ApiController]
-    [Route("{{ resource.route.path }}")]
+    [Route("{{ kebab_case parent.name.plural }}/{{'{' + (camel_case parent.name) + 'Id}' }}/{{ kebab_case resource.name.plural }}")]
     {{~ if resource.authenticate ~}}
     [Authorize]
     {{~ end ~}}
-    public class {{ controller_name resource }} : ControllerBase
+    public class {{ controller_name }} : ControllerBase
     {
         private I{{ resource.pivot.name.plural }}Service pivotService;
-        private I{{ service_name resource }} dataService;
-        public {{ controller_name resource }}(I{{ service_name resource }} dataService, I{{ resource.pivot.name.plural }}Service pivotService)
+        private {{ service_name  }} dataService;
+        public {{ controller_name }}({{ service_name }} dataService, I{{ resource.pivot.name.plural }}Service pivotService)
         {
             this.dataService = dataService;
             this.pivotService = pivotService;

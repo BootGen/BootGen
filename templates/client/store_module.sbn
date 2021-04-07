@@ -43,22 +43,22 @@ export default {
       return context.state.items;
     },
     get{{ resource.name }}: async function(context: Context, id: number): Promise<{{resource.class.name}}> {
-      const {{ camel_case resource.name }} = await api.{{ resource.name }}(id, context.rootState.auth.jwt);
+      const {{ camel_case resource.name }} = await api.get{{ resource.name }}(id, context.rootState.auth.jwt);
       context.commit("set{{resource.name}}", {{ camel_case resource.name }});
       return findById<{{resource.class.name}}>(context.state.items, {{ camel_case resource.name }}.id) as {{resource.class.name}};
     },
     {{~ if !resource.is_readonly ~}}
-    add{{ resource.name }}: function(context: Context, {{ camel_case resource.name}}: {{ resource.class.name}}): Promise<{{resource.class.name}}> {
-      const {{ camel_case resource.name }} = await api.add{{ resource.name }}({{ camel_case resource.name}}, context.rootState.auth.jwt);
+    add{{ resource.name }}: async function(context: Context, {{ camel_case resource.name}}: {{ resource.class.name}}): Promise<{{resource.class.name}}> {
+      {{ camel_case resource.name }} = await api.add{{ resource.name }}({{ camel_case resource.name}}, context.rootState.auth.jwt);
       context.commit("set{{ resource.name }}", {{ camel_case resource.name }});
       return findById<{{resource.class.name}}>(context.state.items, {{ camel_case resource.name }}.id) as {{resource.class.name}};
     },
-    update{{ resource.name }}: function(context: Context, {{ camel_case resource.name}}: {{ resource.class.name}}): Promise<{{resource.class.name}}> {
-      const {{ camel_case resource.name }} = await api.update{{ resource.name }}({{ camel_case resource.name}}, context.rootState.auth.jwt);
+    update{{ resource.name }}: async function(context: Context, {{ camel_case resource.name}}: {{ resource.class.name}}): Promise<{{resource.class.name}}> {
+      {{ camel_case resource.name }} = await api.update{{ resource.name }}({{ camel_case resource.name}}, context.rootState.auth.jwt);
       context.commit("set{{ resource.name }}", {{ camel_case resource.name }});
       return findById<{{resource.class.name}}>(context.state.items, {{ camel_case resource.name }}.id) as {{resource.class.name}};
     },
-    delete{{ resource.name }}: function(context: Context, {{ camel_case resource.name}}: {{ resource.class.name}}): Promise<void> {
+    delete{{ resource.name }}: async function(context: Context, {{ camel_case resource.name}}: {{ resource.class.name}}): Promise<void> {
       context.commit("set{{ resource.name.plural }}", context.state.items.filter((i: {{ resource.class.name}}) => i !== {{ camel_case resource.name}}));
       await api.delete{{ resource.name }}({{ camel_case resource.name}}, context.rootState.auth.jwt);
     },
@@ -66,20 +66,20 @@ export default {
     {{~ for alternate in resource.alternate_resources
     parent = alternate.parent_resource
     ~}}
-    get{{ resource.name.plural }}Of{{ parent.name }}: function(context: Context, {{camel_case parent.name}}: {{parent.class.name}}): Promise<Array<{{alternate.class.name}}>> {
+    get{{ resource.name.plural }}Of{{ parent.name }}: async function(context: Context, {{camel_case parent.name}}: {{parent.class.name}}): Promise<Array<{{alternate.class.name}}>> {
       const {{ camel_case resource.name.plural }} = await api.get{{ resource.name.plural }}Of{{ parent.name }}({{camel_case parent.name}}, context.rootState.auth.jwt);
       context.commit("patch{{alternate.name.plural}}", {{ camel_case resource.name.plural }});
       return context.state.items;
     },
-    add{{ resource.name }}To{{ parent.name }}: function(context: Context, data: {{resource.class.name}}{{parent.class.name}}Pair): Promise<{{alternate.class.name}}> {
-      const {{camel_case resource.name}}: {{resource.class.name}} = data.{{camel_case resource.name}};
+    add{{ resource.name }}To{{ parent.name }}: async function(context: Context, data: {{resource.class.name}}{{parent.class.name}}Pair): Promise<{{alternate.class.name}}> {
+      let {{camel_case resource.name}}: {{resource.class.name}} = data.{{camel_case resource.name}};
       const {{camel_case parent.name}}: {{parent.class.name}} = data.{{camel_case parent.name}};
       {{ camel_case resource.name }} = await api.add{{ resource.name }}To{{ parent.name }}({{ camel_case resource.name}}, {{camel_case parent.name}}, context.rootState.auth.jwt);
       context.commit("set{{ resource.name }}", {{ camel_case resource.name }});
       return findById<{{resource.class.name}}>(context.state.items, {{ camel_case resource.name }}.id) as {{resource.class.name}};
     },
     {{~ if alternate.pivot ~}}
-    delete{{ resource.name }}Of{{ parent.name }}: function(context: Context, data: {{resource.class.name}}{{parent.class.name}}Pair): Promise<void> {
+    delete{{ resource.name }}Of{{ parent.name }}: async function(context: Context, data: {{resource.class.name}}{{parent.class.name}}Pair): Promise<void> {
       const {{camel_case alternate.name}}: {{alternate.class.name}} = data.{{camel_case alternate.name}};
       const {{camel_case parent.name}}: {{parent.class.name}} = data.{{camel_case parent.name}};
       context.commit("set{{ alternate.name.plural }}", context.state.items.filter((i: {{ resource.class.name}}) => i !== {{ camel_case alternate.name}}));
