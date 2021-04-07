@@ -19,6 +19,11 @@ namespace {{ name_space }}.Services
         {{~ if property.is_parent_reference ~}}
         List<{{ class.name }}> Get{{ class.name.plural }}Of{{ property.name }}(int {{ camel_case property.class.name }}Id);
         {{~ end ~}}
+        {{~ if property.is_many_to_many ~}}
+        List<{{ class.name }}> Get{{ class.name.plural }}Of{{ property.class.name }}(int {{ camel_case property.class.name }}Id);
+        bool Add{{ class.name }}To{{ property.class.name }}(int {{ camel_case class.name }}Id, int {{ camel_case property.class.name }}Id);
+        bool Remove{{ class.name }}From{{ property.class.name }}(int {{ camel_case class.name }}Id, int {{ camel_case property.class.name }}Id);
+        {{~ end ~}}
         {{~ end ~}}
         {{~ if !resource.is_readonly ~}}
         {{ class.name }} Add{{ class.name }}({{ class.name }} {{ camel_case class.name }});
