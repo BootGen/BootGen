@@ -4,7 +4,7 @@
       <v-col lg="5" md="6" sm="8" cols="12" class="pa-0 headBar" v-if="$store.state.auth.jwt">
         <head-bar :activeProject="activeProject" @new-project="newProject" @change-project-name="changeProjectName"></head-bar>
       </v-col>
-      <v-col cols="12" class="headBar pl-0 pt-6" v-else>
+      <v-col cols="12" class="pa-0 headBar" v-else>
         <head-bar :activeProject="activeProject" @new-project="newProject" @change-project-name="changeProjectName"></head-bar>
       </v-col>
     </v-row>
@@ -73,7 +73,8 @@
                       </div>
                     </v-btn>
                     </template>
-                  <span>Generate</span>
+                  <span v-if="projectName">Generate</span>
+                  <span v-else>Enter the project name to generate</span>
                 </v-tooltip>
               </div>
             </div>
@@ -102,7 +103,7 @@
               <div class="d-flex">
                 <v-tooltip bottom>
                   <template v-slot:activator="{ on, attrs }">
-                    <v-btn color="white" class="mr-2" elevation="1" :disabled="!isPristine || downLoading" @click="download" fab small v-bind="attrs" v-on="on">
+                    <v-btn color="white" class="mr-2" elevation="1" :disabled="!isPristine || downLoading || projectName == ''" @click="download" fab small v-bind="attrs" v-on="on">
                       <v-icon color="primary" v-if="!downLoading">mdi-download</v-icon>
                       <div v-if="downLoading">
                         <v-progress-circular
@@ -170,9 +171,13 @@ export default Vue.extend({
       this.activeProject = {...this.$store.state.projects.lastProject};
       this.generatedFiles = [...this.$store.state.projects.lastGeneratedFiles];
       this.setActiveFile();
+      this.validateAndGenerate();
     }else{
       this.activeProject = {...this.initialProject};
       await this.validateAndGenerate();
+    }
+    if(this.activeProject.name){
+      this.projectName = this.activeProject.name;
     }
   },
   computed: {
@@ -222,12 +227,12 @@ export default Vue.extend({
     },
     generate: async function(){
       if(!this.generateLoading){
-        this.generateLoading = true;
-        let nameSpace = "Test"
-        if(this.activeProject.name !== ""){
-          nameSpace = this.activeProject.name;
+        if(this.projectName === "" && this.undoStack.length() > 0){
+          this.setSnackbar("red", "Enter the project name to generate", -1);
+          return;
         }
-        const generateResult: GenerateResponse = await api.generate({data: this.activeProject.json, nameSpace: this.camalize(nameSpace)});
+        this.generateLoading = true;
+        const generateResult: GenerateResponse = await api.generate({data: this.activeProject.json, nameSpace: this.camalize(this.activeProject.name)});
         if(generateResult.errorMessage){
           this.setSnackbar("orange darken-2", generateResult.errorMessage, -1);
           if(generateResult.errorLine !== null){
@@ -374,13 +379,9 @@ export default Vue.extend({
       if(!this.downLoading){
         this.downLoading = true;
         this.$gtag.event('download');
-        let nameSpace = "Test"
-        if(this.activeProject.name !== ""){
-          nameSpace = this.activeProject.name;
-        }
         await Promise.all([
           this.delay(3000),
-          api.download({data: this.activeProject.json, nameSpace: this.camalize(nameSpace)})
+          api.download({data: this.activeProject.json, nameSpace: this.camalize(this.projectName)})
         ]);
         this.downLoading = false;
       }
@@ -416,9 +417,10 @@ export default Vue.extend({
       }
     },
     camalize: function(str: string) {
-      return str.replace(/(?:^\w|[A-Z]|\b\w)/g, function(word, index) {
+      const nameSpace = str.replace(/(?:^\w|[A-Z]|\b\w)/g, function(word, index) {
         return index === 0 ? word.toLowerCase() : word.toUpperCase();
       }).replace(/\s+/g, '');
+      return `${nameSpace.charAt(0).toUpperCase()}${nameSpace.slice(1)}`;
     }
   },
 });
