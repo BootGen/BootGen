@@ -102,6 +102,17 @@
               <div class="d-flex">
                 <v-tooltip bottom>
                   <template v-slot:activator="{ on, attrs }">
+                    <v-btn color="white" v-if="isCompare" class="mr-2" elevation="1" @click="setCompare()" fab small v-bind="attrs" v-on="on">
+                      <v-icon color="primary">mdi-file-compare</v-icon>
+                    </v-btn>
+                    <v-btn color="blue-grey" v-else class="mr-2" elevation="1" @click="setCompare()" fab small v-bind="attrs" v-on="on">
+                      <v-icon color="primary">mdi-file-compare</v-icon>
+                    </v-btn>
+                  </template>
+                  <span>Show changes</span>
+                </v-tooltip>
+                <v-tooltip bottom>
+                  <template v-slot:activator="{ on, attrs }">
                     <v-btn color="white" class="mr-2" elevation="1" :disabled="!isPristine" @click="download" fab small v-bind="attrs" v-on="on">
                       <v-icon color="primary" v-if="!downLoading">mdi-download</v-icon>
                       <div v-if="downLoading">
@@ -209,6 +220,7 @@ export default Vue.extend({
       openPath: "",
       generateLoading: false,
       downLoading: false,
+      isCompare: true,
     };
   },
   methods: {
@@ -250,8 +262,17 @@ export default Vue.extend({
         this.generateLoading = false;
       }
     },
+    setCompare: function(){
+      if(this.isCompare){
+        this.isCompare = false;
+        this.cm1LinesToColor = [];
+      }else{
+        this.isCompare = true;
+        this.setCm1LinesToColor();
+      }
+    },
     setCm1LinesToColor: function(){
-      if(this.previousFiles.length > 0){
+      if(this.previousFiles.length > 0 && this.isCompare){
         this.cm1LinesToColor = [];
         for(let i = 0; i < this.previousFiles.length; i++){
           if(this.previousFiles[i].name === this.activeFile.name && this.previousFiles[i].path === this.activeFile.path){
