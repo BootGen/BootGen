@@ -1,13 +1,12 @@
 <template>
   <v-container fluid class="cm">
     <codemirror v-if="mode == 'json'" :id="cmId" :value="value" @input="onInput" return-object :options="cmOptions" @scroll="onScroll"  @scrollCursorIntoView="cursorIntoView()" />
-    <codemirror v-else :id="cmId" :value="value" :options="cmOptions" @scrollCursorIntoView="cursorIntoView()" />
+    <codemirror v-else :id="cmId" :value="value" :options="cmOptions" @scroll="onScroll" @scrollCursorIntoView="cursorIntoView()" />
   </v-container>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import { validateJson } from '../utils/PrettyPrint';
 import { codemirror } from 'vue-codemirror';
 import 'codemirror/theme/material.css';
 import 'codemirror/lib/codemirror.css';
@@ -65,6 +64,7 @@ export default Vue.extend({
           this.unsetHighlight();
         }else{
           linesToColor.forEach(lineToColor => {
+            console.log("linesToCOlor:", {line: lineToColor.line, color: lineToColor.color});
             this.highlightLine(lineToColor.line, lineToColor.color);
           })
         }
