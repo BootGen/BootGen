@@ -42,15 +42,6 @@
                     </template>
                   <span>Save</span>
                 </v-tooltip>
-                <v-tooltip bottom v-if="$store.state.auth.jwt">
-                  <template v-slot:activator="{ on, attrs }">
-                    <v-btn class="mr-2" color="white" elevation="1" fab small @click="openExplorer = true" v-bind="attrs" v-on="on">
-                      <v-icon color="primary">mdi-file-multiple</v-icon>
-                    </v-btn>
-                    </template>
-                  <span>Files</span>
-                </v-tooltip>
-                <file-explorer v-if="$store.state.auth.jwt && openExplorer" @select-project="selectProject" @close-explorer="openExplorer = false"></file-explorer>
                 <v-tooltip bottom>
                   <template v-slot:activator="{ on, attrs }">
                     <v-btn class="mr-2" color="white" elevation="1" fab small :disabled="activeProject.json == ''" @click="callPrettyPrint" v-bind="attrs" v-on="on">
@@ -145,7 +136,6 @@ import CodeMirror from "../components/CodeMirror.vue";
 import TreeView from "../components/TreeView.vue";
 import {validateJson, prettyPrint} from "../utils/PrettyPrint";
 import {UndoStack} from "../utils/UndoStack";
-import FileExplorer from "../components/FileExplorer.vue";
 import HelpDialog from "../components/HelpDialog.vue";
 import HeadBar from "../components/HeadBar.vue";
 import Snackbar from "../components/Snackbar.vue";
@@ -158,7 +148,6 @@ import {GenerateResponse} from "../models/GenerateResponse";
 
 export default Vue.extend({
   components: {
-    FileExplorer,
     HelpDialog,
     HeadBar,
     Snackbar,
@@ -170,6 +159,7 @@ export default Vue.extend({
     if(this.$store.state.projects.lastProject.json){
       this.activeProject = {...this.$store.state.projects.lastProject};
       this.generatedFiles = [...this.$store.state.projects.lastGeneratedFiles];
+      this.callPrettyPrint();
       this.setActiveFile();
       this.validateAndGenerate();
     }else{
@@ -193,7 +183,6 @@ export default Vue.extend({
   },
   data: function () {
     return {
-      openExplorer: false,
       openHelp: false,
       generatedFiles: Array<GeneratedFile>(),
       initialProject: {id: -1, ownerId: -1, name: "", json: "{}"},
@@ -315,20 +304,6 @@ export default Vue.extend({
     },
     hideSnackbar: function(){
       this.snackbar.visible = false;
-    },
-    selectProject: function(project: Project){
-      this.$gtag.event('select-project');
-      let select = true;
-      if(this.activeProject.id === -1){
-        select = confirm("changes will not be saved!");
-      }
-      if(select){
-        project.json = project.json.split("'").join('"');
-        this.activeProject = project;
-        this.validateAndGenerate();
-      }
-      this.undoStack.clear();
-      this.openExplorer = false;
     },
     existsProjectName: function(): Project | null{
       for(const i in this.$store.state.projects.items){

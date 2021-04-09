@@ -6,6 +6,7 @@ import SignUp from '../views/SignUp.vue'
 import Activation from '../views/Activation.vue'
 import PrivacyStatement from '../views/PrivacyStatement.vue'
 import Editor from '../views/Editor.vue'
+import SavedProjects from '../views/SavedProjects.vue'
 import Profile from '../views/Profile.vue'
 import ChangePassword from '../views/ChangePassword.vue'
 
@@ -56,6 +57,12 @@ const loggedOutGuard = (to: any, from: any, next: any) => {
     path: "/",
     name: "Editor",
     component: Editor
+  },
+  {
+    path: "/saved-projects",
+    name: "Saved Projects",
+    beforeEnter: loggedInGuard,
+    component: SavedProjects
   },
   {
     path: "/profile",

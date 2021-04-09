@@ -89,6 +89,7 @@ function replaceToString(strings: string[], lines: string[]): string[]{
 }
 export function prettyPrint(json: string): string {
   json = json.replace("\r","");
+  json = json.replaceAll("'","\"");
   const strings = json.match(/"[^"]*"/g);
   json = json.replace(/"[^"]*"/g, '""');
   const comments = json.match(/(\/\/.*)(\n)/g);

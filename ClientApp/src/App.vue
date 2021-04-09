@@ -119,6 +119,7 @@ export default {
       if (this.$store.state.auth.jwt) {
         return [
           { title: "Editor", link: "/", icon: "mdi-cog" },
+          { title: "Saved Projects", link: "/saved-projects", icon: "mdi-file-multiple" },
           { title: "Profile", link: "/profile", icon: "mdi-account" },
           {
             title: "Change Password",
