@@ -99,10 +99,8 @@ export default Vue.extend({
       }
     },
     onScroll: function(){
-      this.$gtag.event('scroll-cm');
       this.unsetHighlight();
       this.setMinMaxLine();
-      this.$emit("on-scroll");
     },
     unsetHighlight: function (){
       const elementById = document.getElementById(this.cmId);

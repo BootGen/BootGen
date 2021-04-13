@@ -69,7 +69,7 @@
               </div>
             </div>
           </template>
-          <code-mirror cmId="cm0" v-model="activeProject.json" mode="json" :readOnly="false" :linesToColor="cmLinesToColor" @on-scroll="validateAndGenerate" @cursor-into-view="closeDrawer"></code-mirror>
+          <code-mirror cmId="cm0" v-model="activeProject.json" mode="json" :readOnly="false" :linesToColor="cmLinesToColor" @cursor-into-view="closeDrawer"></code-mirror>
         </base-material-generator-card>
       </v-col>
 
@@ -159,11 +159,10 @@ export default Vue.extend({
       this.activeProject = {...this.$store.state.projects.lastProject};
       this.generatedFiles = [...this.$store.state.projects.lastGeneratedFiles];
       this.setActiveFile();
-      this.validateAndGenerate();
     }else{
       this.activeProject = {...this.initialProject};
-      await this.validateAndGenerate();
     }
+    await this.validateAndGenerate();
   },
   computed: {
     isPristine: function(){
@@ -220,6 +219,7 @@ export default Vue.extend({
     },
     generate: async function(){
       if(!this.generateLoading){
+        console.log(new Error().stack);
         this.generateLoading = true;
         const generateResult: GenerateResponse = await api.generate({data: this.activeProject.json, nameSpace: this.camalize(this.activeProject.name)});
         if(generateResult.errorMessage){
@@ -395,7 +395,7 @@ export default Vue.extend({
         this.openPath = "";
       }
     },
-    camalize: function(str: string) {
+    toCamelCase: function(str: string): string {
       const nameSpace = str.replace(/(?:^\w|[A-Z]|\b\w)/g, function(word, index) {
         return index === 0 ? word.toLowerCase() : word.toUpperCase();
       }).replace(/\s+/g, '');
