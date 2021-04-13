@@ -71,10 +71,10 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import Vue from 'vue';
 import { required, email, min } from 'vee-validate/dist/rules';
 import { extend, ValidationObserver, ValidationProvider } from 'vee-validate';
-import api from "../api"
+import api from '../api'
 extend('required', {
   ...required,
   message: '{_field_} can not be empty',
@@ -105,12 +105,12 @@ export default Vue.extend({
   },
   data: function () {
     return {
-      email: "",
-      password: "",
-      confirmPassword: "",
-      userName: "",
+      email: '',
+      password: '',
+      confirmPassword: '',
+      userName: '',
       newsletter: false,
-      errorMsg: "",
+      errorMsg: '',
       registration: false,
     };
   },
@@ -124,18 +124,18 @@ export default Vue.extend({
         password: this.password,
       });
       if(response.isUserNameInUse) {
-        this.errorMsg = "This user name is already in use!";
+        this.errorMsg = 'This user name is already in use!';
       }else if(response.isEmailInUse) {
-        this.errorMsg = "This email is already in use!";
+        this.errorMsg = 'This email is already in use!';
       } else {
         this.registration = true;
         try {
-          await this.$store.dispatch("login", {
+          await this.$store.dispatch('login', {
             email: this.email,
             password: this.password,
           });
         } catch {
-          this.errorMsg = "";
+          this.errorMsg = '';
         }
       }
     },

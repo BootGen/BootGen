@@ -31,8 +31,8 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import api from "@/api"
+import Vue from 'vue';
+import api from '../api';
 
 export default Vue.extend({
   data: function () {

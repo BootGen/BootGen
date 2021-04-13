@@ -68,9 +68,9 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { GenerateResponse } from "../models/GenerateResponse";
-import { Project } from "../models/Project";
+import Vue from 'vue';
+import { GenerateResponse } from '../models/GenerateResponse';
+import { Project } from '../models/Project';
 import api from '../api';
 
 export default Vue.extend({
@@ -84,7 +84,7 @@ export default Vue.extend({
           sortable: true,
           value: 'name',
         },
-        { text: 'Actions', value: 'actions', sortable: false, align: "end" },
+        { text: 'Actions', value: 'actions', sortable: false, align: 'end' },
       ],
       dialog: false,
       deletableProject: null as (null | Project),
@@ -104,8 +104,8 @@ export default Vue.extend({
     }
   },
   created: async function(){
-    this.$store.dispatch("projects/getProjects");
-    if(localStorage.projectView === "false"){
+    this.$store.dispatch('projects/getProjects');
+    if(localStorage.projectView === 'false'){
       this.projectView = false;
     }else{
       localStorage.projectView = true;
@@ -117,9 +117,9 @@ export default Vue.extend({
         this.inLoading = true;
         this.projectInLoading = project;
         const generateResult: GenerateResponse = await api.generate({data: project.json, nameSpace: this.toCamelCase(project.name)});
-        this.$store.commit("projects/setLastProject", project);
-        this.$store.commit("projects/setLastGeneratedFiles", generateResult.generatedFiles);
-        this.$router.push("/");
+        this.$store.commit('projects/setLastProject', project);
+        this.$store.commit('projects/setLastGeneratedFiles', generateResult.generatedFiles);
+        this.$router.push('/');
       }
     },
     deleteItem (project: Project) {
@@ -127,7 +127,7 @@ export default Vue.extend({
       this.dialog = true;
     },
     deleteItemConfirm () {
-      this.$store.dispatch("projects/deleteProject", this.deletableProject);
+      this.$store.dispatch('projects/deleteProject', this.deletableProject);
       this.closeDelete();
     },
     closeDelete () {

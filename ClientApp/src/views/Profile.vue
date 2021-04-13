@@ -73,19 +73,19 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { required, min } from "vee-validate/dist/rules";
-import { extend, ValidationObserver, ValidationProvider } from "vee-validate";
-import api from "../api"
+import Vue from 'vue';
+import { required, min } from 'vee-validate/dist/rules';
+import { extend, ValidationObserver, ValidationProvider } from 'vee-validate';
+import api from '../api'
 
-extend("required", {
+extend('required', {
   ...required,
-  message: "{_field_} can not be empty",
+  message: '{_field_} can not be empty',
 });
 
-extend("min", {
+extend('min', {
   ...min,
-  message: "{_field_} may not be less than {length} characters",
+  message: '{_field_} may not be less than {length} characters',
 });
 
 export default Vue.extend({
@@ -95,30 +95,30 @@ export default Vue.extend({
   },
   mounted: async function() {
     if(this.$store.state.auth.jwt){
-      this.$store.state.auth.user = await this.$store.dispatch("profile");
+      this.$store.state.auth.user = await this.$store.dispatch('profile');
     }
   },
   data: function () {
     return {
       dialog: false,
-      errorMsg: "",
-      successMsg: ""
+      errorMsg: '',
+      successMsg: ''
     };
   },
   methods: {
     saveUser: async function () {
       this.$gtag.event('update-profile');
-      this.successMsg = "";
+      this.successMsg = '';
       const response = await api.updateProfile(this.$store.state.auth.user, this.$store.state.auth.jwt);
       if (response.isUserNameInUse) {
-        this.errorMsg = "This user name already exists!";
+        this.errorMsg = 'This user name already exists!';
       } else if (response.isEmailInUse) {
-        this.errorMsg = "This email already exists!";
+        this.errorMsg = 'This email already exists!';
       } else {
-        this.errorMsg = "";
+        this.errorMsg = '';
       }
       if (response.success) {
-        this.successMsg = "Your profile is successfuly updated."
+        this.successMsg = 'Your profile is successfuly updated.'
       }
     }
   },

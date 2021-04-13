@@ -29,7 +29,7 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import Vue from 'vue';
 
 export default Vue.extend({
   created: function(){
@@ -39,9 +39,9 @@ export default Vue.extend({
     return {
       dialog: true,
       help: [
-        {title: "Title 1", icon: "mdi-account", description: "Description 1"}, 
-        {title: "Title 2", icon: "mdi-clock", description: "Description 2"}, 
-        {title: "Title 3", icon: "mdi-cog", description: "Description 3"}, 
+        {title: 'Title 1', icon: 'mdi-account', description: 'Description 1'}, 
+        {title: 'Title 2', icon: 'mdi-clock', description: 'Description 2'}, 
+        {title: 'Title 3', icon: 'mdi-cog', description: 'Description 3'}, 
       ],
     };
   },
@@ -49,7 +49,7 @@ export default Vue.extend({
     close: function(){
       this.$gtag.event('close-help');
       this.dialog = false;
-      this.$emit("close-help");
+      this.$emit('close-help');
     },
     changeHelpMenu: function(){
       this.$gtag.event('change-help-menu');

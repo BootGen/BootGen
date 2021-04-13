@@ -14,7 +14,7 @@ type Context = ActionContext<AuthState, State>;
 
 export default {
   state: {
-    jwt: "",
+    jwt: '',
     user: null
   },
   mutations: {
@@ -27,7 +27,7 @@ export default {
   },
   actions: {
     init: function(context: Context) {
-      const jwt = localStorage.getItem("jwt")
+      const jwt = localStorage.getItem('jwt')
       if (jwt) {
         context.dispatch('setJwt', jwt);
       }
@@ -36,18 +36,18 @@ export default {
       context.commit('setJwt', jwt);
       try {
         if (jwt) {
-          localStorage.setItem("jwt", jwt);
+          localStorage.setItem('jwt', jwt);
         } else {
-          localStorage.removeItem("jwt");
+          localStorage.removeItem('jwt');
         }
       } catch {
-        console.log("Local storage is not available.")
+        console.log('Local storage is not available.')
       }
     },
     login: async function (context: Context, data: AuthenticationData): Promise<LoginSuccess> {
       const response = await api.login(data);
-      context.commit("setJwt", response.jwt);
-      await context.dispatch("profile");
+      context.commit('setJwt', response.jwt);
+      await context.dispatch('profile');
       return response;
     },
     profile: async function (context: Context): Promise<User> {

@@ -48,24 +48,24 @@ new Vue({
 Vue.config.errorHandler = (error: Error, vm: Vue, info: string) => {
   console.error(error);
   const err: AppError = {
-    kind: "Vue",
+    kind: 'Vue',
     type: error?.name,
     stackTrace: error?.stack,
     message: error?.message,
     info: info
   }
-  axios.post("errors/log", err);
+  axios.post('errors/log', err);
 };
 
 window.onerror = function(event: Event | string, source?: string, lineno?: number, colno?: number, error?: Error) {
   console.error(error);
   const err: AppError = {
-    kind: "JavaScript",
+    kind: 'JavaScript',
     type: error?.name,
     lineNumber: lineno,
     columnNumber: colno,
     stackTrace: error?.stack,
     message: error?.message
   }
-  axios.post("errors/log", err);
+  axios.post('errors/log', err);
  };

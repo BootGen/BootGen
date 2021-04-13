@@ -130,20 +130,20 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import CodeMirror from "../components/CodeMirror.vue";
-import TreeView from "../components/TreeView.vue";
-import {validateJson, prettyPrint} from "../utils/PrettyPrint";
-import {UndoStack} from "../utils/UndoStack";
-import HelpDialog from "../components/HelpDialog.vue";
-import HeadBar from "../components/HeadBar.vue";
-import Snackbar from "../components/Snackbar.vue";
-import {Project} from "../models/Project";
-import {GeneratedFile} from "../models/GeneratedFile";
+import Vue from 'vue';
+import CodeMirror from '../components/CodeMirror.vue';
+import TreeView from '../components/TreeView.vue';
+import {validateJson, prettyPrint} from '../utils/PrettyPrint';
+import {UndoStack} from '../utils/UndoStack';
+import HelpDialog from '../components/HelpDialog.vue';
+import HeadBar from '../components/HeadBar.vue';
+import Snackbar from '../components/Snackbar.vue';
+import {Project} from '../models/Project';
+import {GeneratedFile} from '../models/GeneratedFile';
 import {CRC32} from 'crc_32_ts';
 import axios from 'axios';
 import api from '../api'
-import {GenerateResponse} from "../models/GenerateResponse";
+import {GenerateResponse} from '../models/GenerateResponse';
 
 export default Vue.extend({
   components: {
@@ -154,7 +154,7 @@ export default Vue.extend({
     TreeView,
   },
   created: async function(){
-    this.initialProject.json = (await axios.get(`${this.$root.$data.baseUrl}/example_input.json`, {responseType: "text"})).data;
+    this.initialProject.json = (await axios.get(`${this.$root.$data.baseUrl}/example_input.json`, {responseType: 'text'})).data;
     if(this.$store.state.projects.lastProject.json){
       this.activeProject = {...this.$store.state.projects.lastProject};
       this.generatedFiles = [...this.$store.state.projects.lastGeneratedFiles];
@@ -188,22 +188,22 @@ export default Vue.extend({
     return {
       openHelp: false,
       generatedFiles: Array<GeneratedFile>(),
-      initialProject: {id: -1, ownerId: -1, name: "My Project", json: "{}"},
+      initialProject: {id: -1, ownerId: -1, name: 'My Project', json: '{}'},
       undoStack: new UndoStack(),
-      crc32ProjectName: CRC32.str("My Project"),
-      activeProject: {id: -1, ownerId: -1, name: "", json: ""},
+      crc32ProjectName: CRC32.str('My Project'),
+      activeProject: {id: -1, ownerId: -1, name: '', json: ''},
       activeFile: {} as GeneratedFile,
       snackbar: {
         dismissible: true,
         visible: false,
-        type: "",
-        icon: "mdi-alert-circle",
-        text: "",
+        type: '',
+        icon: 'mdi-alert-circle',
+        text: '',
         timeout: 5000,
       },
       cmLinesToColor: Array<{line: number; color: string}>(),
       drawer: false,
-      openPath: "",
+      openPath: '',
       generateLoading: false,
       downLoading: false,
     };
@@ -223,16 +223,16 @@ export default Vue.extend({
         this.generateLoading = true;
         const generateResult: GenerateResponse = await api.generate({data: this.activeProject.json, nameSpace: this.toCamelCase(this.activeProject.name)});
         if(generateResult.errorMessage){
-          this.setSnackbar("orange darken-2", generateResult.errorMessage, -1);
+          this.setSnackbar('orange darken-2', generateResult.errorMessage, -1);
           if(generateResult.errorLine !== null){
-            this.cmLinesToColor.push({line: generateResult.errorLine-1, color: "red"});
+            this.cmLinesToColor.push({line: generateResult.errorLine-1, color: 'red'});
           }
           this.generateLoading = false;
           return;
         }
         this.generatedFiles = generateResult.generatedFiles;
-        this.$store.commit("projects/setLastProject", this.activeProject);
-        this.$store.commit("projects/setLastGeneratedFiles", this.generatedFiles);
+        this.$store.commit('projects/setLastProject', this.activeProject);
+        this.$store.commit('projects/setLastGeneratedFiles', this.generatedFiles);
         this.crc32ProjectName = CRC32.str(this.activeProject.name);
         if(this.undoStack.length() > 0){
           if(!this.isJsonPristine){
@@ -246,15 +246,15 @@ export default Vue.extend({
       }
     },
     getJsonLength: function(json: string): number{
-      json = json.replace(/ {2}/g, "");
-      json = json.replace(/": /g, "\":");
-      json = json.replace(/[\n\t\r]/g, "");
+      json = json.replace(/ {2}/g, '');
+      json = json.replace(/": /g, '":');
+      json = json.replace(/[\n\t\r]/g, '');
       return json.length;
     },
     setActiveFile: function(){
       if(!this.activeFile.name){
         for(let i = 0; i < this.generatedFiles.length; i++){
-          if(this.generatedFiles[i].name === "restapi.yml" && this.generatedFiles[i].path === ""){
+          if(this.generatedFiles[i].name === 'restapi.yml' && this.generatedFiles[i].path === ''){
             this.activeFile = this.generatedFiles[i];
             break;
           }
@@ -272,8 +272,8 @@ export default Vue.extend({
       this.$gtag.event('pretty-print');
       const result = validateJson(this.activeProject.json);
       if (result.error) {
-        this.cmLinesToColor.push({line: result.line, color: "red"});
-        this.setSnackbar("orange darken-2", result.message, -1);
+        this.cmLinesToColor.push({line: result.line, color: 'red'});
+        this.setSnackbar('orange darken-2', result.message, -1);
       }
       this.activeProject.json = prettyPrint(this.activeProject.json);
       this.hideSnackbar();
@@ -293,13 +293,13 @@ export default Vue.extend({
         this.callPrettyPrint();
         const jsonLength = this.getJsonLength(this.activeProject.json);
         if(jsonLength > 2000) {
-          this.setSnackbar("orange darken-2", `Exceeded character limit: ${jsonLength} / 2000`, -1);
+          this.setSnackbar('orange darken-2', `Exceeded character limit: ${jsonLength} / 2000`, -1);
           return;
         }
         await this.generate();
       } else {
-        this.cmLinesToColor.push({line: result.line, color: "red"});
-        this.setSnackbar("orange darken-2", result.message, -1);
+        this.cmLinesToColor.push({line: result.line, color: 'red'});
+        this.setSnackbar('orange darken-2', result.message, -1);
       }
     },
     setSnackbar: function(type: string, text: string, timeout: number){
@@ -325,18 +325,18 @@ export default Vue.extend({
       if(this.activeProject.name){
         const exists = this.existsProjectName();
         if (!exists && this.activeProject.id === -1) {
-          this.setSnackbar("success", "The new project was successfully created!", 5000);
+          this.setSnackbar('success', 'The new project was successfully created!', 5000);
           this.activeProject.id = 0;
           this.activeProject.ownerId = this.$store.state.auth.user.id;
-          this.activeProject = await this.$store.dispatch("projects/addProject", this.activeProject);
+          this.activeProject = await this.$store.dispatch('projects/addProject', this.activeProject);
         } else if(exists && exists.id !== this.activeProject.id) {
-          this.setSnackbar("error", "This name is already in use, please enter another name!", 5000);
+          this.setSnackbar('error', 'This name is already in use, please enter another name!', 5000);
         } else {
-          this.setSnackbar("success", "Project updated successfully!", 5000);
-          await this.$store.dispatch("projects/updateProject", this.activeProject);
+          this.setSnackbar('success', 'Project updated successfully!', 5000);
+          await this.$store.dispatch('projects/updateProject', this.activeProject);
         }
       }else{
-        this.setSnackbar("error", "This name is incorrect!", 5000);
+        this.setSnackbar('error', 'This name is incorrect!', 5000);
       }
     },
     undo: async function () {
@@ -348,7 +348,7 @@ export default Vue.extend({
       if(top) {
         this.activeProject.json = top.content;
       }
-      this.setSnackbar("info", "Everything restored to its previous generated state", 5000);
+      this.setSnackbar('info', 'Everything restored to its previous generated state', 5000);
     },
     changeProjectName: function(name: string){
       this.$gtag.event('change-project-name');
@@ -367,7 +367,7 @@ export default Vue.extend({
     },
     openFolder: function(idx: number){
       this.$gtag.event('open-folder');
-      this.openPath = "";
+      this.openPath = '';
       for(let i = 0; i < idx; i++){
         if(this.activeFile.path.split('/')[i]){
           this.openPath += `${this.activeFile.path.split('/')[i]}/`;
@@ -385,14 +385,14 @@ export default Vue.extend({
       this.$gtag.event('set-drawer');
       this.drawer = !this.drawer;
       if(!this.drawer){
-        this.openPath = "";
+        this.openPath = '';
       }
     },
     closeDrawer: function(){
       if(this.drawer){
         this.$gtag.event('close-drawer');
         this.drawer = false;
-        this.openPath = "";
+        this.openPath = '';
       }
     },
     toCamelCase: function(str: string): string {

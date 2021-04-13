@@ -16,8 +16,8 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { GeneratedFile } from "../models/GeneratedFile";
+import Vue from 'vue';
+import { GeneratedFile } from '../models/GeneratedFile';
 
 interface Node {
   id: number;
@@ -43,7 +43,7 @@ export default Vue.extend({
     return {
       tree: {
         id: 0,
-        name: "Root",
+        name: 'Root',
         children: Array<Node>(),
         open: Array<Node>(),
       },
@@ -60,7 +60,7 @@ export default Vue.extend({
     init: function () {
       if (this.openPath) {
         this.tree.open = [];
-        this.setOpenFolder(this.openPath.split("/"), this.tree.children);
+        this.setOpenFolder(this.openPath.split('/'), this.tree.children);
       }
     },
     getChild: function (node: Node, name: string): Node | null {
@@ -75,9 +75,9 @@ export default Vue.extend({
       return null;
     },
     addToTree: function (file: GeneratedFile) {
-      const path = file.path.split("/");
+      const path = file.path.split('/');
       let currentNode: Node = this.tree;
-      if (path[0] !== "") {
+      if (path[0] !== '') {
         path.forEach((part) => {
           const childNode = this.getChild(currentNode, part);
           if (!childNode) {
@@ -120,15 +120,15 @@ export default Vue.extend({
     },
     selectFile: function (node: Node[]) {
       if (node[0]) {
-        this.$emit("select-file", this.getFile(node[0]));
+        this.$emit('select-file', this.getFile(node[0]));
       }
     },
     sortFiles: function () {
       this.files.sort(function (a: GeneratedFile, b: GeneratedFile) {
-        if (a.path === "") {
+        if (a.path === '') {
           return b.path.localeCompare(a.path) || a.name.localeCompare(b.name);
         }
-        if (b.path === "") {
+        if (b.path === '') {
           return b.path.localeCompare(a.path) || a.name.localeCompare(b.name);
         }
         return a.path.localeCompare(b.path) || a.name.localeCompare(b.name);

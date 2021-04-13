@@ -49,10 +49,10 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import Vue from 'vue';
 import { required, email, min } from 'vee-validate/dist/rules';
 import { extend, ValidationObserver, ValidationProvider } from 'vee-validate';
-import {LoginError} from "@/models/LoginError";
+import {LoginError} from '@/models/LoginError';
 
 extend('required', {
   ...required,
@@ -76,30 +76,30 @@ export default Vue.extend({
   },
   data: function () {
     return {
-      email: "",
-      password: "",
-      passwordAgain: "",
-      userName: "",
-      errorMsg: ""
+      email: '',
+      password: '',
+      passwordAgain: '',
+      userName: '',
+      errorMsg: ''
     };
   },
   methods: {
     tryLogin: async function () {
       this.$gtag.event('login');
       try {
-        const response = await this.$store.dispatch("login", {
+        const response = await this.$store.dispatch('login', {
           email: this.email,
           password: this.password,
         });
-        this.$store.commit("setJwt", response.jwt);
+        this.$store.commit('setJwt', response.jwt);
         this.$store.state.auth.user = response.user;
-        await this.$router.push("profile");
+        await this.$router.push('profile');
       } catch (reason) {
         const error: LoginError = reason.response.data;
         if(error.isInactive){
-          this.errorMsg = "You have not confirmed your e-mail address yet. Please check your e-mail account and click on the link in the message. If you do not find the confirmation e-mail, please check your spam folder."
+          this.errorMsg = 'You have not confirmed your e-mail address yet. Please check your e-mail account and click on the link in the message. If you do not find the confirmation e-mail, please check your spam folder.'
         }else{
-          this.errorMsg = "Incorrect email or password";
+          this.errorMsg = 'Incorrect email or password';
         }
       }
     }

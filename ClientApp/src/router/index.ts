@@ -10,8 +10,8 @@ import SavedProjects from '../views/SavedProjects.vue'
 import Profile from '../views/Profile.vue'
 import ChangePassword from '../views/ChangePassword.vue'
 
-import store from "../store/index"
-import {NavigationGuardNext, Route} from "vue-router/types/router";
+import store from '../store/index'
+import {NavigationGuardNext, Route} from 'vue-router/types/router';
 
 Vue.use(VueRouter)
 
@@ -55,31 +55,31 @@ const loggedOutGuard = (to: Route, from: Route, next: NavigationGuardNext) => {
     component: PrivacyStatement
   },
   {
-    path: "/",
-    name: "Editor",
+    path: '/',
+    name: 'Editor',
     component: Editor
   },
   {
-    path: "/saved-projects",
-    name: "Saved Projects",
+    path: '/saved-projects',
+    name: 'Saved Projects',
     beforeEnter: loggedInGuard,
     component: SavedProjects
   },
   {
-    path: "/profile",
-    name: "Profile",
+    path: '/profile',
+    name: 'Profile',
     beforeEnter: loggedInGuard,
     component: Profile
   },
   {
-    path: "/change-password",
-    name: "Change Password",
+    path: '/change-password',
+    name: 'Change Password',
     beforeEnter: loggedInGuard,
     component: ChangePassword
   },
   {
-    path: "/logout",
-    name: "Logout",
+    path: '/logout',
+    name: 'Logout',
     beforeEnter: loggedInGuard,
     component: Logout
   }

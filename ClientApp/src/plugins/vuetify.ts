@@ -1,6 +1,5 @@
 import Vue from 'vue'
-import en from 'vuetify'
-import Vuetify from 'vuetify/lib'
+import Vuetify from 'vuetify'
 import '@/sass/overrides.sass'
 
 Vue.use(Vuetify)

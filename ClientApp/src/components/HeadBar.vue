@@ -17,8 +17,8 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { Project } from "../models/Project";
+import Vue from 'vue';
+import { Project } from '../models/Project';
 import { required } from 'vee-validate/dist/rules';
 import { extend, ValidationObserver, ValidationProvider } from 'vee-validate';
 
