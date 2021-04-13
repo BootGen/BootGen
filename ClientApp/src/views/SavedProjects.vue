@@ -39,7 +39,7 @@
                 <div class="d-flex align-center">
                   <v-card-title class="text-truncate pl-0">{{ project.name }}</v-card-title>
                   <v-progress-circular
-                    v-if="projectInLoading == project"
+                    v-if="projectInLoading === project"
                     indeterminate
                     :size="25"
                     color="primary"
@@ -116,7 +116,7 @@ export default Vue.extend({
       if(!this.dialog && !this.inLoading){
         this.inLoading = true;
         this.projectInLoading = project;
-        const generateResult: GenerateResponse = await api.generate({data: project.json, nameSpace: this.camalize(project.name)});
+        const generateResult: GenerateResponse = await api.generate({data: project.json, nameSpace: this.toCamelCase(project.name)});
         this.$store.commit("projects/setLastProject", project);
         this.$store.commit("projects/setLastGeneratedFiles", generateResult.generatedFiles);
         this.$router.push("/");

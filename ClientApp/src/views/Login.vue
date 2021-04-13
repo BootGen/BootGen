@@ -50,7 +50,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { required, email, min, is } from 'vee-validate/dist/rules';
+import { required, email, min } from 'vee-validate/dist/rules';
 import { extend, ValidationObserver, ValidationProvider } from 'vee-validate';
 import {LoginError} from "@/models/LoginError";
 

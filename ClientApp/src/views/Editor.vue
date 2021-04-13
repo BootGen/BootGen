@@ -44,7 +44,7 @@
                 </v-tooltip>
                 <v-tooltip bottom>
                   <template v-slot:activator="{ on, attrs }">
-                    <v-btn class="mr-2" color="white" elevation="1" fab small :disabled="activeProject.json == ''" @click="callPrettyPrint" v-bind="attrs" v-on="on">
+                    <v-btn class="mr-2" color="white" elevation="1" fab small :disabled="activeProject.json === ''" @click="callPrettyPrint" v-bind="attrs" v-on="on">
                       <v-icon color="primary">mdi-format-align-left</v-icon>
                     </v-btn>
                   </template>
@@ -53,7 +53,7 @@
 
                 <v-tooltip bottom>
                   <template v-slot:activator="{ on, attrs }">
-                    <v-btn class="mr-2" color="white" elevation="1" fab small :disabled="isPristine || generateLoading || activeProject.name == ''" @click="validateAndGenerate()" v-bind="attrs" v-on="on">
+                    <v-btn class="mr-2" color="white" elevation="1" fab small :disabled="isPristine || generateLoading || activeProject.name === ''" @click="validateAndGenerate()" v-bind="attrs" v-on="on">
                       <v-icon color="primary" v-if="!generateLoading">mdi-arrow-right-bold</v-icon>
                       <div v-if="generateLoading">
                         <v-progress-circular
@@ -93,7 +93,7 @@
               <div class="d-flex">
                 <v-tooltip bottom>
                   <template v-slot:activator="{ on, attrs }">
-                    <v-btn color="white" class="mr-2" elevation="1" :disabled="!isPristine || downLoading || activeProject.name == ''" @click="download" fab small v-bind="attrs" v-on="on">
+                    <v-btn color="white" class="mr-2" elevation="1" :disabled="!isPristine || downLoading || activeProject.name === ''" @click="download" fab small v-bind="attrs" v-on="on">
                       <v-icon color="primary" v-if="!downLoading">mdi-download</v-icon>
                       <div v-if="downLoading">
                         <v-progress-circular
@@ -221,7 +221,7 @@ export default Vue.extend({
       if(!this.generateLoading){
         console.log(new Error().stack);
         this.generateLoading = true;
-        const generateResult: GenerateResponse = await api.generate({data: this.activeProject.json, nameSpace: this.camalize(this.activeProject.name)});
+        const generateResult: GenerateResponse = await api.generate({data: this.activeProject.json, nameSpace: this.toCamelCase(this.activeProject.name)});
         if(generateResult.errorMessage){
           this.setSnackbar("orange darken-2", generateResult.errorMessage, -1);
           if(generateResult.errorLine !== null){
@@ -303,7 +303,7 @@ export default Vue.extend({
       }
     },
     setSnackbar: function(type: string, text: string, timeout: number){
-      this.snackbar.dismissible = true,
+      this.snackbar.dismissible = true;
       this.snackbar.timeout = timeout;
       this.snackbar.type = type;
       this.snackbar.text = text;
@@ -360,7 +360,7 @@ export default Vue.extend({
         this.$gtag.event('download');
         await Promise.all([
           this.delay(3000),
-          api.download({data: this.activeProject.json, nameSpace: this.camalize(this.activeProject.name)})
+          api.download({data: this.activeProject.json, nameSpace: this.toCamelCase(this.activeProject.name)})
         ]);
         this.downLoading = false;
       }

@@ -35,11 +35,9 @@ export default Vue.extend({
     },
   },
   watch: {
-    openPath: {
-      handler(openPath: string) {
-        this.init();
-      },
-    },
+    openPath: function() {
+      this.init();
+    }
   },
   data: function () {
     return {
