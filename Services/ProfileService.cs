@@ -46,6 +46,7 @@ namespace Editor.Services
             {
                 CurrentUser.Email = user.Email;
                 CurrentUser.UserName = user.UserName;
+                CurrentUser.Newsletter = user.Newsletter;
                 dbContext.Update(CurrentUser);
                 dbContext.SaveChanges();
             }

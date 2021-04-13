@@ -34,6 +34,7 @@ function userToDto(user: User): User {
     id: user.id,
     userName: user.userName,
     email: user.email,
+    newsletter: user.newsletter,
   };
 }
 

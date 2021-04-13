@@ -55,6 +55,7 @@
                           prepend-icon="mdi-form-textbox-password"
                         ></v-text-field>
                       </ValidationProvider>
+                      <v-checkbox v-model="newsletter" label="Sign me up for the newsletter!"></v-checkbox>
                       <v-alert class="text-left" type="error" v-if="errorMsg">{{ errorMsg }}</v-alert>
                       <v-btn color="primary" large @click="trySignUp" :disabled="invalid">Sign up</v-btn>
                     </v-col>
@@ -73,7 +74,7 @@
 import Vue from "vue";
 import { required, email, min } from 'vee-validate/dist/rules';
 import { extend, ValidationObserver, ValidationProvider } from 'vee-validate';
-import api from "@/api"
+import api from "../api"
 extend('required', {
   ...required,
   message: '{_field_} can not be empty',
@@ -108,6 +109,7 @@ export default Vue.extend({
       password: "",
       confirmPassword: "",
       userName: "",
+      newsletter: false,
       errorMsg: "",
       registration: false,
     };
@@ -118,6 +120,7 @@ export default Vue.extend({
       const response = await api.register({
         userName: this.userName,
         email: this.email,
+        newsletter: this.newsletter,
         password: this.password,
       });
       if(response.isUserNameInUse) {
