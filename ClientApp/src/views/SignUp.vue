@@ -109,7 +109,7 @@ export default Vue.extend({
       password: "",
       confirmPassword: "",
       userName: "",
-      newsletter: true,
+      newsletter: false,
       errorMsg: "",
       registration: false,
     };
