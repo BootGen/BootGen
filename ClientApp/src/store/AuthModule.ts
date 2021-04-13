@@ -5,6 +5,7 @@ import { LoginSuccess } from '@/models/LoginSuccess'
 import { User } from '@/models/User'
 import { State } from '.';
 import api from '@/api'
+import { ProfileResponse } from '@/models/ProfileResponse';
 
 export interface AuthState {
   jwt: string;
@@ -54,6 +55,12 @@ export default {
       const user = await api.profile(context.state.jwt);
       context.commit('setUser', user);
       return user;
+    },
+    updateProfile: async function (context: Context, user: User): Promise<ProfileResponse> {
+      const response  = await api.updateProfile(user, context.state.jwt);
+      if (response.success)
+        context.commit("setUser", user);
+      return response;
     }
   },
 }
