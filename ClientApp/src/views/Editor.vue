@@ -28,10 +28,10 @@
                 <help-dialog v-if="openHelp" @close-help="openHelp = false"></help-dialog>
                 <v-tooltip bottom>
                   <template v-slot:activator="{ on, attrs }">
-                    <v-btn class="mr-2" color="white" elevation="1" fab small @click="undo" v-bind="attrs" v-on="on" :disabled="undoStack.length() < 2 && isPristine">
+                    <v-btn class="mr-2" color="white" elevation="1" fab small @click="undo" v-bind="attrs" v-on="on" :disabled="undoStack.length() < 2 && isJsonPristine">
                       <v-icon color="primary">mdi-undo</v-icon>
                     </v-btn>
-                    </template>
+                  </template>
                   <span>Rollback to the last generated state</span>
                 </v-tooltip>
                 <v-tooltip bottom v-if="$store.state.auth.jwt">
@@ -53,7 +53,7 @@
 
                 <v-tooltip bottom>
                   <template v-slot:activator="{ on, attrs }">
-                    <v-btn class="mr-2" color="white" elevation="1" fab small :disabled="isPristine || generateLoading" @click="validateAndGenerate()" v-bind="attrs" v-on="on">
+                    <v-btn class="mr-2" color="white" elevation="1" fab small :disabled="isPristine || generateLoading || activeProject.name == ''" @click="validateAndGenerate()" v-bind="attrs" v-on="on">
                       <v-icon color="primary" v-if="!generateLoading">mdi-arrow-right-bold</v-icon>
                       <div v-if="generateLoading">
                         <v-progress-circular
@@ -64,8 +64,7 @@
                       </div>
                     </v-btn>
                     </template>
-                  <span v-if="projectName">Generate</span>
-                  <span v-else>Enter the project name to generate</span>
+                  <span>Generate</span>
                 </v-tooltip>
               </div>
             </div>
@@ -94,7 +93,7 @@
               <div class="d-flex">
                 <v-tooltip bottom>
                   <template v-slot:activator="{ on, attrs }">
-                    <v-btn color="white" class="mr-2" elevation="1" :disabled="!isPristine || downLoading || projectName == ''" @click="download" fab small v-bind="attrs" v-on="on">
+                    <v-btn color="white" class="mr-2" elevation="1" :disabled="!isPristine || downLoading || activeProject.name == ''" @click="download" fab small v-bind="attrs" v-on="on">
                       <v-icon color="primary" v-if="!downLoading">mdi-download</v-icon>
                       <div v-if="downLoading">
                         <v-progress-circular
@@ -159,25 +158,30 @@ export default Vue.extend({
     if(this.$store.state.projects.lastProject.json){
       this.activeProject = {...this.$store.state.projects.lastProject};
       this.generatedFiles = [...this.$store.state.projects.lastGeneratedFiles];
-      this.callPrettyPrint();
       this.setActiveFile();
       this.validateAndGenerate();
     }else{
       this.activeProject = {...this.initialProject};
       await this.validateAndGenerate();
     }
-    if(this.activeProject.name){
-      this.projectName = this.activeProject.name;
-    }
   },
   computed: {
     isPristine: function(){
-        const top = this.undoStack.top();
-        if(top){
-          if(top.crc32 === CRC32.str(this.activeProject.json)){
-            return true;
-          }
+      const top = this.undoStack.top();
+      if(top){
+        if((top.crc32 === CRC32.str(this.activeProject.json)) && (this.crc32ProjectName === CRC32.str(this.activeProject.name))){
+          return true;
         }
+      }
+      return false;
+    },
+    isJsonPristine: function(){
+      const top = this.undoStack.top();
+      if(top){
+        if(top.crc32 === CRC32.str(this.activeProject.json)){
+          return true;
+        }
+      }
       return false;
     },
   },
@@ -185,8 +189,9 @@ export default Vue.extend({
     return {
       openHelp: false,
       generatedFiles: Array<GeneratedFile>(),
-      initialProject: {id: -1, ownerId: -1, name: "", json: "{}"},
+      initialProject: {id: -1, ownerId: -1, name: "My Project", json: "{}"},
       undoStack: new UndoStack(),
+      crc32ProjectName: CRC32.str("My Project"),
       activeProject: {id: -1, ownerId: -1, name: "", json: ""},
       activeFile: {} as GeneratedFile,
       snackbar: {
@@ -197,7 +202,6 @@ export default Vue.extend({
         text: "",
         timeout: 5000,
       },
-      projectName: "",
       cmLinesToColor: Array<{line: number; color: string}>(),
       drawer: false,
       openPath: "",
@@ -216,10 +220,6 @@ export default Vue.extend({
     },
     generate: async function(){
       if(!this.generateLoading){
-        if(this.projectName === "" && this.undoStack.length() > 0){
-          this.setSnackbar("red", "Enter the project name to generate", -1);
-          return;
-        }
         this.generateLoading = true;
         const generateResult: GenerateResponse = await api.generate({data: this.activeProject.json, nameSpace: this.camalize(this.activeProject.name)});
         if(generateResult.errorMessage){
@@ -233,7 +233,14 @@ export default Vue.extend({
         this.generatedFiles = generateResult.generatedFiles;
         this.$store.commit("projects/setLastProject", this.activeProject);
         this.$store.commit("projects/setLastGeneratedFiles", this.generatedFiles);
-        this.undoStack.push(this.activeProject.json);
+        this.crc32ProjectName = CRC32.str(this.activeProject.name);
+        if(this.undoStack.length() > 0){
+          if(!this.isJsonPristine){
+            this.undoStack.push(this.activeProject.json);
+          }
+        }else{
+          this.undoStack.push(this.activeProject.json);
+        }
         this.setActiveFile();
         this.generateLoading = false;
       }
@@ -315,9 +322,6 @@ export default Vue.extend({
     },
     save: async function (){
       this.$gtag.event('save-project');
-      if(this.projectName !== ""){
-        this.activeProject.name = this.projectName;
-      }
       if(this.activeProject.name){
         const exists = this.existsProjectName();
         if (!exists && this.activeProject.id === -1) {
@@ -348,7 +352,7 @@ export default Vue.extend({
     },
     changeProjectName: function(name: string){
       this.$gtag.event('change-project-name');
-      this.projectName = name;
+      this.activeProject.name = name;
     },
     download: async function() {
       if(!this.downLoading){
@@ -356,7 +360,7 @@ export default Vue.extend({
         this.$gtag.event('download');
         await Promise.all([
           this.delay(3000),
-          api.download({data: this.activeProject.json, nameSpace: this.camalize(this.projectName)})
+          api.download({data: this.activeProject.json, nameSpace: this.camalize(this.activeProject.name)})
         ]);
         this.downLoading = false;
       }
