@@ -11,10 +11,11 @@ import Profile from '../views/Profile.vue'
 import ChangePassword from '../views/ChangePassword.vue'
 
 import store from "../store/index"
+import {NavigationGuardNext, Route} from "vue-router/types/router";
 
 Vue.use(VueRouter)
 
-const loggedInGuard = (to: any, from: any, next: any) => {
+const loggedInGuard = (to: Route, from: Route, next: NavigationGuardNext) => {
   if(store.state.auth.jwt){
     next();
   }else{
@@ -22,7 +23,7 @@ const loggedInGuard = (to: any, from: any, next: any) => {
   }
 };
 
-const loggedOutGuard = (to: any, from: any, next: any) => {
+const loggedOutGuard = (to: Route, from: Route, next: NavigationGuardNext) => {
   if(store.state.auth.jwt){
     next('/profile');
   }else{
