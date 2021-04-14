@@ -93,11 +93,6 @@ export default Vue.extend({
     ValidationProvider,
     ValidationObserver,
   },
-  mounted: async function() {
-    if(this.$store.state.auth.jwt){
-      this.$store.state.auth.user = await this.$store.dispatch('profile');
-    }
-  },
   data: function () {
     return {
       dialog: false,

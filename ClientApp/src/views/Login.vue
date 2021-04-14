@@ -87,13 +87,11 @@ export default Vue.extend({
     tryLogin: async function () {
       this.$gtag.event('login');
       try {
-        const response = await this.$store.dispatch('login', {
+        await this.$store.dispatch("login", {
           email: this.email,
           password: this.password,
         });
-        this.$store.commit('setJwt', response.jwt);
-        this.$store.state.auth.user = response.user;
-        await this.$router.push('profile');
+        await this.$router.push("profile");
       } catch (reason) {
         const error: LoginError = reason.response.data;
         if(error.isInactive){

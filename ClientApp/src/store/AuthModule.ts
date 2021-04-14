@@ -21,6 +21,15 @@ export default {
   mutations: {
     setJwt: function(state: AuthState, jwt: string) {
       state.jwt = jwt
+      try {
+        if (jwt) {
+          localStorage.setItem("jwt", jwt);
+        } else {
+          localStorage.removeItem("jwt");
+        }
+      } catch {
+        console.log("Local storage is not available.")
+      }
     },
     setUser: function(state: AuthState, user: User) {
       state.user = user
@@ -30,19 +39,7 @@ export default {
     init: function(context: Context) {
       const jwt = localStorage.getItem('jwt')
       if (jwt) {
-        context.dispatch('setJwt', jwt);
-      }
-    },
-    setJwt(context: Context, jwt: string) {
-      context.commit('setJwt', jwt);
-      try {
-        if (jwt) {
-          localStorage.setItem('jwt', jwt);
-        } else {
-          localStorage.removeItem('jwt');
-        }
-      } catch {
-        console.log('Local storage is not available.')
+        context.commit('setJwt', jwt);
       }
     },
     login: async function (context: Context, data: AuthenticationData): Promise<LoginSuccess> {
