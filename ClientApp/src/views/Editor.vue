@@ -19,15 +19,6 @@
               <div class="icons">
                 <v-tooltip bottom>
                   <template v-slot:activator="{ on, attrs }">
-                    <v-btn class="mr-2" color="white" elevation="1" fab small @click="openHelp = true" v-bind="attrs" v-on="on">
-                      <v-icon color="primary">mdi-help</v-icon>
-                    </v-btn>
-                    </template>
-                  <span>Help</span>
-                </v-tooltip>
-                <help-dialog v-if="openHelp" @close-help="openHelp = false"></help-dialog>
-                <v-tooltip bottom>
-                  <template v-slot:activator="{ on, attrs }">
                     <v-btn class="mr-2" color="white" elevation="1" fab small @click="undo" v-bind="attrs" v-on="on" :disabled="undoStack.length() < 2 && isJsonPristine">
                       <v-icon color="primary">mdi-undo</v-icon>
                     </v-btn>
@@ -135,7 +126,6 @@ import CodeMirror from '../components/CodeMirror.vue';
 import TreeView from '../components/TreeView.vue';
 import {validateJson, prettyPrint} from '../utils/PrettyPrint';
 import {UndoStack} from '../utils/UndoStack';
-import HelpDialog from '../components/HelpDialog.vue';
 import HeadBar from '../components/HeadBar.vue';
 import Snackbar from '../components/Snackbar.vue';
 import {Project} from '../models/Project';
@@ -147,7 +137,6 @@ import {GenerateResponse} from '../models/GenerateResponse';
 
 export default Vue.extend({
   components: {
-    HelpDialog,
     HeadBar,
     Snackbar,
     CodeMirror,
@@ -186,7 +175,6 @@ export default Vue.extend({
   },
   data: function () {
     return {
-      openHelp: false,
       generatedFiles: Array<GeneratedFile>(),
       initialProject: {id: -1, ownerId: -1, name: 'My Project', json: '{}'},
       undoStack: new UndoStack(),
