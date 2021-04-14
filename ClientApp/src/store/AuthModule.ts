@@ -23,12 +23,12 @@ export default {
       state.jwt = jwt
       try {
         if (jwt) {
-          localStorage.setItem("jwt", jwt);
+          localStorage.setItem('jwt', jwt);
         } else {
-          localStorage.removeItem("jwt");
+          localStorage.removeItem('jwt');
         }
       } catch {
-        console.log("Local storage is not available.")
+        console.log('Local storage is not available.')
       }
     },
     setUser: function(state: AuthState, user: User) {
@@ -56,7 +56,7 @@ export default {
     updateProfile: async function (context: Context, user: User): Promise<ProfileResponse> {
       const response  = await api.updateProfile(user, context.state.jwt);
       if (response.success)
-        context.commit("setUser", user);
+        context.commit('setUser', user);
       return response;
     }
   },

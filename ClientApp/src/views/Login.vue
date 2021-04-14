@@ -52,7 +52,7 @@
 import Vue from 'vue';
 import { required, email, min } from 'vee-validate/dist/rules';
 import { extend, ValidationObserver, ValidationProvider } from 'vee-validate';
-import {LoginError} from '@/models/LoginError';
+import {LoginError} from '../models/LoginError';
 
 extend('required', {
   ...required,
@@ -87,11 +87,11 @@ export default Vue.extend({
     tryLogin: async function () {
       this.$gtag.event('login');
       try {
-        await this.$store.dispatch("login", {
+        await this.$store.dispatch('login', {
           email: this.email,
           password: this.password,
         });
-        await this.$router.push("profile");
+        await this.$router.push('profile');
       } catch (reason) {
         const error: LoginError = reason.response.data;
         if(error.isInactive){
