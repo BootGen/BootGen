@@ -69,15 +69,15 @@
           <template v-slot:heading>
             <div class="d-flex display-1 font-weight-light align-center justify-space-between pa-2">
               <div class="text-break" v-if="activeFile.path && activeFile.path !== ''">
-                <span v-for="(part, i) in activeFile.path.split('/')" :key="i" @click="openFolder(i+1)">
-                  {{ part }}/
+                <span class="pathElement" v-for="(part, i) in activeFile.path.split('/')" :key="i" @click="openFolder(i+1)">
+                  {{ part }} /
                 </span>
-                <span @click="openFolder(activeFile.path.split('/').length)">
+                <span class="pathElement" @click="openFolder(activeFile.path.split('/').length)">
                   {{ activeFile.name }}
                 </span>
               </div>
               <div v-else>
-                <span @click="openFolder(0)">
+                <span class="pathElement" @click="openFolder(0)">
                   {{ activeFile.name }}
                 </span>
               </div>
@@ -429,5 +429,11 @@ export default Vue.extend({
     border-radius: 3px;
     word-wrap: break-word!important;
     z-index: 1;
+  }
+  .pathElement{
+    cursor: pointer!important;
+  }
+  .pathElement:hover{
+    opacity: 0.6;
   }
 </style>
