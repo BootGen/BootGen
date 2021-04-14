@@ -1,0 +1,39 @@
+name: Test
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 5.0.x
+        lfs: true
+    - name: Use Node.js 14.16.1
+      uses: actions/setup-node@v2
+      with:
+        node-version: 14.16.1
+    - name: Checkout LFS objects
+      run: git lfs pull
+    - name: Install dependencies (nuget)
+      run: dotnet restore
+    - name: Build Server
+      run: dotnet build
+    - name: Start Server
+      run: dotnet Editor.dll &
+      working-directory: ./bin/Debug/net5.0
+    - name: Install dependencies (npm)
+      run: npm ci
+      working-directory: ./ClientApp
+    - name: Test
+      run: npm run test:ci
+      working-directory: ./ClientApp
