@@ -9,9 +9,9 @@
         v-if="avatar"
         size="128"
         class="mx-auto v-card--material__avatar elevation-6"
-        color="grey"
+        color="primary"
       >
-        <v-img :src="avatar" />
+        <span class="white--text headline">{{ avatar.match(/(\b\S)?/g).join("").toUpperCase() }}</span>
       </v-avatar>
 
       <v-sheet
