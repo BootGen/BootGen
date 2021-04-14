@@ -98,7 +98,6 @@ const api = {
   },
   download: async function(request: GenerateRequest): Promise<void> {
     const response = await axios.post('generate/download', request, {responseType: 'blob'});
-    console.log(response);
     const fileURL = window.URL.createObjectURL(new Blob([response.data]));
     const fileLink = document.createElement('a');
     fileLink.href = fileURL;

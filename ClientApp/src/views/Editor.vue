@@ -219,7 +219,6 @@ export default Vue.extend({
     },
     generate: async function(){
       if(!this.generateLoading){
-        console.log(new Error().stack);
         this.generateLoading = true;
         const generateResult: GenerateResponse = await api.generate({data: this.activeProject.json, nameSpace: this.toCamelCase(this.activeProject.name)});
         if(generateResult.errorMessage){
