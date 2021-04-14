@@ -10,11 +10,12 @@
   },
   "dependencies": {
     "axios": "^0.21.1",
+    "core-js": "^3.6.5",
     "crc_32_ts": "^1.0.13",
     "vee-validate": "^3.4.5",
     "vue": "^2.6.11",
     "vue-codemirror": "^4.0.6",
-    "vue-gtag": "^1.11.0",
+    "vue-gtag": "^1.14.0",
     "vue-router": "^3.5.1",
     "vuetify": "^2.4.9",
     "vuex": "^3.6.2"
