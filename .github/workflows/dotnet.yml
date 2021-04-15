@@ -26,6 +26,9 @@ jobs:
       run: dotnet restore
     - name: Build Server
       run: dotnet build
+    - name: Configure Server
+      run: cp appsettings.Development.json appsettings.json
+      working-directory: ./bin/Debug/net5.0
     - name: Start Server
       run: dotnet Editor.dll &
       working-directory: ./bin/Debug/net5.0
