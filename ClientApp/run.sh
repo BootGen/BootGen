@@ -1,3 +1,3 @@
 #!/bin/bash
 cd ../bin/Debug/net5.0
-dotnet Editor.dll
+timeout 3m dotnet Editor.dll
