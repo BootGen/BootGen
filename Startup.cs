@@ -63,7 +63,14 @@ namespace Editor
             services.AddScoped<IGenerateService, GenerateService>();
             services.AddScoped<IProjectsService, ProjectsService>();
             services.AddScoped<IErrorService, ErrorService>();
-            services.AddDbContext<ApplicationDbContext>(options => options.UseSqlite(Configuration.GetConnectionString("SQLite")));
+            if (Configuration["DataBaseType"] == "MySQL")
+            {
+                services.AddDbContext<ApplicationDbContext>(options => options.UseMySql(Configuration.GetConnectionString("MySQL"), ServerVersion.FromString(Configuration["DataBaseVersion"])));
+            }
+            else
+            {
+                services.AddDbContext<ApplicationDbContext>(options => options.UseSqlite(Configuration.GetConnectionString("SQLite")));
+            }
             services.AddSingleton(Configuration);
         }
 
