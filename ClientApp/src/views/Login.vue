@@ -18,6 +18,7 @@
                     <v-col cols="12" class="text-center">
                       <ValidationProvider v-slot="{ errors }" name="email" rules="required|email">
                       <v-text-field
+                        name="email"
                         label="E-mail"
                         v-model="email"
                         :error-messages="errors"
@@ -26,6 +27,7 @@
                       </ValidationProvider>
                       <ValidationProvider v-slot="{ errors }" name="password" rules="required">
                         <v-text-field
+                          name="password"
                           label="Password"
                           v-model="password"
                           :error-messages="errors"
