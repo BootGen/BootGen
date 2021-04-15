@@ -29,12 +29,11 @@ jobs:
     - name: Configure Server
       run: cp appsettings.Development.json appsettings.json
       working-directory: ./bin/Debug/net5.0
-    - name: Start Server
-      run: dotnet Editor.dll &
-      working-directory: ./bin/Debug/net5.0
+    - name: Build DB
+      run: chmod +x resetdb.sh ; ./resetdb.sh ; cp editor.db bin/Debug/net5.0/editor.db
     - name: Install dependencies (npm)
       run: npm ci
       working-directory: ./ClientApp
     - name: Test
-      run: npm run test:ci
+      run: chmod +x run.sh ; bash run.sh & npm run test:e2e
       working-directory: ./ClientApp
