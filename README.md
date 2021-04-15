@@ -1,4 +1,4 @@
-# BootGen Editor [![Build Status](https://github.com/BootGen/Editor/workflows/Test/badge.svg?branch=develop)](https://github.com/BootGen/BootGen/actions)
+# BootGen Editor
 
 Online rapid prototyping tool for ASP.Net and Vue.js projects. Turn JSON into well coded application!
 
