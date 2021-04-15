@@ -147,6 +147,7 @@ export default Vue.extend({
     if(this.$store.state.projects.lastProject.json){
       this.activeProject = {...this.$store.state.projects.lastProject};
       this.generatedFiles = [...this.$store.state.projects.lastGeneratedFiles];
+      this.callPrettyPrint();
       this.setActiveFile();
     }else{
       this.activeProject = {...this.initialProject};

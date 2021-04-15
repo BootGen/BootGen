@@ -40,12 +40,11 @@ export function formatJson(json: string): string{
   json = json.replaceAll(/\s/g,'');
   json = json.replaceAll('//','//\n');
   json = json.replaceAll('{','{\n');
-  json = json.replaceAll('}','}\n');
+  json = json.replaceAll('}','\n}');
   json = json.replaceAll('[','[\n');
-  json = json.replaceAll(']',']\n');
+  json = json.replaceAll(']','\n]');
   json = json.replaceAll(',',',\n');
   json = json.replaceAll(':',': ');
-  json = json.replaceAll('"}','"\n}');
   return json;
 }
 function indentLines(lines: string[]): string[]{
