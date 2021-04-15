@@ -51,7 +51,7 @@
       <v-col cols="12" md="4">
         <base-material-card
           class="v-card-profile"
-          :avatar="$store.state.auth.user.userName"
+          :avatar="true"
         >
           <v-card-text class="text-center">
             <h4 class="display-2 font-weight-light mb-3 black--text">

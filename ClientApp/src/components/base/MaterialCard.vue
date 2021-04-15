@@ -9,9 +9,14 @@
         v-if="avatar"
         size="128"
         class="mx-auto v-card--material__avatar elevation-6"
-        color="primary"
+        color="#9090f9"
       >
-        <span class="white--text headline">{{ avatar.match(/(\b\S)?/g).join("").toUpperCase() }}</span>
+        <v-img
+          max-height="128"
+          max-width="128"
+          src="@/assets/img/user.png"
+          alt="avatar"
+        ></v-img>
       </v-avatar>
 
       <v-sheet
@@ -92,8 +97,8 @@
 
     props: {
       avatar: {
-        type: String,
-        default: '',
+        type: Boolean,
+        default: false,
       },
       color: {
         type: String,
