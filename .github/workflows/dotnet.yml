@@ -30,7 +30,7 @@ jobs:
       run: cp appsettings.Development.json appsettings.json
       working-directory: ./bin/Debug/net5.0
     - name: Install dotnet-ef
-      run: dotnet tool uninstall --global dotnet-ef
+      run: dotnet tool install --global dotnet-ef
     - name: Build DB
       run: chmod +x resetdb.sh ; ./resetdb.sh ; cp editor.db bin/Debug/net5.0/editor.db
     - name: Install dependencies (npm)
