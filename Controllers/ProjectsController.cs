@@ -1,10 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
 using Editor.Services;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Editor.Controllers
 {
     [ApiController]
     [Route("/projects")]
+    [Authorize]
     public class ProjectsController : BaseController
     {
         private IProjectsService service;
