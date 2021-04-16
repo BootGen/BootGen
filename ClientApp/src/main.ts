@@ -32,8 +32,13 @@ new Vue({
   vuetify,
   mounted: async function () {
     if (store.state.auth.jwt) {
-      await this.$store.dispatch('profile');
-      await this.$store.dispatch('projects/getProjects');
+      try {
+        await this.$store.dispatch('profile');
+        await this.$store.dispatch('projects/getProjects');
+      } catch {
+        this.$store.commit('setJwt', null);
+        await this.$router.push('/login');
+      }
     }
   },
   data: function () {

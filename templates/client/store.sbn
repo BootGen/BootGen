@@ -8,7 +8,7 @@ import {{camel_case class.name}}Module, { {{class.name.plural}}State } from '@/s
 
 Vue.use(Vuex)
 
-axios.defaults.baseURL = "{{base_url}}"
+axios.defaults.baseURL = '{{base_url}}'
 
 export interface State {
   auth: AuthState;
