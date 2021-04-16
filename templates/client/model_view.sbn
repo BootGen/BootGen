@@ -21,8 +21,8 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { {{ class.name }} } from "../models/{{ class.name }}";
+import Vue from 'vue';
+import { {{ class.name }} } from '../models/{{ class.name }}';
 
 export default Vue.extend({
   props: {

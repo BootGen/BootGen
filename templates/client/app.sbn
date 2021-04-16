@@ -44,32 +44,32 @@ export default {
     items: function () {
       if (this.$store.state.auth.jwt) {
         return [
-          { title: "Profile", link: "/profile", icon: "mdi-account-outline" },
+          { title: 'Profile', link: '/profile', icon: 'mdi-account-outline' },
           {
-            title: "Edit Profile",
-            link: "/edit-profile",
-            icon: "mdi-account-edit-outline",
+            title: 'Edit Profile',
+            link: '/edit-profile',
+            icon: 'mdi-account-edit-outline',
           },
           {
-            title: "Change Password",
-            link: "/change-password",
-            icon: "mdi-form-textbox-password",
+            title: 'Change Password',
+            link: '/change-password',
+            icon: 'mdi-form-textbox-password',
           },
-          { title: "Logout", link: "/logout", icon: "mdi-account-arrow-right-outline" }{{ for class in classes }},
+          { title: 'Logout', link: '/logout', icon: 'mdi-account-arrow-right-outline' }{{ for class in classes }},
           {
-            title: "{{ class.name.plural }}",
-            link: "/{{ camel_case class.name.plural }}",
-            icon: "mdi-format-list-text",
+            title: '{{ class.name.plural }}',
+            link: '/{{ camel_case class.name.plural }}',
+            icon: 'mdi-format-list-text',
           }
           {{~ end ~}}
         ];
       } else {
         return [
-          { title: "Login", link: "/", icon: "mdi-account-arrow-left-outline" },
+          { title: 'Login', link: '/', icon: 'mdi-account-arrow-left-outline' },
           {
-            title: "Sign Up",
-            link: "sign-up",
-            icon: "mdi-account-plus-outline",
+            title: 'Sign Up',
+            link: 'sign-up',
+            icon: 'mdi-account-plus-outline',
           },
         ];
       }
