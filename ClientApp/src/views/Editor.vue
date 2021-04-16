@@ -60,7 +60,7 @@
               </div>
             </div>
           </template>
-          <code-mirror cmId="cm0" v-model="activeProject.json" mode="json" :readOnly="false" :linesToColor="cm0LinesToColor" @cursor-into-view="closeDrawer" @change-json="removeErrors"></code-mirror>
+          <code-mirror cmId="cm0" v-model="activeProject.json" mode="json" :readOnly="false" :linesToColor="jsonErrors" @cursor-into-view="closeDrawer" @change-json="removeErrors"></code-mirror>
         </base-material-generator-card>
       </v-col>
 
@@ -123,7 +123,7 @@
               </div>
             </div>
           </template>
-          <code-mirror cmId="cm1" :value="activeFile.content" :mode="getMode()" :readOnly="true" :linesToColor="cm1LinesToColor" @cursor-into-view="closeDrawer"></code-mirror>
+          <code-mirror cmId="cm1" :value="activeFile.content" :mode="getMode()" :readOnly="true" :linesToColor="highlightedDifferences" @cursor-into-view="closeDrawer"></code-mirror>
         </base-material-generator-card>
       </v-col>
     </v-row>
@@ -202,8 +202,8 @@ export default Vue.extend({
         text: '',
         timeout: 5000,
       },
-      cm0LinesToColor: Array<{line: number; color: string}>(),
-      cm1LinesToColor: Array<{line: number; color: string}>(),
+      jsonErrors: Array<{line: number; color: string}>(),
+      highlightedDifferences: Array<{line: number; color: string}>(),
       drawer: false,
       openPath: '',
       generateLoading: false,
@@ -221,7 +221,7 @@ export default Vue.extend({
       }
     },
     removeErrors: function(){
-      this.cm0LinesToColor = [];
+      this.jsonErrors = [];
       this.hideSnackbar();
     },
     generate: async function(){
@@ -231,7 +231,7 @@ export default Vue.extend({
         if(generateResult.errorMessage){
           this.setSnackbar('orange darken-2', generateResult.errorMessage, -1);
           if(generateResult.errorLine !== null){
-            this.cm0LinesToColor.push({line: generateResult.errorLine-1, color: 'red'});
+            this.jsonErrors.push({line: generateResult.errorLine-1, color: 'red'});
           }
           this.generateLoading = false;
           return;
@@ -249,22 +249,22 @@ export default Vue.extend({
           this.undoStack.push(this.activeProject.json);
         }
         this.setActiveFile();
-        this.setCm1LinesToColor();
+        this.setHighlightedDifferences();
         this.generateLoading = false;
       }
     },
     setCompare: function(){
       if(this.isCompare){
         this.isCompare = false;
-        this.cm1LinesToColor = [];
+        this.highlightedDifferences = [];
       }else{
         this.isCompare = true;
-        this.setCm1LinesToColor();
+        this.setHighlightedDifferences();
       }
     },
-    setCm1LinesToColor: function(){
+    setHighlightedDifferences: function(){
       if(this.previousFiles.length > 0 && this.isCompare){
-        this.cm1LinesToColor = [];
+        this.highlightedDifferences = [];
         for(let i = 0; i < this.previousFiles.length; i++){
           if(this.previousFiles[i].name === this.activeFile.name && this.previousFiles[i].path === this.activeFile.path){
             this.getChanges(this.previousFiles[i].content, this.activeFile.content);
@@ -293,7 +293,7 @@ export default Vue.extend({
       const mapping = this.compare(lines1, lines2);
       lines2.forEach((line, idx) => {
         if (mapping[idx] === undefined){
-          this.cm1LinesToColor.push({line: idx, color: '#412fb3'});
+          this.highlightedDifferences.push({line: idx, color: '#412fb3'});
         }
       });
     },
@@ -319,13 +319,13 @@ export default Vue.extend({
           }
         }
       }
-      this.setCm1LinesToColor();
+      this.setHighlightedDifferences();
     },
     callPrettyPrint: function(){
       this.$gtag.event('pretty-print');
       const result = validateJson(this.activeProject.json);
       if (result.error) {
-        this.cm0LinesToColor.push({line: result.line, color: 'red'});
+        this.jsonErrors.push({line: result.line, color: 'red'});
         this.setSnackbar('orange darken-2', result.message, -1);
       }
       this.activeProject.json = prettyPrint(this.activeProject.json);
@@ -335,12 +335,12 @@ export default Vue.extend({
       this.$gtag.event('create-new-project');
       this.activeProject = {...this.initialProject};
       this.undoStack.clear();
-      this.cm1LinesToColor = [];
+      this.highlightedDifferences = [];
       await this.generate();
     },
     validateAndGenerate: async function() {
       this.$gtag.event('generate');
-      this.cm0LinesToColor = [];
+      this.jsonErrors = [];
       const result = validateJson(this.activeProject.json);
       if(!result.error) {
         this.hideSnackbar();
@@ -352,7 +352,7 @@ export default Vue.extend({
         }
         await this.generate();
       } else {
-        this.cm0LinesToColor.push({line: result.line, color: 'red'});
+        this.jsonErrors.push({line: result.line, color: 'red'});
         this.setSnackbar('orange darken-2', result.message, -1);
       }
     },
@@ -434,7 +434,7 @@ export default Vue.extend({
       this.$gtag.event('select-file');
       this.activeFile = data;
       this.closeDrawer();
-      this.setCm1LinesToColor();
+      this.setHighlightedDifferences();
     },
     setDrawer: function(){
       this.$gtag.event('set-drawer');
