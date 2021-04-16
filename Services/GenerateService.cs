@@ -24,7 +24,7 @@ namespace Editor.Services
             {
                 var virtualDisk = new VirtualDisk();
                 BootGen.Project project = InitProject(request, virtualDisk);
-                project.GenerateFiles(request.NameSpace, request.NameSpace, "http://localhost:5000");
+                project.GenerateFiles(request.NameSpace, "http://localhost:5000");
                 var files = new List<GeneratedFile>();
                 foreach (var file in virtualDisk.Files)
                 {
@@ -112,7 +112,7 @@ namespace Editor.Services
             ReplaceNamespace(tempDir, request.NameSpace);
             var disk = new Disk(tempDir);
             BootGen.Project project = InitProject(request, disk);
-            project.GenerateFiles(request.NameSpace, request.NameSpace, "http://localhost:5000");
+            project.GenerateFiles(request.NameSpace, "http://localhost:5000");
             ZipFile.CreateFromDirectory(tempDir, tempFile);
             var reader = new BinaryReader(File.Open(tempFile, FileMode.Open));
             const int bufferSize = 4096;
