@@ -60,13 +60,18 @@ export default Vue.extend({
     },
     linesToColor: {
       handler(linesToColor: {line: number; color: string}[]) {
-        if(linesToColor.length < 1){
+        if(linesToColor.length === 0){
           this.unsetHighlight();
         }else{
           this.highlight();
         }
       }
     }
+  },
+  updated: function() {
+      this.unsetHighlight();
+      this.setMinMaxLine();
+      this.highlight();
   },
   created: function(){
     this.cmOptions.readOnly = this.readOnly;
