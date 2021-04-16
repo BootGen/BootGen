@@ -42,7 +42,7 @@ namespace Editor.Services
             return new LoginResponse
             {
                 Success = false,
-                WrongCreditentials = true
+                WrongCredentials = true
             };
         }
 

@@ -20,7 +20,7 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import Vue from 'vue';
 
 export default Vue.extend({
   data: function () {
@@ -41,7 +41,7 @@ export default Vue.extend({
     }
   },
   created: function(){
-    if(localStorage.cookiesAccepted === "false"){
+    if(localStorage.cookiesAccepted === 'false'){
       this.cookiesAccepted = false;
     }else{
       localStorage.cookiesAccepted = true;

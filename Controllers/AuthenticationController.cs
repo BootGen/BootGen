@@ -32,7 +32,7 @@ namespace Editor.Controllers
             var error = new LoginError
             {
                 IsInactive = response.IsInactive,
-                WrongCreditentials = response.WrongCreditentials
+                WrongCredentials = response.WrongCredentials
             };
             return new ObjectResult(error) { StatusCode = 401 };
         }

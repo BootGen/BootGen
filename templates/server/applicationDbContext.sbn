@@ -9,7 +9,9 @@ namespace {{ name_space }}
     public class ApplicationDbContext : DbContext
     {
         {{~ for class in classes ~}}
+        {{~ if !class.is_pivot ~}}
         public DbSet<{{ class.name }}> {{ class.name.plural }} { get; set; }
+        {{~ end ~}}
         {{~ end ~}}
         
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
@@ -20,6 +22,24 @@ namespace {{ name_space }}
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             {{~ for class in classes ~}}
+            {{~ if class.is_pivot ~}}
+            modelBuilder.Entity<{{ (first_reference class).class.name }}>()
+            .HasMany(p => p.{{ (second_reference class).class.name.plural }})
+            .WithMany(p => p.{{ (first_reference class).class.name.plural }})
+            .UsingEntity(j =>
+                {
+                    {{~ for item in seedList ~}}
+                    {{~ if item.is_pivot && item.name == class.name ~}}
+                    j.HasData(new {
+                        {{~ for kvp in item.values ~}}
+                        {{ kvp.key }} = {{ kvp.value }}{{ if !for.last}},{{ end }}
+                        {{~ end ~}}
+                    });
+                    {{~ end ~}}
+                    {{~ end ~}}
+                }
+            );
+            {{~ else ~}}
             {{~ for property in class.properties ~}}
             {{~ if property.class && !property.is_collection ~}}
             modelBuilder.Entity<{{ class.name }}>()
@@ -27,6 +47,7 @@ namespace {{ name_space }}
                 .WithMany({{ if property.mirror_property }}p => p.{{ property.mirror_property.name }}{{ end }})
                 .HasForeignKey(p => p.{{ property.name }}Id);
 
+            {{~ end ~}}
             {{~ end ~}}
             {{~ end ~}}
             {{~ end ~}}
@@ -44,7 +65,7 @@ namespace {{ name_space }}
             user{{idx}}.PasswordHash = passwordHasher.HashPassword(user{{idx}}, "password123");
             modelBuilder.Entity<User>().HasData(user{{idx}});
             {{~ idx = idx + 1 ~}}
-            {{~ else ~}}
+            {{~ else if !item.is_pivot ~}}
             modelBuilder.Entity<{{item.name}}>().HasData(new {{item.name}} {
                 {{~ for kvp in item.values ~}}
                 {{ kvp.key }} = {{ kvp.value }}{{ if !for.last}},{{ end }}

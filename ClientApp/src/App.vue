@@ -77,7 +77,7 @@
 
 <script>
 import { mapState } from 'vuex'
-import Snackbar from "./components/Snackbar.vue";
+import Snackbar from './components/Snackbar.vue';
 
 export default {
   data: () => ({
@@ -85,13 +85,13 @@ export default {
     snackbar: {
       dismissible: false,
       visible: true,
-      type: "third",
-      icon: "mdi-cookie-alert",
-      text: "We use cookies to improve your experience on our website.",
+      type: 'third',
+      icon: 'mdi-cookie-alert',
+      text: 'We use cookies to improve your experience on our website.',
       timeout: -1,
       buttons: [
-        {name: "accept", color: "secondary"},
-        {name: "customize", color: "secondary"}
+        {name: 'accept', color: 'secondary'},
+        {name: 'customize', color: 'secondary'}
       ]
     },
     cookieConsentAnswered: false,
@@ -118,23 +118,26 @@ export default {
     items: function () {
       if (this.$store.state.auth.jwt) {
         return [
-          { title: "Editor", link: "/", icon: "mdi-cog" },
-          { title: "Profile", link: "/profile", icon: "mdi-account" },
+          { title: 'Editor', link: '/', icon: 'mdi-cog' },
+          { title: 'Saved Projects', link: '/saved-projects', icon: 'mdi-file-multiple' },
+          { title: 'Getting Started', link: '/getting-started', icon: 'mdi-help' },
+          { title: 'Profile', link: '/profile', icon: 'mdi-account' },
           {
-            title: "Change Password",
-            link: "/change-password",
-            icon: "mdi-form-textbox-password",
+            title: 'Change Password',
+            link: '/change-password',
+            icon: 'mdi-form-textbox-password',
           },
-          { title: "Logout", link: "/logout", icon: "mdi-account-arrow-right" }
+          { title: 'Logout', link: '/logout', icon: 'mdi-account-arrow-right' }
         ];
       } else {
         return [
-          { title: "Editor", link: "/", icon: "mdi-cog" },
-          { title: "Login", link: "/login", icon: "mdi-account-arrow-left" },
+          { title: 'Editor', link: '/', icon: 'mdi-cog' },
+          { title: 'Getting Started', link: '/getting-started', icon: 'mdi-help' },
+          { title: 'Login', link: '/login', icon: 'mdi-account-arrow-left' },
           {
-            title: "Sign Up",
-            link: "sign-up",
-            icon: "mdi-account-plus",
+            title: 'Sign Up',
+            link: 'sign-up',
+            icon: 'mdi-account-plus',
           }
         ];
       }

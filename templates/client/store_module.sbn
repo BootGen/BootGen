@@ -1,19 +1,11 @@
-import axios from 'axios'
 import { ActionContext } from 'vuex';
-import { config, findById, findObjectsById, patchArray, setArray, setItem } from './util';
+import { findById, patchArray, setArray, setItem } from './util';
 import { State } from '.';
 import { {{resource.class.name}} } from '@/models/{{resource.class.name}}'
 {{~ for r in resource.alternate_resources ~}}
 import { {{r.parent_resource.class.name}} } from '@/models/{{r.parent_resource.class.name}}'
 {{~ end ~}}
-
-export function {{ camel_case resource.class.name }}ToDto({{ camel_case resource.class.name }}: {{ resource.class.name }}): {{ resource.class.name }} {
-  return {
-    {{~ for property in resource.class.common_properties~}}
-    {{ camel_case property.name }}: {{ camel_case resource.class.name }}.{{ camel_case property.name }},
-    {{~ end ~}}
-  };
-}
+import api from "../api"
 
 export interface {{resource.class.name}}sState {
   items: Array<{{resource.class.name}}>;
@@ -45,121 +37,53 @@ export default {
     }
   },
   actions: {
-    {{ get_list_function_name resource }}: function(context: Context): Promise<Array<{{resource.class.name}}>> {
-      return new Promise((resolve, reject) => {
-        axios.get({{path_template resource}}, config(context.rootState.auth.jwt)).then(response => {
-          context.commit("set{{ resource.name.plural }}", response.data);
-          resolve(context.state.items);
-        }).catch(reason => {
-          reject(reason);
-        })
-      })
+    get{{ resource.name.plural }}: async function(context: Context): Promise<Array<{{resource.class.name}}>> {
+      const {{ camel_case resource.name.plural }} = await api.get{{ resource.name.plural }}(context.rootState.auth.jwt);
+      context.commit("set{{ resource.name.plural }}", {{ camel_case resource.name.plural }});
+      return context.state.items;
     },
-    {{ get_item_function_name resource }}: function(context: Context, id: number): Promise<{{resource.class.name}}> {
-      return new Promise((resolve, reject) => {
-        axios.get({{get_item_path_template resource}}, config(context.rootState.auth.jwt)).then(response => {
-          context.commit("set{{resource.name}}", response.data);
-          const savedItem = findById<{{resource.class.name}}>(context.state.items, response.data.id);
-          if (savedItem)
-            resolve(savedItem);
-        }).catch(reason => {
-          reject(reason);
-        })
-      })
+    get{{ resource.name }}: async function(context: Context, id: number): Promise<{{resource.class.name}}> {
+      const {{ camel_case resource.name }} = await api.get{{ resource.name }}(id, context.rootState.auth.jwt);
+      context.commit("set{{resource.name}}", {{ camel_case resource.name }});
+      return findById<{{resource.class.name}}>(context.state.items, {{ camel_case resource.name }}.id) as {{resource.class.name}};
     },
     {{~ if !resource.is_readonly ~}}
-    {{ add_function_name resource }}: function(context: Context, {{ camel_case resource.name}}: {{ resource.class.name}}): Promise<{{resource.class.name}}> {
-      return new Promise((resolve, reject) => {
-        axios.post({{path_template resource}}, {{ camel_case resource.class.name}}ToDto({{ camel_case resource.name}}), config(context.rootState.auth.jwt)).then(response => {
-          context.commit("set{{ resource.name }}", response.data);
-          const savedItem = findById<{{resource.class.name}}>(context.state.items, response.data.id);
-          if (savedItem)
-            resolve(savedItem);
-        }).catch(reason => {
-          reject(reason);
-        })
-      })
+    add{{ resource.name }}: async function(context: Context, {{ camel_case resource.name}}: {{ resource.class.name}}): Promise<{{resource.class.name}}> {
+      {{ camel_case resource.name }} = await api.add{{ resource.name }}({{ camel_case resource.name}}, context.rootState.auth.jwt);
+      context.commit("set{{ resource.name }}", {{ camel_case resource.name }});
+      return findById<{{resource.class.name}}>(context.state.items, {{ camel_case resource.name }}.id) as {{resource.class.name}};
     },
-    {{ update_function_name resource }}: function(context: Context, {{ camel_case resource.name}}: {{ resource.class.name}}): Promise<{{resource.class.name}}> {
-      return new Promise((resolve, reject) => {
-        axios.put({{item_path_template resource}}, {{ camel_case resource.class.name}}ToDto({{ camel_case resource.name}}), config(context.rootState.auth.jwt)).then(response => {
-          context.commit("set{{resource.name}}", response.data);
-          const savedItem = findById<{{resource.class.name}}>(context.state.items, response.data.id);
-          if (savedItem)
-            resolve(savedItem);
-        }).catch(reason => {
-          reject(reason);
-        })
-      })
+    update{{ resource.name }}: async function(context: Context, {{ camel_case resource.name}}: {{ resource.class.name}}): Promise<{{resource.class.name}}> {
+      {{ camel_case resource.name }} = await api.update{{ resource.name }}({{ camel_case resource.name}}, context.rootState.auth.jwt);
+      context.commit("set{{ resource.name }}", {{ camel_case resource.name }});
+      return findById<{{resource.class.name}}>(context.state.items, {{ camel_case resource.name }}.id) as {{resource.class.name}};
     },
-    {{ delete_function_name resource }}: function(context: Context, {{ camel_case resource.name}}: {{ resource.class.name}}): Promise<void> {
+    delete{{ resource.name }}: async function(context: Context, {{ camel_case resource.name}}: {{ resource.class.name}}): Promise<void> {
       context.commit("set{{ resource.name.plural }}", context.state.items.filter((i: {{ resource.class.name}}) => i !== {{ camel_case resource.name}}));
-
-      return new Promise((resolve, reject) => {
-        axios.delete({{item_path_template resource}}, config(context.rootState.auth.jwt)).then(() => {
-          resolve()
-        }).catch(reason => {
-          reject(reason);
-        })
-      })
+      await api.delete{{ resource.name }}({{ camel_case resource.name}}, context.rootState.auth.jwt);
     },
     {{~ end ~}}
     {{~ for alternate in resource.alternate_resources
     parent = alternate.parent_resource
     ~}}
-    {{ get_list_function_name alternate }}: function(context: Context, {{camel_case parent.name}}: {{parent.class.name}}): Promise<Array<{{alternate.class.name}}>> {
-      return new Promise((resolve, reject) => {
-        axios.get({{path_template alternate}}, config(context.rootState.auth.jwt)).then(response => {
-          context.commit("patch{{alternate.name.plural}}", response.data);
-          resolve(findObjectsById(context.state.items, response.data));
-        }).catch(reason => {
-          reject(reason);
-        })
-      })
+    get{{ resource.name.plural }}Of{{ parent.name }}: async function(context: Context, {{camel_case parent.name}}: {{parent.class.name}}): Promise<Array<{{alternate.class.name}}>> {
+      const {{ camel_case resource.name.plural }} = await api.get{{ resource.name.plural }}Of{{ parent.name }}({{camel_case parent.name}}, context.rootState.auth.jwt);
+      context.commit("patch{{alternate.name.plural}}", {{ camel_case resource.name.plural }});
+      return context.state.items;
     },
-    {{~ if !alternate.is_readonly ~}}
-    {{ add_function_name alternate }}: function(context: Context, data: {{resource.class.name}}{{parent.class.name}}Pair): Promise<{{alternate.class.name}}> {
-      const {{camel_case resource.name}}: {{resource.class.name}} = data.{{camel_case resource.name}};
+    add{{ resource.name }}To{{ parent.name }}: async function(context: Context, data: {{resource.class.name}}{{parent.class.name}}Pair): Promise<{{alternate.class.name}}> {
+      let {{camel_case resource.name}}: {{resource.class.name}} = data.{{camel_case resource.name}};
       const {{camel_case parent.name}}: {{parent.class.name}} = data.{{camel_case parent.name}};
-      return new Promise((resolve, reject) => {
-        axios.post({{path_template alternate}}, {{ camel_case resource.class.name}}ToDto({{ camel_case resource.name}}), config(context.rootState.auth.jwt)).then(response => {
-          context.commit("set{{ resource.name }}", response.data);
-          const savedItem = findById<{{resource.class.name}}>(context.state.items, response.data.id);
-          if (savedItem)
-            resolve(savedItem);
-        }).catch(reason => {
-          reject(reason);
-        })
-      })
+      {{ camel_case resource.name }} = await api.add{{ resource.name }}To{{ parent.name }}({{ camel_case resource.name}}, {{camel_case parent.name}}, context.rootState.auth.jwt);
+      context.commit("set{{ resource.name }}", {{ camel_case resource.name }});
+      return findById<{{resource.class.name}}>(context.state.items, {{ camel_case resource.name }}.id) as {{resource.class.name}};
     },
-    {{~ if !alternate.pivot ~}}
-    {{ update_function_name alternate }}: function(context: Context, data: {{resource.class.name}}{{parent.class.name}}Pair): Promise<{{alternate.class.name}}> {
-      const {{camel_case alternate.name}}: {{alternate.class.name}} = data.{{camel_case alternate.name}};
-      const {{camel_case parent.name}}: {{parent.class.name}} = data.{{camel_case parent.name}};
-      return new Promise((resolve, reject) => {
-        axios.put({{item_path_template alternate}}, {{ camel_case alternate.class.name}}ToDto({{ camel_case alternate.name}}), config(context.rootState.auth.jwt)).then(response => {
-          context.commit("set{{alternate.name}}", response.data);
-          const savedItem = findById<{{resource.class.name}}>(context.state.items, response.data.id);
-          if (savedItem)
-            resolve(savedItem);
-        }).catch(reason => {
-          reject(reason);
-        })
-      })
-    },
-    {{~ end ~}}
-    {{ delete_function_name alternate }}: function(context: Context, data: {{resource.class.name}}{{parent.class.name}}Pair): Promise<void> {
+    {{~ if alternate.pivot ~}}
+    delete{{ resource.name }}Of{{ parent.name }}: async function(context: Context, data: {{resource.class.name}}{{parent.class.name}}Pair): Promise<void> {
       const {{camel_case alternate.name}}: {{alternate.class.name}} = data.{{camel_case alternate.name}};
       const {{camel_case parent.name}}: {{parent.class.name}} = data.{{camel_case parent.name}};
       context.commit("set{{ alternate.name.plural }}", context.state.items.filter((i: {{ resource.class.name}}) => i !== {{ camel_case alternate.name}}));
-
-      return new Promise((resolve, reject) => {
-        axios.delete({{item_path_template alternate}}, config(context.rootState.auth.jwt)).then(() => {
-          resolve()
-        }).catch(reason => {
-          reject(reason);
-        })
-      })
+      await api.delete{{ resource.name }}Of{{ parent.name }}({{ camel_case resource.name}}, {{camel_case parent.name}}, context.rootState.auth.jwt);
     },
     {{~ end ~}}
     {{~ end ~}}

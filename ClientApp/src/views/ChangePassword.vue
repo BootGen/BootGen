@@ -94,27 +94,27 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { required, min } from "vee-validate/dist/rules";
-import { extend, ValidationObserver, ValidationProvider } from "vee-validate";
-import api from "@/api";
+import Vue from 'vue';
+import { required, min } from 'vee-validate/dist/rules';
+import { extend, ValidationObserver, ValidationProvider } from 'vee-validate';
+import api from '@/api';
 
-extend("required", {
+extend('required', {
   ...required,
-  message: "{_field_} can not be empty",
+  message: '{_field_} can not be empty',
 });
 
-extend("min", {
+extend('min', {
   ...min,
-  message: "{_field_} may not be less than {length} characters",
+  message: '{_field_} may not be less than {length} characters',
 });
 
-extend("password", {
-  params: ["target"],
+extend('password', {
+  params: ['target'],
   validate(value, { target }: any) {
     return value === target;
   },
-  message: "Password confirmation does not match",
+  message: 'Password confirmation does not match',
 });
 
 export default Vue.extend({
@@ -125,26 +125,26 @@ export default Vue.extend({
   data: function () {
     return {
       dialog: false,
-      oldPassword: "",
-      newPassword: "",
-      confirmPassword: "",
-      errorMsg: "",
-      successMsg: ""
+      oldPassword: '',
+      newPassword: '',
+      confirmPassword: '',
+      errorMsg: '',
+      successMsg: ''
     };
   },
   methods: {
     savePassword: async function () {
       this.$gtag.event('change-password');
-      this.successMsg = "";
-      this.errorMsg = "";
+      this.successMsg = '';
+      this.errorMsg = '';
       try {
             await api.changePassword({
               oldPassword: this.oldPassword,
               newPassword: this.newPassword,
             }, this.$store.state.auth.jwt);
-            this.successMsg = "Your password is successfuly changed."
+            this.successMsg = 'Your password is successfuly changed.'
       } catch {
-        this.errorMsg = "Wrong password."
+        this.errorMsg = 'Wrong password.'
       }
     }
   },

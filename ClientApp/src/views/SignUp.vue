@@ -9,7 +9,7 @@
               <v-icon class="pa-2">mdi-account-plus</v-icon>
             </div>
           </template>
-          <div v-if="registration" class="d-flex flex-column align-center">
+          <div v-if="registrationComplete" class="d-flex flex-column align-center">
             <v-icon color="green" size="70">mdi-check-circle-outline</v-icon>
             <p class="display-2 text-center">Registration was <span class="green--text">successful.</span></p>
             <p class="display-1 text-center">Thank you for choosing us!</p>
@@ -71,10 +71,10 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import Vue from 'vue';
 import { required, email, min } from 'vee-validate/dist/rules';
 import { extend, ValidationObserver, ValidationProvider } from 'vee-validate';
-import api from "../api"
+import api from '../api'
 extend('required', {
   ...required,
   message: '{_field_} can not be empty',
@@ -105,13 +105,13 @@ export default Vue.extend({
   },
   data: function () {
     return {
-      email: "",
-      password: "",
-      confirmPassword: "",
-      userName: "",
-      newsletter: true,
-      errorMsg: "",
-      registration: false,
+      email: '',
+      password: '',
+      confirmPassword: '',
+      userName: '',
+      newsletter: false,
+      errorMsg: '',
+      registrationComplete: false
     };
   },
   methods: {
@@ -124,19 +124,11 @@ export default Vue.extend({
         password: this.password,
       });
       if(response.isUserNameInUse) {
-        this.errorMsg = "This user name is already in use!";
+        this.errorMsg = 'This user name is already in use!';
       }else if(response.isEmailInUse) {
-        this.errorMsg = "This email is already in use!";
-      }else{
-        this.registration = true;
-        try{
-          await this.$store.dispatch("login", {
-            email: this.email,
-            password: this.password,
-          });
-        }catch(e){
-          this.errorMsg = "";
-        }
+        this.errorMsg = 'This email is already in use!';
+      } else {
+        this.registrationComplete = true;
       }
     },
   },

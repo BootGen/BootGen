@@ -6,14 +6,17 @@ import SignUp from '../views/SignUp.vue'
 import Activation from '../views/Activation.vue'
 import PrivacyStatement from '../views/PrivacyStatement.vue'
 import Editor from '../views/Editor.vue'
+import SavedProjects from '../views/SavedProjects.vue'
+import GettingStarted from '../views/GettingStarted.vue'
 import Profile from '../views/Profile.vue'
 import ChangePassword from '../views/ChangePassword.vue'
 
-import store from "../store/index"
+import store from '../store/index'
+import {NavigationGuardNext, Route} from 'vue-router/types/router';
 
 Vue.use(VueRouter)
 
-const loggedInGuard = (to: any, from: any, next: any) => {
+const loggedInGuard = (to: Route, from: Route, next: NavigationGuardNext) => {
   if(store.state.auth.jwt){
     next();
   }else{
@@ -21,7 +24,7 @@ const loggedInGuard = (to: any, from: any, next: any) => {
   }
 };
 
-const loggedOutGuard = (to: any, from: any, next: any) => {
+const loggedOutGuard = (to: Route, from: Route, next: NavigationGuardNext) => {
   if(store.state.auth.jwt){
     next('/profile');
   }else{
@@ -53,25 +56,36 @@ const loggedOutGuard = (to: any, from: any, next: any) => {
     component: PrivacyStatement
   },
   {
-    path: "/",
-    name: "Editor",
+    path: '/',
+    name: 'Editor',
     component: Editor
   },
   {
-    path: "/profile",
-    name: "Profile",
+    path: '/saved-projects',
+    name: 'Saved Projects',
+    beforeEnter: loggedInGuard,
+    component: SavedProjects
+  },
+  {
+    path: '/getting-started',
+    name: 'Getting Started',
+    component: GettingStarted
+  },
+  {
+    path: '/profile',
+    name: 'Profile',
     beforeEnter: loggedInGuard,
     component: Profile
   },
   {
-    path: "/change-password",
-    name: "Change Password",
+    path: '/change-password',
+    name: 'Change Password',
     beforeEnter: loggedInGuard,
     component: ChangePassword
   },
   {
-    path: "/logout",
-    name: "Logout",
+    path: '/logout',
+    name: 'Logout',
     beforeEnter: loggedInGuard,
     component: Logout
   }

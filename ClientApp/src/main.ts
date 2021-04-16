@@ -3,11 +3,15 @@ import App from './App.vue'
 import router from './router/index'
 import store from './store/index'
 import vuetify from './plugins/vuetify'
-import './plugins/base'
 import './plugins/vee-validate'
 import VueGtag from 'vue-gtag';
 import axios from 'axios'
 import { AppError } from './models/AppError'
+import MaterialCard from './components/base/MaterialCard.vue'
+import MaterialGeneratorCard from './components/base/MaterialGeneratorCard.vue'
+
+Vue.component('base-material-card', MaterialCard)
+Vue.component('base-material-generator-card', MaterialGeneratorCard)
 
 Vue.use(VueGtag, {
   config: {
@@ -42,26 +46,26 @@ new Vue({
 
 
 Vue.config.errorHandler = (error: Error, vm: Vue, info: string) => {
-  const t = error as TypeError;
+  console.error(error);
   const err: AppError = {
-    kind: "Vue",
+    kind: 'Vue',
     type: error?.name,
     stackTrace: error?.stack,
     message: error?.message,
     info: info
   }
-  axios.post("errors/log", err);
+  axios.post('errors/log', err);
 };
 
 window.onerror = function(event: Event | string, source?: string, lineno?: number, colno?: number, error?: Error) {
-  console.log(event, source, lineno, colno, error);
+  console.error(error);
   const err: AppError = {
-    kind: "JavaScript",
+    kind: 'JavaScript',
     type: error?.name,
     lineNumber: lineno,
     columnNumber: colno,
     stackTrace: error?.stack,
     message: error?.message
   }
-  axios.post("errors/log", err);
+  axios.post('errors/log', err);
  };

@@ -4,7 +4,7 @@
       <v-col lg="5" md="6" sm="8" cols="12" class="pa-0 headBar" v-if="$store.state.auth.jwt">
         <head-bar :activeProject="activeProject" @new-project="newProject" @change-project-name="changeProjectName"></head-bar>
       </v-col>
-      <v-col cols="12" class="headBar pl-0 pt-6" v-else>
+      <v-col cols="12" class="pa-0 headBar" v-else>
         <head-bar :activeProject="activeProject" @new-project="newProject" @change-project-name="changeProjectName"></head-bar>
       </v-col>
     </v-row>
@@ -19,19 +19,10 @@
               <div class="icons">
                 <v-tooltip bottom>
                   <template v-slot:activator="{ on, attrs }">
-                    <v-btn class="mr-2" color="white" elevation="1" fab small @click="openHelp = true" v-bind="attrs" v-on="on">
-                      <v-icon color="primary">mdi-help</v-icon>
-                    </v-btn>
-                    </template>
-                  <span>Help</span>
-                </v-tooltip>
-                <help-dialog v-if="openHelp" @close-help="openHelp = false"></help-dialog>
-                <v-tooltip bottom>
-                  <template v-slot:activator="{ on, attrs }">
-                    <v-btn class="mr-2" color="white" elevation="1" fab small @click="undo" v-bind="attrs" v-on="on" :disabled="undoStack.length() < 2 && isPristine">
+                    <v-btn class="mr-2" color="white" elevation="1" fab small @click="undo" v-bind="attrs" v-on="on" :disabled="undoStack.length() < 2 && isJsonPristine">
                       <v-icon color="primary">mdi-undo</v-icon>
                     </v-btn>
-                    </template>
+                  </template>
                   <span>Rollback to the last generated state</span>
                 </v-tooltip>
                 <v-tooltip bottom v-if="$store.state.auth.jwt">
@@ -42,32 +33,23 @@
                     </template>
                   <span>Save</span>
                 </v-tooltip>
-                <v-tooltip bottom v-if="$store.state.auth.jwt">
-                  <template v-slot:activator="{ on, attrs }">
-                    <v-btn class="mr-2" color="white" elevation="1" fab small @click="openExplorer = true" v-bind="attrs" v-on="on">
-                      <v-icon color="primary">mdi-file-multiple</v-icon>
-                    </v-btn>
-                    </template>
-                  <span>Files</span>
-                </v-tooltip>
-                <file-explorer v-if="$store.state.auth.jwt && openExplorer" @select-project="selectProject" @close-explorer="openExplorer = false"></file-explorer>
                 <v-tooltip bottom>
                   <template v-slot:activator="{ on, attrs }">
-                    <v-btn class="mr-2" color="white" elevation="1" fab small :disabled="activeProject.json == ''" @click="callPrettyPrint" v-bind="attrs" v-on="on">
+                    <v-btn class="mr-2" color="white" elevation="1" fab small :disabled="activeProject.json === ''" @click="callPrettyPrint" v-bind="attrs" v-on="on">
                       <v-icon color="primary">mdi-format-align-left</v-icon>
                     </v-btn>
                   </template>
                   <span>Formatting</span>
                 </v-tooltip>
-                
+
                 <v-tooltip bottom>
                   <template v-slot:activator="{ on, attrs }">
-                    <v-btn class="mr-2" color="white" elevation="1" fab small :disabled="isPristine" @click="validateAndGenerate()" v-bind="attrs" v-on="on">
+                    <v-btn class="mr-2" color="white" elevation="1" fab small :disabled="isPristine || generateLoading || activeProject.name === ''" @click="validateAndGenerate()" v-bind="attrs" v-on="on">
                       <v-icon color="primary" v-if="!generateLoading">mdi-arrow-right-bold</v-icon>
                       <div v-if="generateLoading">
                         <v-progress-circular
-                          indeterminate  
-                          :size="35" 
+                          indeterminate
+                          :size="25"
                           color="primary"
                         ></v-progress-circular>
                       </div>
@@ -78,7 +60,7 @@
               </div>
             </div>
           </template>
-          <code-mirror cmId="cm0" v-model="activeProject.json" mode="json" :readOnly="false" :linesToColor="cm0LinesToColor" @on-scroll="validateAndGenerate" @cursor-into-view="closeDrawer"></code-mirror>
+          <code-mirror cmId="cm0" v-model="activeProject.json" mode="json" :readOnly="false" :linesToColor="cm0LinesToColor" @cursor-into-view="closeDrawer"></code-mirror>
         </base-material-generator-card>
       </v-col>
 
@@ -87,15 +69,15 @@
           <template v-slot:heading>
             <div class="d-flex display-1 font-weight-light align-center justify-space-between pa-2">
               <div class="text-break" v-if="activeFile.path && activeFile.path !== ''">
-                <span v-for="(part, i) in activeFile.path.split('/')" :key="i" @click="openFolder(i+1)">
-                  {{ part }}/
+                <span class="pathElement" v-for="(part, i) in activeFile.path.split('/')" :key="i" @click="openFolder(i+1)">
+                  {{ part }} /
                 </span>
-                <span @click="openFolder(activeFile.path.split('/').length)">
+                <span class="pathElement" @click="openFolder(activeFile.path.split('/').length)">
                   {{ activeFile.name }}
                 </span>
               </div>
               <div v-else>
-                <span @click="openFolder(0)">
+                <span class="pathElement" @click="openFolder(0)">
                   {{ activeFile.name }}
                 </span>
               </div>
@@ -113,12 +95,12 @@
                 </v-tooltip>
                 <v-tooltip bottom>
                   <template v-slot:activator="{ on, attrs }">
-                    <v-btn color="white" class="mr-2" elevation="1" :disabled="!isPristine" @click="download" fab small v-bind="attrs" v-on="on">
+                    <v-btn color="white" class="mr-2" elevation="1" :disabled="!isPristine || downLoading || activeProject.name === ''" @click="download" fab small v-bind="attrs" v-on="on">
                       <v-icon color="primary" v-if="!downLoading">mdi-download</v-icon>
                       <div v-if="downLoading">
                         <v-progress-circular
-                          indeterminate  
-                          :size="35" 
+                          indeterminate
+                          :size="25"
                           color="primary"
                         ></v-progress-circular>
                       </div>
@@ -150,74 +132,80 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import CodeMirror from "../components/CodeMirror.vue";
-import TreeView from "../components/TreeView.vue";
-import {validateJson, prettyPrint} from "../utils/PrettyPrint";
-import {UndoStack} from "../utils/UndoStack";
-import FileExplorer from "../components/FileExplorer.vue";
-import HelpDialog from "../components/HelpDialog.vue";
-import HeadBar from "../components/HeadBar.vue";
-import Snackbar from "../components/Snackbar.vue";
-import {Project} from "../models/Project";
-import {GeneratedFile} from "../models/GeneratedFile";
+import Vue from 'vue';
+import CodeMirror from '../components/CodeMirror.vue';
+import TreeView from '../components/TreeView.vue';
+import {validateJson, prettyPrint} from '../utils/PrettyPrint';
+import {UndoStack} from '../utils/UndoStack';
+import HeadBar from '../components/HeadBar.vue';
+import Snackbar from '../components/Snackbar.vue';
+import {Project} from '../models/Project';
+import {GeneratedFile} from '../models/GeneratedFile';
 import {CRC32} from 'crc_32_ts';
 import axios from 'axios';
+import api from '../api'
+import {GenerateResponse} from '../models/GenerateResponse';
 
 export default Vue.extend({
   components: {
-    FileExplorer,
-    HelpDialog,
     HeadBar,
     Snackbar,
     CodeMirror,
     TreeView,
   },
   created: async function(){
-    this.initialProject.json = (await axios.get(`${this.$root.$data.baseUrl}/example_input.json`, {responseType: "text"})).data;
+    this.initialProject.json = (await axios.get(`${this.$root.$data.baseUrl}/example_input.json`, {responseType: 'text'})).data;
     if(this.$store.state.projects.lastProject.json){
       this.activeProject = {...this.$store.state.projects.lastProject};
       this.generatedFiles = [...this.$store.state.projects.lastGeneratedFiles];
+      this.callPrettyPrint();
       this.setActiveFile();
     }else{
       this.activeProject = {...this.initialProject};
-      await this.validateAndGenerate();
     }
+    await this.validateAndGenerate();
   },
   computed: {
     isPristine: function(){
-        const top = this.undoStack.top();
-        if(top){
-          if(top.crc32 === CRC32.str(this.activeProject.json)){
-            return true;
-          }
+      const top = this.undoStack.top();
+      if(top){
+        if((top.crc32 === CRC32.str(this.activeProject.json)) && (this.crc32ProjectName === CRC32.str(this.activeProject.name))){
+          return true;
         }
+      }
+      return false;
+    },
+    isJsonPristine: function(){
+      const top = this.undoStack.top();
+      if(top){
+        if(top.crc32 === CRC32.str(this.activeProject.json)){
+          return true;
+        }
+      }
       return false;
     },
   },
   data: function () {
     return {
-      openExplorer: false,
-      openHelp: false,
       generatedFiles: Array<GeneratedFile>(),
       previousFiles: Array<GeneratedFile>(),
-      initialProject: {id: -1, ownerId: -1, name: "", json: "{}"},
+      initialProject: {id: -1, ownerId: -1, name: 'My Project', json: '{}'},
       undoStack: new UndoStack(),
-      activeProject: {id: -1, ownerId: -1, name: "", json: ""},
+      crc32ProjectName: CRC32.str('My Project'),
+      activeProject: {id: -1, ownerId: -1, name: '', json: ''},
       activeFile: {} as GeneratedFile,
       snackbar: {
         dismissible: true,
         visible: false,
-        type: "",
-        icon: "mdi-alert-circle",
-        text: "",
+        type: '',
+        icon: 'mdi-alert-circle',
+        text: '',
         timeout: 5000,
       },
-      projectName: "",
       cm0LinesToColor: Array<{line: number; color: string}>(),
       cm1LinesToColor: Array<{line: number; color: string}>(),
       drawer: false,
-      openPath: "",
+      openPath: '',
       generateLoading: false,
       downLoading: false,
       isCompare: true,
@@ -235,28 +223,27 @@ export default Vue.extend({
     generate: async function(){
       if(!this.generateLoading){
         this.generateLoading = true;
-        let nameSpace = "Test"
-        if(this.activeProject.name !== ""){
-          nameSpace = this.activeProject.name;
-        }
-        const [delay, generateResult] = await Promise.all([
-          this.delay(3000),
-          await this.$store.dispatch("generate", {data: this.activeProject.json, nameSpace: this.camalize(nameSpace)})
-        ]);
-        const generate = generateResult;
-        if(generate.errorMessage){
-          this.setSnackbar("orange darken-2", generate.errorMessage, -1);
-          if(generate.errorLine !== ""){
-            this.cm0LinesToColor.push({line: generate.errorLine-1, color: "red"});
+        const generateResult: GenerateResponse = await api.generate({data: this.activeProject.json, nameSpace: this.toCamelCase(this.activeProject.name)});
+        if(generateResult.errorMessage){
+          this.setSnackbar('orange darken-2', generateResult.errorMessage, -1);
+          if(generateResult.errorLine !== null){
+            this.cm0LinesToColor.push({line: generateResult.errorLine-1, color: 'red'});
           }
           this.generateLoading = false;
           return;
         }
         this.previousFiles = [...this.generatedFiles];
-        this.generatedFiles = generate.generatedFiles;
-        this.$store.commit("projects/setLastProject", this.activeProject);
-        this.$store.commit("projects/setLastGeneratedFiles", this.generatedFiles);
-        this.undoStack.push(this.activeProject.json);
+        this.generatedFiles = generateResult.generatedFiles;
+        this.$store.commit('projects/setLastProject', this.activeProject);
+        this.$store.commit('projects/setLastGeneratedFiles', this.generatedFiles);
+        this.crc32ProjectName = CRC32.str(this.activeProject.name);
+        if(this.undoStack.length() > 0){
+          if(!this.isJsonPristine){
+            this.undoStack.push(this.activeProject.json);
+          }
+        }else{
+          this.undoStack.push(this.activeProject.json);
+        }
         this.setActiveFile();
         this.setCm1LinesToColor();
         this.generateLoading = false;
@@ -307,15 +294,15 @@ export default Vue.extend({
       });
     },
     getJsonLength: function(json: string): number{
-      json = json.replace(/ {2}/g, "");
-      json = json.replace(/": /g, "\":");
-      json = json.replace(/[\n\t\r]/g, "");
+      json = json.replace(/ {2}/g, '');
+      json = json.replace(/": /g, '":');
+      json = json.replace(/[\n\t\r]/g, '');
       return json.length;
     },
     setActiveFile: function(){
       if(!this.activeFile.name){
         for(let i = 0; i < this.generatedFiles.length; i++){
-          if(this.generatedFiles[i].name === "restapi.yml" && this.generatedFiles[i].path === ""){
+          if(this.generatedFiles[i].name === 'restapi.yml' && this.generatedFiles[i].path === ''){
             this.activeFile = this.generatedFiles[i];
             break;
           }
@@ -334,8 +321,8 @@ export default Vue.extend({
       this.$gtag.event('pretty-print');
       const result = validateJson(this.activeProject.json);
       if (result.error) {
-        this.cm0LinesToColor.push({line: result.line, color: "red"});
-        this.setSnackbar("orange darken-2", result.message, -1);
+        this.cm0LinesToColor.push({line: result.line, color: 'red'});
+        this.setSnackbar('orange darken-2', result.message, -1);
       }
       this.activeProject.json = prettyPrint(this.activeProject.json);
       this.hideSnackbar();
@@ -356,17 +343,17 @@ export default Vue.extend({
         this.callPrettyPrint();
         const jsonLength = this.getJsonLength(this.activeProject.json);
         if(jsonLength > 2000) {
-          this.setSnackbar("orange darken-2", `Exceeded character limit: ${jsonLength} / 2000`, -1);
+          this.setSnackbar('orange darken-2', `Exceeded character limit: ${jsonLength} / 2000`, -1);
           return;
         }
         await this.generate();
       } else {
-        this.cm0LinesToColor.push({line: result.line, color: "red"});
-        this.setSnackbar("orange darken-2", result.message, -1);
+        this.cm0LinesToColor.push({line: result.line, color: 'red'});
+        this.setSnackbar('orange darken-2', result.message, -1);
       }
     },
     setSnackbar: function(type: string, text: string, timeout: number){
-      this.snackbar.dismissible = true,
+      this.snackbar.dismissible = true;
       this.snackbar.timeout = timeout;
       this.snackbar.type = type;
       this.snackbar.text = text;
@@ -374,21 +361,6 @@ export default Vue.extend({
     },
     hideSnackbar: function(){
       this.snackbar.visible = false;
-    },
-    selectProject: function(project: Project){
-      this.$gtag.event('select-project');
-      let select = true;
-      if(this.activeProject.id === -1){
-        select = confirm("changes will not be saved!");
-      }
-      if(select){
-        project.json = project.json.split("'").join('"');
-        this.activeProject = project;
-        this.validateAndGenerate();
-      }
-      this.undoStack.clear();
-      this.cm1LinesToColor = [];
-      this.openExplorer = false;
     },
     existsProjectName: function(): Project | null{
       for(const i in this.$store.state.projects.items){
@@ -400,24 +372,21 @@ export default Vue.extend({
     },
     save: async function (){
       this.$gtag.event('save-project');
-      if(this.projectName !== ""){
-        this.activeProject.name = this.projectName;
-      }
       if(this.activeProject.name){
         const exists = this.existsProjectName();
         if (!exists && this.activeProject.id === -1) {
-          this.setSnackbar("success", "The new project was successfully created!", 5000);
+          this.setSnackbar('success', 'The new project was successfully created!', 5000);
           this.activeProject.id = 0;
           this.activeProject.ownerId = this.$store.state.auth.user.id;
-          this.activeProject = await this.$store.dispatch("projects/addProject", this.activeProject);
+          this.activeProject = await this.$store.dispatch('projects/addProject', this.activeProject);
         } else if(exists && exists.id !== this.activeProject.id) {
-          this.setSnackbar("error", "This name is already in use, please enter another name!", 5000);
+          this.setSnackbar('error', 'This name is already in use, please enter another name!', 5000);
         } else {
-          this.setSnackbar("success", "Project updated successfully!", 5000);
-          await this.$store.dispatch("projects/updateProject", this.activeProject);
+          this.setSnackbar('success', 'Project updated successfully!', 5000);
+          await this.$store.dispatch('projects/updateProject', this.activeProject);
         }
       }else{
-        this.setSnackbar("error", "This name is incorrect!", 5000);
+        this.setSnackbar('error', 'This name is incorrect!', 5000);
       }
     },
     undo: async function () {
@@ -429,30 +398,26 @@ export default Vue.extend({
       if(top) {
         this.activeProject.json = top.content;
       }
-      this.setSnackbar("info", "Everything restored to its previous generated state", 5000);
+      this.setSnackbar('info', 'Everything restored to its previous generated state', 5000);
     },
     changeProjectName: function(name: string){
       this.$gtag.event('change-project-name');
-      this.projectName = name;
+      this.activeProject.name = name;
     },
     download: async function() {
       if(!this.downLoading){
         this.downLoading = true;
         this.$gtag.event('download');
-        let nameSpace = "Test"
-        if(this.activeProject.name !== ""){
-          nameSpace = this.activeProject.name;
-        }
         await Promise.all([
-          this.delay(3000), this.$store.dispatch("download",
-          {data: this.activeProject.json, nameSpace: this.camalize(nameSpace)})
+          this.delay(3000),
+          api.download({data: this.activeProject.json, nameSpace: this.toCamelCase(this.activeProject.name)})
         ]);
         this.downLoading = false;
       }
     },
     openFolder: function(idx: number){
       this.$gtag.event('open-folder');
-      this.openPath = "";
+      this.openPath = '';
       for(let i = 0; i < idx; i++){
         if(this.activeFile.path.split('/')[i]){
           this.openPath += `${this.activeFile.path.split('/')[i]}/`;
@@ -471,20 +436,21 @@ export default Vue.extend({
       this.$gtag.event('set-drawer');
       this.drawer = !this.drawer;
       if(!this.drawer){
-        this.openPath = "";
+        this.openPath = '';
       }
     },
     closeDrawer: function(){
       if(this.drawer){
         this.$gtag.event('close-drawer');
         this.drawer = false;
-        this.openPath = "";
+        this.openPath = '';
       }
     },
-    camalize: function(str: string) {
-      return str.replace(/(?:^\w|[A-Z]|\b\w)/g, function(word, index) {
+    toCamelCase: function(str: string): string {
+      const nameSpace = str.replace(/(?:^\w|[A-Z]|\b\w)/g, function(word, index) {
         return index === 0 ? word.toLowerCase() : word.toUpperCase();
       }).replace(/\s+/g, '');
+      return `${nameSpace.charAt(0).toUpperCase()}${nameSpace.slice(1)}`;
     }
   },
 });
@@ -527,5 +493,11 @@ export default Vue.extend({
     border-radius: 3px;
     word-wrap: break-word!important;
     z-index: 1;
+  }
+  .pathElement{
+    cursor: pointer!important;
+  }
+  .pathElement:hover{
+    opacity: 0.6;
   }
 </style>

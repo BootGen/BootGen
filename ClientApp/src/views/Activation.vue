@@ -31,8 +31,8 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import api from "@/api"
+import Vue from 'vue';
+import api from '../api';
 
 export default Vue.extend({
   data: function () {
@@ -47,7 +47,7 @@ export default Vue.extend({
         await api.activate(this.$route.params.activationToken);
         this.activeted = true;
         this.waitForResponse = false;
-      } catch(reason) {
+      } catch {
         this.activeted = false;
         this.waitForResponse = false;
       }

@@ -1,14 +1,11 @@
 
-import axios from 'axios'
 import { ActionContext } from 'vuex';
 import { AuthenticationData } from '@/models/AuthenticationData'
-import { LoginResponse } from '@/models/LoginResponse'
-import { RegistrationData } from '@/models/RegistrationData'
-import { ProfileResponse } from '@/models/ProfileResponse'
-import { ChangePasswordData } from '@/models/ChangePasswordData'
+import { LoginSuccess } from '@/models/LoginSuccess'
 import { User } from '@/models/User'
 import { State } from '.';
 import api from '@/api'
+import { ProfileResponse } from '@/models/ProfileResponse';
 
 export interface AuthState {
   jwt: string;
@@ -18,12 +15,21 @@ type Context = ActionContext<AuthState, State>;
 
 export default {
   state: {
-    jwt: "",
+    jwt: '',
     user: null
   },
   mutations: {
     setJwt: function(state: AuthState, jwt: string) {
       state.jwt = jwt
+      try {
+        if (jwt) {
+          localStorage.setItem('jwt', jwt);
+        } else {
+          localStorage.removeItem('jwt');
+        }
+      } catch {
+        console.log('Local storage is not available.')
+      }
     },
     setUser: function(state: AuthState, user: User) {
       state.user = user
@@ -31,33 +37,27 @@ export default {
   },
   actions: {
     init: function(context: Context) {
-      const jwt = localStorage.getItem("jwt")
+      const jwt = localStorage.getItem('jwt')
       if (jwt) {
-        context.dispatch('setJwt', jwt);
+        context.commit('setJwt', jwt);
       }
     },
-    setJwt(context: Context, jwt: string) {
-      context.commit('setJwt', jwt);
-      try {
-        if (jwt) {
-          localStorage.setItem("jwt", jwt);
-        } else {
-          localStorage.removeItem("jwt");
-        }
-      } catch {
-        console.log("Local storage is not available.")
-      }
-    },
-    login: async function (context: Context, data: AuthenticationData): Promise<LoginResponse> {
+    login: async function (context: Context, data: AuthenticationData): Promise<LoginSuccess> {
       const response = await api.login(data);
-      context.commit("setJwt", response.jwt);
-      await context.dispatch("profile");
+      context.commit('setJwt', response.jwt);
+      await context.dispatch('profile');
       return response;
     },
     profile: async function (context: Context): Promise<User> {
       const user = await api.profile(context.state.jwt);
       context.commit('setUser', user);
       return user;
+    },
+    updateProfile: async function (context: Context, user: User): Promise<ProfileResponse> {
+      const response  = await api.updateProfile(user, context.state.jwt);
+      if (response.success)
+        context.commit('setUser', user);
+      return response;
     }
   },
 }

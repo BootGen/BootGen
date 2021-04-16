@@ -10,19 +10,22 @@ using {{ name_space }}.Services;
 
 namespace {{ name_space }}.Controllers
 {
+    {{~
+        parent = resource.parent_resource
+        controller_name = parent.name.plural + resource.name.plural + 'Controller'
+        service_name = 'I' + resource.name.plural + 'Service'
+    ~}}
     [ApiController]
-    [Route("{{ resource.route.path }}")]
+    [Route("{{ kebab_case parent.name.plural }}/{{'{' + (camel_case parent.name) + 'Id}' }}/{{ kebab_case resource.name.plural }}")]
     {{~ if resource.authenticate ~}}
     [Authorize]
     {{~ end ~}}
-    public class {{ controller_name resource }} : ControllerBase
+    public class {{ controller_name }} : ControllerBase
     {
-        private I{{ resource.pivot.name.plural }}Service pivotService;
-        private I{{ service_name resource }} dataService;
-        public {{ controller_name resource }}(I{{ service_name resource }} dataService, I{{ resource.pivot.name.plural }}Service pivotService)
+        private {{ service_name  }} dataService;
+        public {{ controller_name }}({{ service_name }} dataService)
         {
             this.dataService = dataService;
-            this.pivotService = pivotService;
         }
 
         {{~
@@ -32,14 +35,14 @@ namespace {{ name_space }}.Controllers
         [HttpGet]
         public IActionResult Get{{ resource.name.plural }}([FromRoute] int {{ camel_case parent.class.name }}Id)
         {
-            return Ok(pivotService.Get{{ resource.name.plural }}Of{{ parent.class.name }}({{ camel_case parent.class.name }}Id));
+            return Ok(dataService.Get{{ resource.name.plural }}Of{{ parent.class.name }}({{ camel_case parent.class.name }}Id));
         }
         {{~ if !resource.is_readonly ~}}
 
         [HttpPost]
         public IActionResult Add{{ resource.name }}([FromRoute] int {{ camel_case parent.class.name }}Id, [FromBody] {{ resource.class.name }} {{ camel_case resource.name }})
         {
-            if (pivotService.Assign({{ camel_case parent.class.name }}Id: {{ camel_case parent.class.name }}Id, {{ camel_case resource.name }}Id: {{ camel_case resource.name }}.Id))
+            if (dataService.Add{{ resource.class.name }}To{{ parent.class.name }}({{ camel_case resource.name }}.Id, {{ camel_case parent.class.name }}Id))
                 return Ok(dataService.Get{{ resource.class.name }}({{ camel_case resource.name }}.Id));
             return BadRequest();
         }
@@ -51,7 +54,7 @@ namespace {{ name_space }}.Controllers
         [Route("{{path_parameter}}")]
         public IActionResult Remove{{ resource.name }}([FromRoute] int {{ camel_case parent.class.name }}Id, [FromRoute] int {{ camel_case resource.name }}Id)
         {
-            if (pivotService.Remove({{ camel_case parent.class.name }}Id: {{ camel_case parent.class.name }}Id, {{ camel_case resource.name }}Id: {{ camel_case resource.name }}Id))
+            if (dataService.Remove{{ resource.class.name }}From{{ parent.class.name }}({{ camel_case resource.name }}Id, {{ camel_case parent.class.name }}Id))
                 return Ok();
             return BadRequest();
         }

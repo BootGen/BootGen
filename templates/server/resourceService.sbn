@@ -10,12 +10,12 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace {{ name_space }}.Services
 {
-    public class {{ service_name resource }} : I{{ service_name resource }}
+    public class {{ resource.name.plural }}Service : I{{ resource.name.plural }}Service
     {
         {{~ class = resource.class ~}}
         private readonly ApplicationDbContext dbContext;
 
-        public {{ service_name resource }}(ApplicationDbContext dbContext)
+        public {{ resource.name.plural }}Service(ApplicationDbContext dbContext)
         {
             this.dbContext = dbContext;
         }
@@ -35,11 +35,41 @@ namespace {{ name_space }}.Services
         }
 
         {{~ end ~}}
+        {{~ if property.is_many_to_many ~}}
+        public List<{{ class.name }}> Get{{ class.name.plural }}Of{{ property.class.name }}(int {{ camel_case property.class.name }}Id)
+        {
+            var {{ camel_case property.class.name }} = dbContext.{{ property.class.name.plural }}.Include(i => i.{{ property.mirror_property.name }}).First();
+            return {{ camel_case property.class.name }}.{{ property.mirror_property.name }};
+        }
+
+        public bool Add{{ class.name }}To{{ property.class.name }}(int {{ camel_case class.name }}Id, int {{ camel_case property.class.name }}Id)
+        {
+            var {{ camel_case property.class.name }} = dbContext.{{ property.class.name.plural }}.Include(i => i.{{ property.mirror_property.name }}).FirstOrDefault();
+            if ({{ camel_case property.class.name }} == null)
+                return false;
+            var {{ camel_case class.name }} = dbContext.{{ class.name.plural }}.Single(item => item.Id == {{ camel_case class.name }}Id);
+            if ({{ camel_case class.name }} == null)
+                return false;
+            {{ camel_case property.class.name }}.{{ property.mirror_property.name }}.Add({{ camel_case class.name }});
+            dbContext.SaveChanges();
+            return true;
+        }
+
+        public bool Remove{{ class.name }}From{{ property.class.name }}(int {{ camel_case class.name }}Id, int {{ camel_case property.class.name }}Id)
+        {
+            var {{ camel_case property.class.name }} = dbContext.{{ property.class.name.plural }}.Include(i => i.{{ property.mirror_property.name }}).FirstOrDefault();
+            if ({{ camel_case property.class.name }}.{{ property.mirror_property.name }}.All(i => i.Id != {{ camel_case class.name }}Id))
+                return false;
+            {{ camel_case property.class.name }}.{{ property.mirror_property.name }}.RemoveAll(i => i.Id == {{ camel_case class.name }}Id);
+            dbContext.SaveChanges();
+            return true;
+        }
+
+        {{~ end ~}}
         {{~ end ~}}
         public {{ class.name }} Get{{ class.name }}(int {{ camel_case class.name }}Id)
         {
-            return dbContext.{{ class.name.plural }}
-                            .Where(item => item.Id == {{ camel_case class.name }}Id).FirstOrDefault();
+            return dbContext.{{ class.name.plural }}.Single(item => item.Id == {{ camel_case class.name }}Id);
         }
         {{~ if !resource.is_readonly ~}}
 

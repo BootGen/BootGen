@@ -1,9 +1,9 @@
 function getLine(idx: number, str: string): number{
-  if(navigator.userAgent.indexOf("Firefox") != -1){
+  if(navigator.userAgent.indexOf('Firefox') != -1){
     return idx;
   }
   let charCount = 0;
-  const strArray: string[] = str.split("\n");
+  const strArray: string[] = str.split('\n');
   for(let i = 0; i < strArray.length; i++){
     charCount += strArray[i].length+1;
     if(charCount >= idx){
@@ -20,16 +20,16 @@ export interface JsonValidationResult {
 }
 
 export function validateJson(text: string): JsonValidationResult {
-  const json = text.split("\n").filter(line => !line.trim().startsWith("//")).join("\n");
+  const json = text.split('\n').filter(line => !line.trim().startsWith('//')).join('\n');
   try {
     JSON.parse(json);
     return {error: false, line: -1, message: ''};
   } catch (err) {
     const idx = err.message.match(/\d+/g)[0]-1;
-    const lines = text.split("\n");
+    const lines = text.split('\n');
     let errorLine = getLine(idx, json);
     for(let i = 0; i < errorLine; i++){
-      if(lines[i].includes("//")){
+      if(lines[i].includes('//')){
         errorLine++;
       }
     }
@@ -37,28 +37,27 @@ export function validateJson(text: string): JsonValidationResult {
   }
 }
 export function formatJson(json: string): string{
-  json = json.replaceAll(/\s/g,"");
-  json = json.replaceAll("//","//\n");
-  json = json.replaceAll("{","{\n");
-  json = json.replaceAll("}","}\n");
-  json = json.replaceAll("[","[\n");
-  json = json.replaceAll("]","]\n");
-  json = json.replaceAll(",",",\n");
-  json = json.replaceAll(":",": ");
-  json = json.replaceAll('"}','"\n}');
+  json = json.replaceAll(/\s/g,'');
+  json = json.replaceAll('//','\n//\n');
+  json = json.replaceAll('{','{\n');
+  json = json.replaceAll('}','\n}');
+  json = json.replaceAll('[','[\n');
+  json = json.replaceAll(']','\n]');
+  json = json.replaceAll(',',',\n');
+  json = json.replaceAll(':',': ');
   return json;
 }
 function indentLines(lines: string[]): string[]{
   let tabCount = 0;
   for(let i = 0; i < lines.length; i++){
-    if(lines[i].includes("{") || lines[i].includes("[")){
-      lines[i] = "\t".repeat(tabCount).concat(lines[i].trim());
+    if(lines[i].includes('{') || lines[i].includes('[')){
+      lines[i] = '\t'.repeat(tabCount).concat(lines[i].trim());
       tabCount++;
-    }else if(lines[i].includes("}") || lines[i].includes("]")){
+    }else if(lines[i].includes('}') || lines[i].includes(']')){
       --tabCount;
-      lines[i] = "\t".repeat(tabCount).concat(lines[i].trim());
+      lines[i] = '\t'.repeat(tabCount).concat(lines[i].trim());
     }else{
-      lines[i] = "\t".repeat(tabCount).concat(lines[i].trim());
+      lines[i] = '\t'.repeat(tabCount).concat(lines[i].trim());
     }
   }
   return lines;
@@ -69,7 +68,7 @@ function replaceToComment(comments: string[], lines: string[]): string[]{
     for(let i = startIdx; i < lines.length; i++){
       if(lines[i].includes('//')){
         startIdx = i+1;
-        lines[i] = lines[i].replace('//', comment.replace('\n', ''));
+        lines[i] = lines[i].replace('//', comment);
         break;
       }
     }
@@ -88,18 +87,24 @@ function replaceToString(strings: string[], lines: string[]): string[]{
   return lines;
 }
 export function prettyPrint(json: string): string {
-  json = json.replace("\r","");
+  json = json.replaceAll('\r','');
+  json = json.replaceAll('\'','"');
   const strings = json.match(/"[^"]*"/g);
   json = json.replace(/"[^"]*"/g, '""');
-  const comments = json.match(/(\/\/.*)(\n)/g);
-  json = json.replace(/(\/\/.*)(\n)/g, '//');
+  const comments = json.match(/\/\/.+?(?=\n)/g);
+  json = json.replace(/\/\/.+(?=\n)/g, '//');
   json = formatJson(json);
-  let lines = indentLines(json.split("\n"));
+  let lines = indentLines(json.split('\n'));
   if (comments) {
     lines = replaceToComment(comments, lines);
   }
   if (strings) {
     lines = replaceToString(strings, lines);
   }
-  return lines.join("\n");
+  lines.forEach((line, idx) =>{
+    if((/^(\t)+$/g).test(line) || line === ''){
+      lines.splice(idx, 1);
+    } 
+  })
+  return lines.join('\n');
 }
