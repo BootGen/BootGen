@@ -75,6 +75,7 @@ export default Vue.extend({
     onInput: function(content: string) {
       this.$gtag.event('change-json');
       this.$emit('input', content);
+      this.$emit('change-json');
       this.unsetHighlight();
     },
     setMinMaxLine: function(){
@@ -113,8 +114,8 @@ export default Vue.extend({
     },
     highlight: function() {
       this.linesToColor.forEach(lineToColor => {
-            this.highlightLine(lineToColor.line, lineToColor.color);
-          });
+        this.highlightLine(lineToColor.line, lineToColor.color);
+      });
     },
     highlightLine: function (line: number, color: string){
       this.unsetHighlight();

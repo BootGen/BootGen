@@ -60,7 +60,7 @@
               </div>
             </div>
           </template>
-          <code-mirror cmId="cm0" v-model="activeProject.json" mode="json" :readOnly="false" :linesToColor="cm0LinesToColor" @cursor-into-view="closeDrawer"></code-mirror>
+          <code-mirror cmId="cm0" v-model="activeProject.json" mode="json" :readOnly="false" :linesToColor="cm0LinesToColor" @cursor-into-view="closeDrawer" @change-json="removeErrors"></code-mirror>
         </base-material-generator-card>
       </v-col>
 
@@ -123,7 +123,7 @@
               </div>
             </div>
           </template>
-          <code-mirror cmId="cm1" :value="activeFile.content" :mode="getMode()" :readOnly="true" :linesToColor="cm1LinesToColor" @on-scroll="setCm1LinesToColor" @cursor-into-view="closeDrawer"></code-mirror>
+          <code-mirror cmId="cm1" :value="activeFile.content" :mode="getMode()" :readOnly="true" :linesToColor="cm1LinesToColor" @cursor-into-view="closeDrawer"></code-mirror>
         </base-material-generator-card>
       </v-col>
     </v-row>
@@ -219,6 +219,10 @@ export default Vue.extend({
       if(this.activeFile.name){
         return this.activeFile.name.split('.')[1];
       }
+    },
+    removeErrors: function(){
+      this.cm0LinesToColor = [];
+      this.hideSnackbar();
     },
     generate: async function(){
       if(!this.generateLoading){
