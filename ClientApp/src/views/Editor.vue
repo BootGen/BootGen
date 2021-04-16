@@ -2,10 +2,10 @@
   <v-container fluid class="editor">
     <v-row class="d-flex align-center ma-0 pa-0">
       <v-col lg="5" md="6" sm="8" cols="12" class="pa-0 headBar" v-if="$store.state.auth.jwt">
-        <head-bar :activeProject="activeProject" @new-project="newProject" @change-project-name="changeProjectName"></head-bar>
+        <head-bar :activeProject="activeProject" @new-project="createNewProject" @change-project-name="changeProjectName"></head-bar>
       </v-col>
       <v-col cols="12" class="pa-0 headBar" v-else>
-        <head-bar :activeProject="activeProject" @new-project="newProject" @change-project-name="changeProjectName"></head-bar>
+        <head-bar :activeProject="activeProject" @new-project="createNewProject" @change-project-name="changeProjectName"></head-bar>
       </v-col>
     </v-row>
     <v-row class="d-flex align-center">
@@ -153,15 +153,41 @@ export default Vue.extend({
     CodeMirror,
     TreeView,
   },
+  data: function () {
+    return {
+      generatedFiles: Array<GeneratedFile>(),
+      previousFiles: Array<GeneratedFile>(),
+      undoStack: new UndoStack(),
+      crc32ProjectName: CRC32.str('My Project'),
+      activeProject: {id: -1, ownerId: -1, name: 'My Project', json: ''},
+      newProject: {id: -1, ownerId: -1, name: 'My Project', json: ''},
+      activeFile: {} as GeneratedFile,
+      snackbar: {
+        dismissible: true,
+        visible: false,
+        type: '',
+        icon: 'mdi-alert-circle',
+        text: '',
+        timeout: 5000,
+      },
+      jsonErrors: Array<{line: number; color: string}>(),
+      highlightedDifferences: Array<{line: number; color: string}>(),
+      drawer: false,
+      openPath: '',
+      generateLoading: false,
+      downLoading: false,
+      isCompare: true,
+    };
+  },
   created: async function(){
-    this.initialProject.json = (await axios.get(`${this.$root.$data.baseUrl}/example_input.json`, {responseType: 'text'})).data;
+    this.newProject.json = JSON.stringify((await axios.get(`${this.$root.$data.baseUrl}/new_project_input.json`, {responseType: 'json'})).data);
     if(this.$store.state.projects.lastProject.json){
       this.activeProject = {...this.$store.state.projects.lastProject};
       this.generatedFiles = [...this.$store.state.projects.lastGeneratedFiles];
       this.callPrettyPrint();
       this.setActiveFile();
     }else{
-      this.activeProject = {...this.initialProject};
+      this.activeProject.json = (await axios.get(`${this.$root.$data.baseUrl}/example_input.json`, {responseType: 'text'})).data;
     }
     await this.validateAndGenerate();
   },
@@ -184,32 +210,6 @@ export default Vue.extend({
       }
       return false;
     },
-  },
-  data: function () {
-    return {
-      generatedFiles: Array<GeneratedFile>(),
-      previousFiles: Array<GeneratedFile>(),
-      initialProject: {id: -1, ownerId: -1, name: 'My Project', json: '{}'},
-      undoStack: new UndoStack(),
-      crc32ProjectName: CRC32.str('My Project'),
-      activeProject: {id: -1, ownerId: -1, name: '', json: ''},
-      activeFile: {} as GeneratedFile,
-      snackbar: {
-        dismissible: true,
-        visible: false,
-        type: '',
-        icon: 'mdi-alert-circle',
-        text: '',
-        timeout: 5000,
-      },
-      jsonErrors: Array<{line: number; color: string}>(),
-      highlightedDifferences: Array<{line: number; color: string}>(),
-      drawer: false,
-      openPath: '',
-      generateLoading: false,
-      downLoading: false,
-      isCompare: true,
-    };
   },
   methods: {
     delay: function(ms: number) {
@@ -331,12 +331,15 @@ export default Vue.extend({
       this.activeProject.json = prettyPrint(this.activeProject.json);
       this.hideSnackbar();
     },
-    newProject: async function(){
+    createNewProject: async function(name: string){
       this.$gtag.event('create-new-project');
-      this.activeProject = {...this.initialProject};
+      this.newProject.name = name;
+      this.activeProject = {...this.newProject};
+      this.callPrettyPrint();
+      this.save();
       this.undoStack.clear();
-      this.highlightedDifferences = [];
       await this.generate();
+      this.highlightedDifferences = [];
     },
     validateAndGenerate: async function() {
       this.$gtag.event('generate');
