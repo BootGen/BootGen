@@ -10,7 +10,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.EntityFrameworkCore;
 using {{ name_space }}.Services;
 
-namespace WebProject
+namespace {{ name_space }}
 {
     public class Startup
     {

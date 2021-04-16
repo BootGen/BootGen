@@ -1,1 +1,1 @@
-declare module "vue-chartist";
+declare module 'vue-chartist';

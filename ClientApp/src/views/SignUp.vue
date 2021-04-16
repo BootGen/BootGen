@@ -9,7 +9,7 @@
               <v-icon class="pa-2">mdi-account-plus</v-icon>
             </div>
           </template>
-          <div v-if="registration" class="d-flex flex-column align-center">
+          <div v-if="registrationComplete" class="d-flex flex-column align-center">
             <v-icon color="green" size="70">mdi-check-circle-outline</v-icon>
             <p class="display-2 text-center">Registration was <span class="green--text">successful.</span></p>
             <p class="display-1 text-center">Thank you for choosing us!</p>
@@ -111,7 +111,7 @@ export default Vue.extend({
       userName: '',
       newsletter: false,
       errorMsg: '',
-      registration: false,
+      registrationComplete: false
     };
   },
   methods: {
@@ -128,15 +128,7 @@ export default Vue.extend({
       }else if(response.isEmailInUse) {
         this.errorMsg = 'This email is already in use!';
       } else {
-        this.registration = true;
-        try {
-          await this.$store.dispatch('login', {
-            email: this.email,
-            password: this.password,
-          });
-        } catch {
-          this.errorMsg = '';
-        }
+        this.registrationComplete = true;
       }
     },
   },

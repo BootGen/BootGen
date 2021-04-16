@@ -21,10 +21,10 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import {{ class.name }}View from "../components/{{ class.name }}View.vue";
-import {{ class.name }}Edit from "../components/{{ class.name }}Edit.vue";
-import { {{ class.name }} } from "../models/{{ class.name }}";
+import Vue from 'vue';
+import {{ class.name }}View from '../components/{{ class.name }}View.vue';
+import {{ class.name }}Edit from '../components/{{ class.name }}Edit.vue';
+import { {{ class.name }} } from '../models/{{ class.name }}';
 export default Vue.extend({
   components: { {{ class.name }}View, {{ class.name }}Edit },
   data: function () {
@@ -34,7 +34,7 @@ export default Vue.extend({
     };
   },
   created: async function () {
-    this.{{ camel_case class.name.plural }} = await this.$store.dispatch("{{ camel_case class.name.plural }}/get{{ class.name.plural }}");
+    this.{{ camel_case class.name.plural }} = await this.$store.dispatch('{{ camel_case class.name.plural }}/get{{ class.name.plural }}');
   },
   methods: {}
 });

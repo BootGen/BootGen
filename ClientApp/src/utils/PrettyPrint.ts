@@ -38,14 +38,13 @@ export function validateJson(text: string): JsonValidationResult {
 }
 export function formatJson(json: string): string{
   json = json.replaceAll(/\s/g,'');
-  json = json.replaceAll('//','//\n');
+  json = json.replaceAll('//','\n//\n');
   json = json.replaceAll('{','{\n');
-  json = json.replaceAll('}','}\n');
+  json = json.replaceAll('}','\n}');
   json = json.replaceAll('[','[\n');
-  json = json.replaceAll(']',']\n');
+  json = json.replaceAll(']','\n]');
   json = json.replaceAll(',',',\n');
   json = json.replaceAll(':',': ');
-  json = json.replaceAll('"}','"\n}');
   return json;
 }
 function indentLines(lines: string[]): string[]{
@@ -69,7 +68,7 @@ function replaceToComment(comments: string[], lines: string[]): string[]{
     for(let i = startIdx; i < lines.length; i++){
       if(lines[i].includes('//')){
         startIdx = i+1;
-        lines[i] = lines[i].replace('//', comment.replace('\n', ''));
+        lines[i] = lines[i].replace('//', comment);
         break;
       }
     }
@@ -88,12 +87,12 @@ function replaceToString(strings: string[], lines: string[]): string[]{
   return lines;
 }
 export function prettyPrint(json: string): string {
-  json = json.replace('\r','');
+  json = json.replaceAll('\r','');
   json = json.replaceAll('\'','"');
   const strings = json.match(/"[^"]*"/g);
   json = json.replace(/"[^"]*"/g, '""');
-  const comments = json.match(/(\/\/.*)(\n)/g);
-  json = json.replace(/(\/\/.*)(\n)/g, '//');
+  const comments = json.match(/\/\/.+?(?=\n)/g);
+  json = json.replace(/\/\/.+(?=\n)/g, '//');
   json = formatJson(json);
   let lines = indentLines(json.split('\n'));
   if (comments) {
@@ -102,5 +101,10 @@ export function prettyPrint(json: string): string {
   if (strings) {
     lines = replaceToString(strings, lines);
   }
+  lines.forEach((line, idx) =>{
+    if((/^(\t)+$/g).test(line) || line === ''){
+      lines.splice(idx, 1);
+    } 
+  })
   return lines.join('\n');
 }

@@ -9,9 +9,14 @@
         v-if="avatar"
         size="128"
         class="mx-auto v-card--material__avatar elevation-6"
-        color="grey"
+        color="#9090f9"
       >
-        <v-img :src="avatar" />
+        <v-img
+          max-height="128"
+          max-width="128"
+          src="@/assets/img/user.png"
+          alt="avatar"
+        ></v-img>
       </v-avatar>
 
       <v-sheet
@@ -92,8 +97,8 @@
 
     props: {
       avatar: {
-        type: String,
-        default: '',
+        type: Boolean,
+        default: false,
       },
       color: {
         type: String,

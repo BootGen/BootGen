@@ -5,15 +5,19 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
+    "test:e2e": "vue-cli-service test:e2e --mode development",
+    "test:ci": "vue-cli-service test:e2e --mode development --headless",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
     "axios": "^0.21.1",
+    "core-js": "^3.6.5",
     "crc_32_ts": "^1.0.13",
+    "define-property": "^2.0.2",
     "vee-validate": "^3.4.5",
     "vue": "^2.6.11",
     "vue-codemirror": "^4.0.6",
-    "vue-gtag": "^1.11.0",
+    "vue-gtag": "^1.14.0",
     "vue-router": "^3.5.1",
     "vuetify": "^2.4.9",
     "vuex": "^3.6.2"
@@ -22,6 +26,7 @@
     "@typescript-eslint/eslint-plugin": "^2.33.0",
     "@typescript-eslint/parser": "^2.33.0",
     "@vue/cli-plugin-babel": "^4.5.12",
+    "@vue/cli-plugin-e2e-cypress": "~4.5.0",
     "@vue/cli-plugin-eslint": "^4.5.12",
     "@vue/cli-plugin-router": "^4.5.12",
     "@vue/cli-plugin-typescript": "^4.5.12",

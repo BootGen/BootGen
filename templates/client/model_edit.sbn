@@ -42,10 +42,10 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { {{ class.name }} } from "../models/{{ class.name }}";
+import Vue from 'vue';
+import { {{ class.name }} } from '../models/{{ class.name }}';
 {{~ if useDateTimePicker ~}}
-import DateTimePicker from "./DateTimePicker.vue"
+import DateTimePicker from './DateTimePicker.vue';
 {{~ end ~}}
 
 export default Vue.extend({
@@ -70,11 +70,11 @@ export default Vue.extend({
   methods: {
     save: async function () {
       Object.assign(this.{{ camel_case class.name }}, this.edited{{ class.name }});
-      await this.$store.dispatch("{{ camel_case class.name.plural }}/update{{ class.name }}", this.{{ camel_case class.name }});
-      this.$emit("close");
+      await this.$store.dispatch('{{ camel_case class.name.plural }}/update{{ class.name }}', this.{{ camel_case class.name }});
+      this.$emit('close');
     },
     cancel: async function () {
-      this.$emit("close");
+      this.$emit('close');
     }
   },
 });

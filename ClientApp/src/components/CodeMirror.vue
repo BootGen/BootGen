@@ -1,7 +1,7 @@
 <template>
   <v-container fluid class="cm">
-    <codemirror v-if="mode === 'json'" :id="cmId" :value="value" @input="onInput" return-object :options="cmOptions" @scroll="onScroll"  @scrollCursorIntoView="cursorIntoView()" />
-    <codemirror v-else :id="cmId" :value="value" :options="cmOptions" @scrollCursorIntoView="cursorIntoView()" />
+    <codemirror v-if="mode == 'json'" :id="cmId" :value="value" @input="onInput" return-object :options="cmOptions" @scroll="onScroll"  @scrollCursorIntoView="cursorIntoView()" />
+    <codemirror v-else :id="cmId" :value="value" :options="cmOptions" @scroll="onScroll" @scrollCursorIntoView="cursorIntoView()" />
   </v-container>
 </template>
 
@@ -60,15 +60,18 @@ export default Vue.extend({
     },
     linesToColor: {
       handler(linesToColor: {line: number; color: string}[]) {
-        if(linesToColor.length < 1){
+        if(linesToColor.length === 0){
           this.unsetHighlight();
         }else{
-          linesToColor.forEach(lineToColor => {
-            this.highlightLine(lineToColor.line, lineToColor.color);
-          })
+          this.highlight();
         }
       }
     }
+  },
+  updated: function() {
+      this.unsetHighlight();
+      this.setMinMaxLine();
+      this.highlight();
   },
   created: function(){
     this.cmOptions.readOnly = this.readOnly;
@@ -77,6 +80,8 @@ export default Vue.extend({
     onInput: function(content: string) {
       this.$gtag.event('change-json');
       this.$emit('input', content);
+      this.$emit('change-json');
+      this.unsetHighlight();
     },
     setMinMaxLine: function(){
       const elementById = document.getElementById(this.cmId);
@@ -100,6 +105,7 @@ export default Vue.extend({
     onScroll: function(){
       this.unsetHighlight();
       this.setMinMaxLine();
+      this.highlight();
     },
     unsetHighlight: function (){
       const elementById = document.getElementById(this.cmId);
@@ -111,16 +117,20 @@ export default Vue.extend({
         e[i].setAttribute('style', 'background-color: unset;');
       }
     },
+    highlight: function() {
+      this.linesToColor.forEach(lineToColor => {
+        this.highlightLine(lineToColor.line, lineToColor.color);
+      });
+    },
     highlightLine: function (line: number, color: string){
-      this.unsetHighlight();
       const elementById = document.getElementById(this.cmId);
       if(!elementById || (this.minLine > line && this.minLine < 5000000) || (this.maxLine < line && this.maxLine > -1)){
         return;
       }
       if(this.minLine < line && line < this.maxLine){
-        elementById.getElementsByClassName('CodeMirror-line')[line-this.minLine+2].setAttribute('style', `background-color:${color};`);
+        elementById.getElementsByClassName('CodeMirror-line')[line-this.minLine+2]?.setAttribute('style', `background-color:${color};`);
       }else{
-        elementById.getElementsByClassName('CodeMirror-line')[line].setAttribute('style', `background-color:${color};`);
+        elementById.getElementsByClassName('CodeMirror-line')[line]?.setAttribute('style', `background-color:${color};`);
       }
     },
     cursorIntoView: function(){

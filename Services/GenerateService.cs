@@ -24,7 +24,7 @@ namespace Editor.Services
             {
                 var virtualDisk = new VirtualDisk();
                 BootGen.Project project = InitProject(request, virtualDisk);
-                project.GenerateFiles("WebProject", "WebProject", "http://localhost:5000");
+                project.GenerateFiles(request.NameSpace, "http://localhost:5000");
                 var files = new List<GeneratedFile>();
                 foreach (var file in virtualDisk.Files)
                 {
@@ -108,9 +108,11 @@ namespace Editor.Services
                 Directory.CreateDirectory(tempRoot);
             Directory.CreateDirectory(tempDir);
             ZipFile.ExtractToDirectory("templates/WebProject.zip", tempDir);
+            File.Move(Path.Combine(tempDir, "WebProject.csproj"), Path.Combine(tempDir, $"{request.NameSpace}.csproj"));
+            ReplaceNamespace(tempDir, request.NameSpace);
             var disk = new Disk(tempDir);
             BootGen.Project project = InitProject(request, disk);
-            project.GenerateFiles("WebProject", "WebProject", "http://localhost:5000");
+            project.GenerateFiles(request.NameSpace, "http://localhost:5000");
             ZipFile.CreateFromDirectory(tempDir, tempFile);
             var reader = new BinaryReader(File.Open(tempFile, FileMode.Open));
             const int bufferSize = 4096;
@@ -121,6 +123,22 @@ namespace Editor.Services
                 ms.Write(buffer, 0, count);
             ms.Position = 0;
             return ms;
+        }
+
+        private static void ReplaceNamespace(string tempDir, string namespce)
+        {
+            foreach( var path in Directory.GetFiles(tempDir)) {
+                if (path.EndsWith(".cs") || path.EndsWith(".json"))
+                {
+                    var content = File.ReadAllText(path);
+                    content = content.Replace("WebProject", namespce);
+                    File.WriteAllText(path, content);
+                }
+            }
+            foreach( var path in Directory.GetDirectories(tempDir))
+            {
+                ReplaceNamespace(path, namespce);
+            }
         }
 
         private static BootGen.Project InitProject(GenerateRequest request, IDisk disk)

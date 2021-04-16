@@ -16,8 +16,9 @@
                 <v-col cols="12">
                   <ValidationObserver v-slot="{ invalid }">
                     <v-col cols="12" class="text-center">
-                      <ValidationProvider v-slot="{ errors }" name="email" rules="required|email">
+                      <ValidationProvider v-slot="{ errors }" name="email" rules="required|custom_email">
                       <v-text-field
+                        name="email"
                         label="E-mail"
                         v-model="email"
                         :error-messages="errors"
@@ -26,6 +27,7 @@
                       </ValidationProvider>
                       <ValidationProvider v-slot="{ errors }" name="password" rules="required">
                         <v-text-field
+                          name="password"
                           label="Password"
                           v-model="password"
                           :error-messages="errors"
@@ -64,8 +66,10 @@ extend('min', {
   message: '{_field_} may not be less than {length} characters',
 });
 
-extend('email', {
-  ...email,
+extend('custom_email', {
+  validate(value) {
+    return (/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(value.trim()));
+  },
   message: 'Email must be valid',
 });
 
@@ -88,7 +92,7 @@ export default Vue.extend({
       this.$gtag.event('login');
       try {
         await this.$store.dispatch('login', {
-          email: this.email,
+          email: this.email.trim(),
           password: this.password,
         });
         await this.$router.push('profile');

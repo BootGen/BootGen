@@ -120,6 +120,7 @@ export default {
         return [
           { title: 'Editor', link: '/', icon: 'mdi-cog' },
           { title: 'Saved Projects', link: '/saved-projects', icon: 'mdi-file-multiple' },
+          { title: 'Getting Started', link: '/getting-started', icon: 'mdi-help' },
           { title: 'Profile', link: '/profile', icon: 'mdi-account' },
           {
             title: 'Change Password',
@@ -131,6 +132,7 @@ export default {
       } else {
         return [
           { title: 'Editor', link: '/', icon: 'mdi-cog' },
+          { title: 'Getting Started', link: '/getting-started', icon: 'mdi-help' },
           { title: 'Login', link: '/login', icon: 'mdi-account-arrow-left' },
           {
             title: 'Sign Up',
