@@ -118,15 +118,14 @@ export default Vue.extend({
       });
     },
     highlightLine: function (line: number, color: string){
-      this.unsetHighlight();
       const elementById = document.getElementById(this.cmId);
       if(!elementById || (this.minLine > line && this.minLine < 5000000) || (this.maxLine < line && this.maxLine > -1)){
         return;
       }
       if(this.minLine < line && line < this.maxLine){
-        elementById.getElementsByClassName('CodeMirror-line')[line-this.minLine+2].setAttribute('style', `background-color:${color};`);
+        elementById.getElementsByClassName('CodeMirror-line')[line-this.minLine+2]?.setAttribute('style', `background-color:${color};`);
       }else{
-        elementById.getElementsByClassName('CodeMirror-line')[line].setAttribute('style', `background-color:${color};`);
+        elementById.getElementsByClassName('CodeMirror-line')[line]?.setAttribute('style', `background-color:${color};`);
       }
     },
     cursorIntoView: function(){
