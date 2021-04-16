@@ -63,9 +63,7 @@ export default Vue.extend({
         if(linesToColor.length < 1){
           this.unsetHighlight();
         }else{
-          linesToColor.forEach(lineToColor => {
-            this.highlightLine(lineToColor.line, lineToColor.color);
-          })
+          this.highlight();
         }
       }
     }
@@ -100,6 +98,7 @@ export default Vue.extend({
     onScroll: function(){
       this.unsetHighlight();
       this.setMinMaxLine();
+      this.highlight();
     },
     unsetHighlight: function (){
       const elementById = document.getElementById(this.cmId);
@@ -110,6 +109,11 @@ export default Vue.extend({
       for(let i = 0; i < e.length; i++){
         e[i].setAttribute('style', 'background-color: unset;');
       }
+    },
+    highlight: function() {
+      this.linesToColor.forEach(lineToColor => {
+            this.highlightLine(lineToColor.line, lineToColor.color);
+          });
     },
     highlightLine: function (line: number, color: string){
       this.unsetHighlight();
