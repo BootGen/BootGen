@@ -284,12 +284,12 @@ export default Vue.extend({
       return result;
     },
     getChanges: function(file1: string, file2: string) {
-      const lines1 = file1.split("\n");
-      const lines2 = file2.split("\n");
+      const lines1 = file1.split('\n');
+      const lines2 = file2.split('\n');
       const mapping = this.compare(lines1, lines2);
       lines2.forEach((line, idx) => {
         if (mapping[idx] === undefined){
-          this.cm1LinesToColor.push({line: idx, color: "#412fb3"});
+          this.cm1LinesToColor.push({line: idx, color: '#412fb3'});
         }
       });
     },
