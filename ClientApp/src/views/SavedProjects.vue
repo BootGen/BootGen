@@ -2,12 +2,7 @@
   <v-container class="pt-0 pb-0" fluid style="height:100vh">
     <v-row>
       <v-col cols="12" class="pt-0 pb-0">
-        <div class="d-flex justify-end w-100vw mb-5">
-          <v-icon v-if="!projectView" @click="projectView = true">mdi-view-headline</v-icon>
-          <v-icon v-else @click="projectView = false">mdi-view-module-outline</v-icon>
-        </div>
         <v-data-table
-          v-if="projectView"
           :headers="headers"
           :items="$store.state.projects.items"
           :search="search"
@@ -32,25 +27,6 @@
             <v-icon @click="deleteItem(item)">mdi-delete</v-icon>
           </template>
         </v-data-table>
-        <v-row v-else class="pt-0 pb-0">
-          <v-col cols="12" md="4" sm="6" class="pt-0 pb-0 projectCard" v-for="(project, indexi) in $store.state.projects.items" :key="indexi" @click="openProject(project)">
-            <v-card class="mt-2 m-b-2">
-              <div class="d-flex justify-space-between pl-3 pr-3">
-                <div class="d-flex align-center">
-                  <v-card-title class="text-truncate pl-0">{{ project.name }}</v-card-title>
-                  <v-progress-circular
-                    v-if="projectInLoading === project"
-                    indeterminate
-                    :size="25"
-                    color="primary"
-                  ></v-progress-circular>
-                </div>
-                <v-icon class="pl-0" @click="deleteItem(project)">mdi-delete</v-icon>
-              </div>
-              <v-card-text class="text-truncate text--disabled">{{ project.json }}</v-card-text>
-            </v-card>
-          </v-col>
-        </v-row>
         <v-dialog v-model="dialog" max-width="500">
           <v-card>
             <v-card-title>Are you sure you want to delete this project?</v-card-title>
@@ -88,28 +64,12 @@ export default Vue.extend({
       ],
       dialog: false,
       deletableProject: null as (null | Project),
-      projectView: true,
       inLoading: false,
       projectInLoading: null as (null | Project),
     };
   },
-  watch:{
-    projectView(view) {
-      this.$gtag.event('change-projects-view');
-      if(view){
-        localStorage.projectView = true;
-      }else{
-        localStorage.projectView = false;
-      }
-    }
-  },
   created: async function(){
-    this.$store.dispatch('projects/getProjects');
-    if(localStorage.projectView === 'false'){
-      this.projectView = false;
-    }else{
-      localStorage.projectView = true;
-    }
+    await this.$store.dispatch('projects/getProjects');
   },
   methods: {
     openProject: async function(project: Project){
