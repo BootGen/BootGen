@@ -145,6 +145,7 @@ import {CRC32} from 'crc_32_ts';
 import axios from 'axios';
 import api from '../api'
 import {GenerateResponse} from '../models/GenerateResponse';
+import {getChanges}from '../utils/TextCompare'
 
 export default Vue.extend({
   components: {
@@ -267,35 +268,14 @@ export default Vue.extend({
         this.highlightedDifferences = [];
         for(let i = 0; i < this.previousFiles.length; i++){
           if(this.previousFiles[i].name === this.activeFile.name && this.previousFiles[i].path === this.activeFile.path){
-            this.getChanges(this.previousFiles[i].content, this.activeFile.content);
+            const changes = getChanges(this.previousFiles[i].content, this.activeFile.content);
+            changes.forEach(v =>{
+              this.highlightedDifferences.push({ line : v, color:'#412fb3' })
+            })
             break;
           }
         }
       }
-    },
-    compare: function(lines1: string[], lines2: string[]): number[] {
-      const result: number[] = [];
-      let position = 0;
-      lines2.forEach((line, idx2) => {
-        for(let idx1 = position; idx1 < lines1.length; ++idx1) {
-          if (lines1[idx1] == line) {
-            position = idx1 + 1;
-            result[idx2] = idx1;
-            break;
-          }
-        }
-      });
-      return result;
-    },
-    getChanges: function(file1: string, file2: string) {
-      const lines1 = file1.split('\n');
-      const lines2 = file2.split('\n');
-      const mapping = this.compare(lines1, lines2);
-      lines2.forEach((line, idx) => {
-        if (mapping[idx] === undefined){
-          this.highlightedDifferences.push({line: idx, color: '#412fb3'});
-        }
-      });
     },
     getJsonLength: function(json: string): number{
       json = json.replace(/ {2}/g, '');

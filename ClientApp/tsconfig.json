@@ -13,6 +13,8 @@
     "baseUrl": ".",
     "types": [
       "webpack-env",
+      "mocha",
+      "chai"
     ],
     "typeRoots": [
       "./node_modules/@types",
