@@ -145,7 +145,7 @@ import {CRC32} from 'crc_32_ts';
 import axios from 'axios';
 import api from '../api'
 import {GenerateResponse} from '../models/GenerateResponse';
-import {getChanges}from '../utils/TextCompare'
+import {Compare}from '../utils/TextCompare'
 
 export default Vue.extend({
   components: {
@@ -268,7 +268,8 @@ export default Vue.extend({
         this.highlightedDifferences = [];
         for(let i = 0; i < this.previousFiles.length; i++){
           if(this.previousFiles[i].name === this.activeFile.name && this.previousFiles[i].path === this.activeFile.path){
-            const changes = getChanges(this.previousFiles[i].content, this.activeFile.content);
+            const compare = new Compare(this.previousFiles[i].content.split('\n'), this.activeFile.content.split('\n'));
+            const changes = compare.getChanges();
             changes.forEach(v =>{
               this.highlightedDifferences.push({ line : v, color:'#412fb3' })
             })
