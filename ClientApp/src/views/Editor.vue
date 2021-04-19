@@ -13,10 +13,24 @@
         <base-material-generator-card>
           <template v-slot:heading>
             <div class="d-flex align-center justify-space-between pa-2">
-              <div class="display-1 font-weight-light pa-2">
-                JSON
+              <div class="d-flex">
+                <span class="display-1 font-weight-light pa-2">JSON</span>
+                <div class="d-flex freamworkSelect">
+                  <v-select
+                    v-model="backendFramework"
+                    :items="backendFrameworks"
+                    dense
+                    hide-details                
+                  ></v-select>
+                  <v-select
+                    v-model="frontendFramework"
+                    :items="frontendFrameworks"
+                    dense
+                    hide-details                
+                  ></v-select>
+                </div>
               </div>
-              <div class="icons">
+              <div>
                 <v-tooltip bottom>
                   <template v-slot:activator="{ on, attrs }">
                     <v-btn class="mr-2" color="white" elevation="1" fab small @click="undo" v-bind="attrs" v-on="on" :disabled="undoStack.length() < 2 && isJsonPristine">
@@ -177,6 +191,10 @@ export default Vue.extend({
       generateLoading: false,
       downLoading: false,
       isCompare: true,
+      backendFrameworks: ['ASP.NET'],
+      frontendFrameworks: ['Vue.js 2', 'Vue.js 3', 'React'],
+      backendFramework: 'ASP.NET',
+      frontendFramework: 'Vue.js 2'
     };
   },
   created: async function(){
@@ -485,9 +503,6 @@ export default Vue.extend({
       margin-top: 60px;
       margin-left: unset;
     }
-    .icons button{
-      margin-top: 5px;
-    }
   }
   .fileSelector {
     max-height: calc(100vh - 230px);
@@ -506,5 +521,8 @@ export default Vue.extend({
   }
   .pathElement:hover{
     opacity: 0.6;
+  }
+  .freamworkSelect{
+    max-width: 200px;
   }
 </style>
