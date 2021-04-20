@@ -14,7 +14,7 @@ export class Compare{
       for(let idx1 = 0; idx1 < this.lines1.length; ++idx1) {
         for(let idx3 = offset; idx3 >= 0; idx3--){
           if(!this.matched[idx1 + idx3]){
-            if((idx1 + idx3) > 0 && (idx1 + idx3) < this.lines1.length){
+            if((idx1 + idx3) >= 0 && (idx1 + idx3) <= this.lines1.length){
               if(this.lines1[idx1 + idx3] === line2) {
                 this.indices[idx1 + idx3] = idx1 + idx3;
                 this.matched[idx1 + idx3] = true;
@@ -22,7 +22,7 @@ export class Compare{
             }
           }
           if(!this.matched[idx1 - idx3]){
-            if((idx1 - idx3) > 0 && (idx1 - idx3) < this.lines1.length){
+            if((idx1 - idx3) >= 0 && (idx1 - idx3) <= this.lines1.length){
               if(this.lines1[idx1 - idx3] === line2) {
                 this.indices[idx1 - idx3] = idx1 - idx3;
                 this.matched[idx1 - idx3] = true;
@@ -69,7 +69,6 @@ export class Compare{
         changes.push(i);
       }
     }
-    console.log('changes', changes);
     return changes;
   }
 }
