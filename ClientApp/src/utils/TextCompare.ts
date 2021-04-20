@@ -10,58 +10,32 @@ export class Compare{
   }
 
   compareWithOffset(offset: number){
-    this.lines2.forEach(line2 => {
-      for(let idx1 = 0; idx1 < this.lines1.length; ++idx1) {
-        for(let idx3 = offset; idx3 >= 0; idx3--){
-          if(!this.matched[idx1 + idx3]){
-            if((idx1 + idx3) >= 0 && (idx1 + idx3) <= this.lines1.length){
-              if(this.lines1[idx1 + idx3] === line2) {
-                this.indices[idx1 + idx3] = idx1 + idx3;
-                this.matched[idx1 + idx3] = true;
-              }
-            }
-          }
-          if(!this.matched[idx1 - idx3]){
-            if((idx1 - idx3) >= 0 && (idx1 - idx3) <= this.lines1.length){
-              if(this.lines1[idx1 - idx3] === line2) {
-                this.indices[idx1 - idx3] = idx1 - idx3;
-                this.matched[idx1 - idx3] = true;
-              }
-            }
-          }
+    this.lines2.forEach((line2, idx2) => {
+      const idx1 = idx2 + offset;
+      if (!this.matched[idx1]) {
+        if (this.lines1[idx1] === line2) {
+          this.matched[idx1] = true;
+          this.indices[idx2] = idx1;
         }
       }
     });
   }
-  getMaxMissingBlock(missingLines: number[]): number{
-    let block = 0;
-    let missingMaxBlock = 0;
-    for(let i = 0; i < missingLines.length-1; i++){
-      if(missingLines[i] + 1 === missingLines[i+1]){
-        if(block === 0){
-          block++;
-        }
-        block++;
-      }else{
-        if(missingMaxBlock < block){
-          missingMaxBlock = block;
-          block = 0;
-        }
-      }
-    }
-    return missingMaxBlock;
-  }
   public getChanges(): Array<number> {
     this.compareWithOffset(0);
-    const missingLines: number[] = [];
+    let offset = 0;
+    let maxOffset = 0;
     for(let i = 0; i < this.matched.length; i++){
-      if(!this.matched[i]){
-        missingLines.push(i);
+      if(this.matched[i]){
+        ++offset;
+        if (maxOffset < offset)
+          maxOffset = offset;
+      } else {
+        offset = 0;
       }
     }
-    const offset = this.getMaxMissingBlock(missingLines);
-    if(offset > 1){
-      this.compareWithOffset(offset-1);
+    for (let i = 1; i < maxOffset; ++i) {
+      this.compareWithOffset(i);
+      this.compareWithOffset(-i);
     }
     const changes: number[] = [];
     for(let i = 0; i < this.matched.length; i++){
