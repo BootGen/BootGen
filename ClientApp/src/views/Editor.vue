@@ -91,8 +91,8 @@
                       <v-icon color="primary">mdi-file-compare</v-icon>
                     </v-btn>
                   </template>
-                  <span v-if="isCompare">Show Changes: Off</span>
-                  <span v-else>Show Changes: On</span>
+                  <span v-if="isCompare">Show Changes: On</span>
+                  <span v-else>Show Changes: Off</span>
                 </v-tooltip>
                 <v-tooltip bottom>
                   <template v-slot:activator="{ on, attrs }">
