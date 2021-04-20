@@ -11,6 +11,22 @@ Create sample JSON data, and generate your application. Edit the JSON, and regen
 
 When you are finnished click download, and start coding!
 
+### The Generated Application
+
+<img width="800px" height="450px" src="Images/app_demo.gif">
+
+The application has an ASP.Net 5 backend and a Vue.js 2 frontend.
+The backend has:
+ * An Entity Framework database context, seeded with the provided example data.
+ * Data services for each entity class.
+ * REST API controllers.
+The frontend has:
+ * A REST client.
+ * Modularized Vuex store, with on module for each entity class.
+ * A simple Vuetify UI with views and editing forms for each entity class.
+
+The application comes with an email / password authentication. Every user in your JSON data will automatically get a password, which by default will be "password123". This you can change later in the `ApplicationDbContext.cs` file.
+
 ### An Example JSON Input
 
 ```js
