@@ -192,9 +192,9 @@ export default Vue.extend({
       downLoading: false,
       isCompare: true,
       backendFrameworks: ['ASP.NET'],
-      frontendFrameworks: ['Vue.js 2', 'Vue.js 3', 'React'],
+      frontendFrameworks: ['Vue 2', 'Vue 3', 'React'],
       backendFramework: 'ASP.NET',
-      frontendFramework: 'Vue.js 2'
+      frontendFramework: 'Vue 2'
     };
   },
   created: async function(){
@@ -245,7 +245,12 @@ export default Vue.extend({
     generate: async function(){
       if(!this.generateLoading){
         this.generateLoading = true;
-        const generateResult: GenerateResponse = await api.generate({data: this.activeProject.json, nameSpace: this.toCamelCase(this.activeProject.name)});
+        const generateResult: GenerateResponse = await api.generate({
+          data: this.activeProject.json,
+          nameSpace: this.toCamelCase(this.activeProject.name),
+          backendFramework: this.backendFramework,
+          frontendFramework: this.frontendFramework
+        });
         if(generateResult.errorMessage){
           this.setSnackbar('orange darken-2', generateResult.errorMessage, -1);
           if(generateResult.errorLine !== null){
@@ -435,7 +440,12 @@ export default Vue.extend({
         this.$gtag.event('download');
         await Promise.all([
           this.delay(3000),
-          api.download({data: this.activeProject.json, nameSpace: this.toCamelCase(this.activeProject.name)})
+          api.download({
+            data: this.activeProject.json,
+            nameSpace: this.toCamelCase(this.activeProject.name),
+            backendFramework: this.backendFramework,
+            frontendFramework: this.frontendFramework
+          })
         ]);
         this.downLoading = false;
       }
