@@ -17,10 +17,13 @@ When you are finnished click download, and start coding!
 
 The application has an ASP.Net 5 backend and a Vue.js 2 frontend.
 The backend has:
+
  * An Entity Framework database context, seeded with the provided example data.
  * Data services for each entity class.
  * REST API controllers.
+
 The frontend has:
+
  * A REST client.
  * Modularized Vuex store, with on module for each entity class.
  * A simple Vuetify UI with views and editing forms for each entity class.
