@@ -63,6 +63,7 @@ namespace Editor
             services.AddScoped<IGenerateService, GenerateService>();
             services.AddScoped<IProjectsService, ProjectsService>();
             services.AddScoped<IErrorService, ErrorService>();
+            services.AddScoped<IStatisticsService, StatisticsService>();
             if (Configuration["DataBaseType"] == "MySQL")
             {
                 services.AddDbContext<ApplicationDbContext>(options => options.UseMySql(Configuration.GetConnectionString("MySQL"), ServerVersion.FromString(Configuration["DataBaseVersion"])));

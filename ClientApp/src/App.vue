@@ -65,9 +65,7 @@
     </v-app-bar>
 
     <v-main>
-      <!-- Provides the application the proper gutter -->
       <v-container fluid>
-        <!-- If using vue-router -->
         <router-view></router-view>
       </v-container>
     </v-main>
@@ -116,30 +114,22 @@ export default {
   computed: {
     ...mapState(['barColor', 'barImage']),
     items: function () {
+      const menuItems = [
+          { title: 'Getting Started', link: '/', icon: 'mdi-rocket-launch' },
+          { title: 'Editor', link: '/editor', icon: 'mdi-cog' }
+      ];
       if (this.$store.state.auth.jwt) {
-        return [
-          { title: 'Editor', link: '/', icon: 'mdi-cog' },
+        return menuItems.concat([
           { title: 'Saved Projects', link: '/saved-projects', icon: 'mdi-file-multiple' },
-          { title: 'Getting Started', link: '/getting-started', icon: 'mdi-help' },
           { title: 'Profile', link: '/profile', icon: 'mdi-account' },
-          {
-            title: 'Change Password',
-            link: '/change-password',
-            icon: 'mdi-form-textbox-password',
-          },
+          { title: 'Change Password', link: '/change-password', icon: 'mdi-form-textbox-password' },
           { title: 'Logout', link: '/logout', icon: 'mdi-account-arrow-right' }
-        ];
+        ]);
       } else {
-        return [
-          { title: 'Editor', link: '/', icon: 'mdi-cog' },
-          { title: 'Getting Started', link: '/getting-started', icon: 'mdi-help' },
+        return menuItems.concat([
           { title: 'Login', link: '/login', icon: 'mdi-account-arrow-left' },
-          {
-            title: 'Sign Up',
-            link: 'sign-up',
-            icon: 'mdi-account-plus',
-          }
-        ];
+          { title: 'Sign Up', link: 'sign-up', icon: 'mdi-account-plus' }
+        ]);
       }
     },
   },

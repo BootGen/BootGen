@@ -13,10 +13,12 @@ namespace Editor.Services
     public class GenerateService : IGenerateService
     {
         public IErrorService ErrorService { get; }
+        public IStatisticsService StatisticsService { get; }
 
-        public GenerateService(IErrorService errorService)
+        public GenerateService(IErrorService errorService, IStatisticsService statisticsService)
         {
             ErrorService = errorService;
+            StatisticsService = statisticsService;
         }
         public GenerateResponse Generate(GenerateRequest request)
         {
@@ -35,7 +37,7 @@ namespace Editor.Services
                         Content = file.Content
                     });
                 }
-
+                StatisticsService.OnGenerated(project.ResourceCollection.DataModel, request.Data, StatEvent.Generate);
                 return new GenerateResponse
                     {
                         Success = true,
@@ -102,7 +104,7 @@ namespace Editor.Services
             }
         }
 
-        private static MemoryStream CreateDownloadStream(GenerateRequest request, string tempRoot, string tempFile, string tempDir)
+        private MemoryStream CreateDownloadStream(GenerateRequest request, string tempRoot, string tempFile, string tempDir)
         {
             if (!Directory.Exists(tempRoot))
                 Directory.CreateDirectory(tempRoot);
@@ -122,6 +124,7 @@ namespace Editor.Services
             while ((count = reader.Read(buffer, 0, buffer.Length)) != 0)
                 ms.Write(buffer, 0, count);
             ms.Position = 0;
+            StatisticsService.OnGenerated(project.ResourceCollection.DataModel, request.Data, StatEvent.Download);
             return ms;
         }
 

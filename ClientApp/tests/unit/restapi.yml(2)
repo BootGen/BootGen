@@ -1,0 +1,634 @@
+openapi: '3.0.0'
+info:
+  version: 1.0.0
+  title: 'MyProject'
+  license:
+    name: MIT
+servers:
+  - url: http://localhost:5000
+paths:
+  /authentication/login:
+    post:
+      summary: login with email and password
+      operationId: login
+      responses:
+        '200':
+          description: successful login
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LoginSuccess'
+        '401':
+          description: login error
+  /registration/register:
+    post:
+      summary: register with email and password
+      operationId: register
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+                $ref: '#/components/schemas/RegistrationData'
+      responses:
+        '200':
+          description: response to registration request
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProfileResponse'
+  /profile:
+    get:
+      summary: get current user
+      security:
+      - bearerAuth: []
+      operationId: profile
+      responses:
+        '200':
+          description: successful login
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+    post:
+      summary: update profile
+      security:
+      - bearerAuth: []
+      operationId: updateProfile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+                $ref: '#/components/schemas/User'
+      responses:
+        '200':
+          description: response to update profile request
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProfileResponse'
+  /profile/change-password:
+    post:
+      summary: change password
+      security:
+      - bearerAuth: []
+      operationId: changePassword
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+                $ref: '#/components/schemas/ChangePasswordData'
+      responses:
+        '200':
+          description: response to update profile request
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ChangePasswordResponse'
+  /users:
+    get:
+      summary: get the list of users
+      operationId: getUsers
+      responses:
+        '200':
+          description: successful query
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+    post:
+      summary: add a new element to the collection
+      operationId: addUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+                $ref: '#/components/schemas/User'
+      responses:
+        '200':
+          description: successful insertion
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+  /users/{userId}:
+    get:
+      summary: get a user by id
+      operationId: getUser
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: successful query
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+    put:
+      summary: update a user
+      operationId: updateUser
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+                $ref: '#/components/schemas/User'
+      responses:
+        '200':
+          description: successful update
+    delete:
+      summary: delete a user by id
+      operationId: deleteUser
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: successful deletion
+  /users/{userId}/tasks:
+    get:
+      summary: get the list of tasks that belong to the given user
+      operationId: getTasksOfUser
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: successful query
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Task'
+    post:
+      summary: add a new element to the collection
+      operationId: addTaskToUser
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+                $ref: '#/components/schemas/Task'
+      responses:
+        '200':
+          description: successful insertion
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+  /tasks:
+    get:
+      summary: get the list of tasks
+      operationId: getTasks
+      responses:
+        '200':
+          description: successful query
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Task'
+    post:
+      summary: add a new element to the collection
+      operationId: addTask
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+                $ref: '#/components/schemas/Task'
+      responses:
+        '200':
+          description: successful insertion
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+  /tasks/{taskId}:
+    get:
+      summary: get a task by id
+      operationId: getTask
+      parameters:
+        - name: taskId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: successful query
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+    put:
+      summary: update a task
+      operationId: updateTask
+      parameters:
+        - name: taskId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+                $ref: '#/components/schemas/Task'
+      responses:
+        '200':
+          description: successful update
+    delete:
+      summary: delete a task by id
+      operationId: deleteTask
+      parameters:
+        - name: taskId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: successful deletion
+  /tasks/{taskId}/tags:
+    get:
+      summary: get the list of tags that belong to the given task
+      operationId: getTagsOfTask
+      parameters:
+        - name: taskId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: successful query
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Tag'
+    post:
+      summary: add a new element to the collection
+      operationId: addTagToTask
+      parameters:
+        - name: taskId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+                $ref: '#/components/schemas/Tag'
+      responses:
+        '200':
+          description: successful insertion
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tag'
+  /tasks/{taskId}/tags/{tagId}:
+    delete:
+      summary: remove a tag by id from the given task
+      operationId: deleteTagsOfTask
+      parameters:
+        - name: taskId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: tagId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: successful deletion
+  /tags:
+    get:
+      summary: get the list of tags
+      operationId: getTags
+      responses:
+        '200':
+          description: successful query
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Tag'
+    post:
+      summary: add a new element to the collection
+      operationId: addTag
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+                $ref: '#/components/schemas/Tag'
+      responses:
+        '200':
+          description: successful insertion
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tag'
+  /tags/{tagId}:
+    get:
+      summary: get a tag by id
+      operationId: getTag
+      parameters:
+        - name: tagId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: successful query
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tag'
+    put:
+      summary: update a tag
+      operationId: updateTag
+      parameters:
+        - name: tagId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+                $ref: '#/components/schemas/Tag'
+      responses:
+        '200':
+          description: successful update
+    delete:
+      summary: delete a tag by id
+      operationId: deleteTag
+      parameters:
+        - name: tagId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: successful deletion
+  /tags/{tagId}/tasks:
+    get:
+      summary: get the list of tasks that belong to the given tag
+      operationId: getTasksOfTag
+      parameters:
+        - name: tagId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: successful query
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Task'
+    post:
+      summary: add a new element to the collection
+      operationId: addTaskToTag
+      parameters:
+        - name: tagId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+                $ref: '#/components/schemas/Task'
+      responses:
+        '200':
+          description: successful insertion
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+  /tags/{tagId}/tasks/{taskId}:
+    delete:
+      summary: remove a task by id from the given tag
+      operationId: deleteTasksOfTag
+      parameters:
+        - name: tagId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: taskId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: successful deletion
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT 
+  schemas:
+    LoginSuccess:
+      type: object
+      required:
+        - jwt
+      properties:
+        jwt:
+          type: string
+    RegistrationData:
+      type: object
+      required:
+        - userName
+        - email
+        - password
+      properties:
+        userName:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+    ProfileResponse:
+      type: object
+      required:
+        - success
+        - isUserNameInUse
+        - isEmailInUse
+      properties:
+        success:
+          type: boolean
+        isUserNameInUse:
+          type: boolean
+        isEmailInUse:
+          type: boolean
+    ChangePasswordData:
+      type: object
+      required:
+        - oldPassword
+        - newPassword
+      properties:
+        oldPassword:
+          type: string
+        newPassword:
+          type: string
+    ChangePasswordResponse:
+      type: object
+      required:
+        - success
+      properties:
+        success:
+          type: boolean
+    User:
+      type: object
+      required:
+        - id
+        - user_name
+        - email
+      properties:
+        id:
+          type: integer
+          format: int32
+          readOnly: true
+        user_name:
+          type: string
+        email:
+          type: string
+    Task:
+      type: object
+      required:
+        - id
+        - created
+        - updated
+        - name
+        - desc
+        - is_open
+        - due_date
+        - estimated_hours
+        - priority
+        - user_id
+      properties:
+        id:
+          type: integer
+          format: int32
+          readOnly: true
+        created:
+          type: string
+          format: date-time
+        updated:
+          type: string
+          format: date-time
+        name:
+          type: string
+        desc:
+          type: string
+        is_open:
+          type: boolean
+        due_date:
+          type: string
+          format: date-time
+        estimated_hours:
+          type: number
+          format: float
+        priority:
+          type: integer
+          format: int32
+        user_id:
+          type: integer
+          format: int32
+    Tag:
+      type: object
+      required:
+        - id
+        - name
+        - color
+      properties:
+        id:
+          type: integer
+          format: int32
+          readOnly: true
+        name:
+          type: string
+        color:
+          type: string

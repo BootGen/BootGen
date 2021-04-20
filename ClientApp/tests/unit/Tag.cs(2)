@@ -1,0 +1,14 @@
+using System;
+using System.Text.Json.Serialization;
+using System.Collections.Generic;
+namespace MyProject
+{
+    public class Tag
+    {
+        public int Id { get; set; }
+        public string Title { get; set; }
+        public string Color { get; set; }
+        [JsonIgnore]
+        public List<Task> Tasks { get; set; }
+    }
+}

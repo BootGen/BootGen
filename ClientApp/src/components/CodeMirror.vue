@@ -35,8 +35,7 @@ export default Vue.extend({
         line: true,
         readOnly: false,
       },
-      minLine: 5000000,
-      maxLine: -1,
+      minLine: 5000000
     }
   },
   components: {
@@ -90,15 +89,12 @@ export default Vue.extend({
       }
       const list = elementById.getElementsByClassName('CodeMirror-linenumber');
       this.minLine = 5000000;
-      this.maxLine = -1;
-      for (let i = 1; i < list.length; i++) {
+      for (let i = 0; i < list.length; i++) {
         const textval = list[i].textContent;
         if (textval) {
           const lineNum = parseInt(textval, 10);
           if (lineNum < this.minLine)
             this.minLine = lineNum;
-          if (lineNum > this.maxLine)
-            this.maxLine = lineNum;
         }
       }
     },
@@ -124,13 +120,11 @@ export default Vue.extend({
     },
     highlightLine: function (line: number, color: string){
       const elementById = document.getElementById(this.cmId);
-      if(!elementById || (this.minLine > line && this.minLine < 5000000) || (this.maxLine < line && this.maxLine > -1)){
+      if(!elementById || (this.minLine > line && this.minLine < 5000000)){
         return;
       }
-      if(this.minLine < line && line < this.maxLine){
+      if(this.minLine < line){
         elementById.getElementsByClassName('CodeMirror-line')[line-this.minLine+2]?.setAttribute('style', `background-color:${color};`);
-      }else{
-        elementById.getElementsByClassName('CodeMirror-line')[line]?.setAttribute('style', `background-color:${color};`);
       }
     },
     cursorIntoView: function(){
