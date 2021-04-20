@@ -79,8 +79,8 @@ export default Vue.extend({
         const generateResult: GenerateResponse = await api.generate({
           data: project.json,
           nameSpace: this.toCamelCase(project.name),
-          backendFramework: 'ASP.NET',
-          frontendFramework: 'Vue 2'
+          backendFramework: project.backendFramework,
+          frontendFramework: project.frontendFramework
         });
         this.$store.commit('projects/setLastProject', project);
         this.$store.commit('projects/setLastGeneratedFiles', generateResult.generatedFiles);

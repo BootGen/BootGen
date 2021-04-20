@@ -5,7 +5,7 @@
         <v-toolbar-title class="font-weight-light mr-2">Editor -</v-toolbar-title>
         <ValidationObserver>
           <ValidationProvider v-slot="{ errors }" name="Project name" rules="required">
-            <v-text-field v-model="activeProject.name" placeholder="Name your project" type="text" :error-messages="errors" required @input="changeName"></v-text-field>
+            <v-text-field v-model="activeProjectName" placeholder="Name your project" type="text" :error-messages="errors" required @input="changeName"></v-text-field>
           </ValidationProvider>
         </ValidationObserver>
         <v-btn class="mr-0 ml-3" color="primary" small @click="dialog = true" v-if="$store.state.auth.jwt">New project</v-btn>
@@ -21,11 +21,21 @@
                 <v-container>
                   <v-row>
                     <v-col cols="12">
-                        <ValidationProvider v-slot="{ errors }" name="Project name" rules="required">
-                          <v-text-field v-model="projectName" placeholder="Name your project" type="text" :error-messages="errors" required></v-text-field>
-                        </ValidationProvider>
+                      <ValidationProvider v-slot="{ errors }" name="Project name" rules="required">
+                        <v-text-field v-model="projectName" label="Project Name" type="text" :error-messages="errors" required></v-text-field>
+                      </ValidationProvider>
                     </v-col>
                   </v-row>
+                  <v-select
+                    v-model="backendFramework"
+                    :items="backendFrameworks"
+                    label="Backend"              
+                  ></v-select>
+                  <v-select
+                    v-model="frontendFramework"
+                    :items="frontendFrameworks"
+                    label="Frontend"             
+                  ></v-select>
                 </v-container>
                 <v-alert class="text-left" type="error" v-if="errorMsg">This name is already in use, please enter another name!</v-alert>
               </v-card-text>
@@ -59,15 +69,21 @@ export default Vue.extend({
     ValidationObserver,
   },
   props: {
-    activeProject: {
-      type: Object as () => Project
+    activeProjectName: String,
+    backendFrameworks: {
+      type: Array as () => Array<string>
+    },
+    frontendFrameworks: {
+      type: Array as () => Array<string>
     },
   },
   data: function () {
     return {
       errorMsg: false,
       dialog: false,
-      projectName: 'My Project'
+      projectName: 'My Project',
+      backendFramework: 'ASP.NET',
+      frontendFramework: 'Vue 2',
     };
   },
   methods: {
@@ -75,7 +91,7 @@ export default Vue.extend({
       if(this.existsProjectName()){
         this.errorMsg = true;
       }else{
-        this.$emit('new-project', this.projectName);
+        this.$emit('new-project', this.projectName, this.backendFramework, this.frontendFramework);
         this.dialog = false;
       }
     },

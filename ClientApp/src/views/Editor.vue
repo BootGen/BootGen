@@ -2,10 +2,10 @@
   <v-container fluid class="editor">
     <v-row class="d-flex align-center ma-0 pa-0">
       <v-col lg="5" md="6" sm="8" cols="12" class="pa-0 headBar" v-if="$store.state.auth.jwt">
-        <head-bar :activeProject="activeProject" @new-project="createNewProject" @change-project-name="changeProjectName"></head-bar>
+        <head-bar :activeProjectName="activeProject.name" :backendFrameworks="backendFrameworks" :frontendFrameworks="frontendFrameworks" @new-project="createNewProject" @change-project-name="changeProjectName"></head-bar>
       </v-col>
       <v-col cols="12" class="pa-0 headBar" v-else>
-        <head-bar :activeProject="activeProject" @new-project="createNewProject" @change-project-name="changeProjectName"></head-bar>
+        <head-bar :activeProjectName="activeProject.name" @new-project="createNewProject" @change-project-name="changeProjectName"></head-bar>
       </v-col>
     </v-row>
     <v-row class="d-flex align-center">
@@ -15,16 +15,18 @@
             <div class="d-flex align-center justify-space-between pa-2">
               <div class="d-flex">
                 <span class="display-1 font-weight-light pa-2">JSON</span>
-                <div class="d-flex freamworkSelect">
+                <div class="d-flex frameworkSelect">
                   <v-select
-                    v-model="backendFramework"
+                    v-model="activeProject.backendFramework"
                     :items="backendFrameworks"
+                    @change="changeFramework('backend')"
                     dense
-                    hide-details                
+                    hide-details              
                   ></v-select>
                   <v-select
-                    v-model="frontendFramework"
+                    v-model="activeProject.frontendFramework"
                     :items="frontendFrameworks"
+                    @change="changeFramework('frontend')"
                     dense
                     hide-details                
                   ></v-select>
@@ -173,8 +175,8 @@ export default Vue.extend({
       previousFiles: Array<GeneratedFile>(),
       undoStack: new UndoStack(),
       crc32ProjectName: CRC32.str('My Project'),
-      activeProject: {id: -1, ownerId: -1, name: 'My Project', json: ''},
-      newProject: {id: -1, ownerId: -1, name: 'My Project', json: ''},
+      activeProject: {id: -1, ownerId: -1, name: 'My Project', json: '', backendFramework: 'ASP.NET', frontendFramework: 'Vue 2'},
+      newProject: {id: -1, ownerId: -1, name: 'My Project', json: '', backendFramework: 'ASP.NET', frontendFramework: 'Vue 2'},
       activeFile: {} as GeneratedFile,
       snackbar: {
         dismissible: true,
@@ -202,6 +204,8 @@ export default Vue.extend({
     if(this.$store.state.projects.lastProject.json){
       this.activeProject = {...this.$store.state.projects.lastProject};
       this.generatedFiles = [...this.$store.state.projects.lastGeneratedFiles];
+      this.backendFramework = this.$store.state.projects.lastProject.backendFramework;
+      this.frontendFramework = this.$store.state.projects.lastProject.frontendFramework;
       this.callPrettyPrint();
       this.setActiveFile();
     }else{
@@ -213,7 +217,11 @@ export default Vue.extend({
     isPristine: function(){
       const top = this.undoStack.top();
       if(top){
-        if((top.crc32 === CRC32.str(this.activeProject.json)) && (this.crc32ProjectName === CRC32.str(this.activeProject.name))){
+        if((top.crc32 === CRC32.str(this.activeProject.json)) &&
+          (this.crc32ProjectName === CRC32.str(this.activeProject.name)) &&
+          (this.backendFramework === this.activeProject.backendFramework) &&
+          (this.frontendFramework === this.activeProject.frontendFramework)
+        ){
           return true;
         }
       }
@@ -248,8 +256,8 @@ export default Vue.extend({
         const generateResult: GenerateResponse = await api.generate({
           data: this.activeProject.json,
           nameSpace: this.toCamelCase(this.activeProject.name),
-          backendFramework: this.backendFramework,
-          frontendFramework: this.frontendFramework
+          backendFramework: this.activeProject.backendFramework,
+          frontendFramework: this.activeProject.frontendFramework
         });
         if(generateResult.errorMessage){
           this.setSnackbar('orange darken-2', generateResult.errorMessage, -1);
@@ -264,6 +272,8 @@ export default Vue.extend({
         this.$store.commit('projects/setLastProject', this.activeProject);
         this.$store.commit('projects/setLastGeneratedFiles', this.generatedFiles);
         this.crc32ProjectName = CRC32.str(this.activeProject.name);
+        this.backendFramework = this.activeProject.backendFramework;
+        this.frontendFramework = this.activeProject.frontendFramework;
         if(this.undoStack.length() > 0){
           if(!this.isJsonPristine){
             this.undoStack.push(this.activeProject.json);
@@ -354,9 +364,11 @@ export default Vue.extend({
       this.activeProject.json = prettyPrint(this.activeProject.json);
       this.hideSnackbar();
     },
-    createNewProject: async function(name: string){
+    createNewProject: async function(name: string, backendFramework: string, frontendFramework: string){
       this.$gtag.event('create-new-project');
       this.newProject.name = name;
+      this.newProject.backendFramework = backendFramework;
+      this.newProject.frontendFramework = frontendFramework;
       this.activeProject = {...this.newProject};
       this.callPrettyPrint();
       this.save();
@@ -405,15 +417,15 @@ export default Vue.extend({
       if(this.activeProject.name){
         const exists = this.existsProjectName();
         if (!exists && this.activeProject.id === -1) {
-          this.setSnackbar('success', 'The new project was successfully created!', 5000);
           this.activeProject.id = 0;
           this.activeProject.ownerId = this.$store.state.auth.user.id;
           this.activeProject = await this.$store.dispatch('projects/addProject', this.activeProject);
+          this.setSnackbar('success', 'The new project was successfully created!', 5000);
         } else if(exists && exists.id !== this.activeProject.id) {
           this.setSnackbar('error', 'This name is already in use, please enter another name!', 5000);
         } else {
-          this.setSnackbar('success', 'Project updated successfully!', 5000);
           await this.$store.dispatch('projects/updateProject', this.activeProject);
+          this.setSnackbar('success', 'Project updated successfully!', 5000);
         }
       }else{
         this.setSnackbar('error', 'This name is incorrect!', 5000);
@@ -430,6 +442,9 @@ export default Vue.extend({
       }
       this.setSnackbar('info', 'Everything restored to its previous generated state', 5000);
     },
+    changeFramework: function(page: string){
+      this.$gtag.event(`change-${page}framework`);
+    },
     changeProjectName: function(name: string){
       this.$gtag.event('change-project-name');
       this.activeProject.name = name;
@@ -443,8 +458,8 @@ export default Vue.extend({
           api.download({
             data: this.activeProject.json,
             nameSpace: this.toCamelCase(this.activeProject.name),
-            backendFramework: this.backendFramework,
-            frontendFramework: this.frontendFramework
+            backendFramework: this.activeProject.backendFramework,
+            frontendFramework: this.activeProject.frontendFramework
           })
         ]);
         this.downLoading = false;
@@ -532,7 +547,7 @@ export default Vue.extend({
   .pathElement:hover{
     opacity: 0.6;
   }
-  .freamworkSelect{
+  .frameworkSelect{
     max-width: 200px;
   }
 </style>

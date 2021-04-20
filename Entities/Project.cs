@@ -11,5 +11,7 @@ namespace Editor
         [JsonIgnore]
         public User Owner { get; set; }
         public int OwnerId { get; set; }
+        public string BackendFramework { get; set; }
+        public string FrontendFramework { get; set; }
     }
 }
