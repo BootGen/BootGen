@@ -2,14 +2,14 @@
 
 Online rapid prototyping tool for ASP.Net and Vue.js projects. Turn JSON into well coded application at https://bootgen.com!
 
-## Supported Languages
-C#, TypeScript, Swagger (OAS3)
 
 ## How Does it Work?
 
-From a set of sample data given JSON format BootGen will determine a data model. Using this data model and a set of Scriban templates it will generate a server and a client application.
+<img width="600px" height="338px" src="Images/diff_demo.gif">
 
-An example set of Scriban templates can be found [here.](https://github.com/BootGen/BootGen/tree/master/BootGenTest/templates)
+Create sample JSON data, and generate your application. Edit the JSON, and regenerate until you are satisfied with the result. Changes will be highlighted in the generated files.
+
+When you are finnished click download, and start coding!
 
 ### An Example JSON Input
 
