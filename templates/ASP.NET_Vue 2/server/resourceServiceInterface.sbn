@@ -1,0 +1,34 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+
+namespace {{ name_space }}.Services
+{
+    {{~ class = resource.class ~}}
+    public interface I{{ resource.name.plural }}Service
+    {
+        List<{{ class.name }}> Get{{ class.name.plural }}();
+        {{ class.name }} Get{{ class.name }}(int {{ camel_case class.name }}Id);
+        {{~ for property in class.properties ~}}
+        {{~ if property.is_parent_reference ~}}
+        List<{{ class.name }}> Get{{ class.name.plural }}Of{{ property.name }}(int {{ camel_case property.class.name }}Id);
+        {{~ end ~}}
+        {{~ if property.is_many_to_many ~}}
+        List<{{ class.name }}> Get{{ class.name.plural }}Of{{ property.class.name }}(int {{ camel_case property.class.name }}Id);
+        bool Add{{ class.name }}To{{ property.class.name }}(int {{ camel_case class.name }}Id, int {{ camel_case property.class.name }}Id);
+        bool Remove{{ class.name }}From{{ property.class.name }}(int {{ camel_case class.name }}Id, int {{ camel_case property.class.name }}Id);
+        {{~ end ~}}
+        {{~ end ~}}
+        {{~ if !resource.is_readonly ~}}
+        {{ class.name }} Add{{ class.name }}({{ class.name }} {{ camel_case class.name }});
+        {{ class.name }} Update{{ class.name }}(int {{ camel_case class.name }}Id, {{ class.name }} {{ camel_case class.name }});
+        bool Delete{{ class.name }}(int {{ camel_case class.name }}Id);
+        {{~ end ~}}
+    }
+}

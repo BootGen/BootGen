@@ -1,0 +1,27 @@
+import Vue from 'vue'
+import Vuex from 'vuex'
+import axios from 'axios'
+import authModule, { AuthState } from '@/store/AuthModule'
+{{~ for class in classes ~}}
+import {{camel_case class.name}}Module, { {{class.name.plural}}State } from '@/store/{{class.name}}Module'
+{{~ end ~}}
+
+Vue.use(Vuex)
+
+axios.defaults.baseURL = '{{base_url}}'
+
+export interface State {
+  auth: AuthState;
+  {{~ for class in classes ~}}
+  {{camel_case class.name.plural}}: {{class.name.plural}}State;
+  {{~ end ~}}
+}
+
+export default new Vuex.Store<State>({
+  modules: {
+    auth: authModule,
+    {{~ for class in classes ~}}
+    {{camel_case class.name.plural}}: {{camel_case class.name}}Module{{if !for.last}},{{end}}
+    {{~ end ~}}
+  }
+})

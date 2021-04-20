@@ -1,0 +1,79 @@
+<template>
+  <v-app id="inspire">
+    <v-navigation-drawer v-model="drawer" app>
+      <v-list dense nav>
+        <v-list-item
+          v-for="item in items"
+          :key="item.title"
+          :to="item.link"
+          link
+        >
+          <v-list-item-icon>
+            <v-icon>{{'{{'}} item.icon {{'}}'}}</v-icon>
+          </v-list-item-icon>
+
+          <v-list-item-content>
+            <v-list-item-title>{{'{{'}} item.title {{'}}'}}</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+      </v-list>
+    </v-navigation-drawer>
+
+    <v-app-bar app>
+      <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
+
+      <v-toolbar-title>{{'{{'}} $route.name {{'}}'}}</v-toolbar-title>
+    </v-app-bar>
+
+    <v-main>
+      <!-- Provides the application the proper gutter -->
+      <v-container fluid>
+        <!-- If using vue-router -->
+        <router-view></router-view>
+      </v-container>
+    </v-main>
+  </v-app>
+</template>
+
+<script>
+export default {
+  data: () => ({
+    drawer: null,
+  }),
+  computed: {
+    items: function () {
+      if (this.$store.state.auth.jwt) {
+        return [
+          { title: 'Profile', link: '/profile', icon: 'mdi-account-outline' },
+          {
+            title: 'Edit Profile',
+            link: '/edit-profile',
+            icon: 'mdi-account-edit-outline',
+          },
+          {
+            title: 'Change Password',
+            link: '/change-password',
+            icon: 'mdi-form-textbox-password',
+          },
+          { title: 'Logout', link: '/logout', icon: 'mdi-account-arrow-right-outline' }{{ for class in classes }},
+          {
+            title: '{{ class.name.plural }}',
+            link: '/{{ camel_case class.name.plural }}',
+            icon: 'mdi-format-list-text',
+          }
+          {{~ end ~}}
+        ];
+      } else {
+        return [
+          { title: 'Login', link: '/', icon: 'mdi-account-arrow-left-outline' },
+          {
+            title: 'Sign Up',
+            link: 'sign-up',
+            icon: 'mdi-account-plus-outline',
+          },
+        ];
+      }
+    },
+  },
+};
+</script>

@@ -1,0 +1,81 @@
+<template>
+  <v-card elevation="2">
+    <v-list dense>
+      <v-list-item class="justify-end">
+        <v-btn @click="save"><v-icon>mdi-floppy</v-icon></v-btn>
+        <v-btn @click="cancel"><v-icon>mdi-close</v-icon></v-btn>
+      </v-list-item>
+      {{~
+      useDateTimePicker = false
+      ~}}
+      {{~ for property in class.common_properties ~}}
+      {{~ if (camel_case property.name) != "userId" ~}}
+      <v-list-item>
+        <v-list-item-content>{{ camel_case property.name }}:</v-list-item-content>
+        {{~ if property.name == "Created" || property.name == "Updated" ~}}
+        {{'{{'}} edited{{ class.name }}.{{ camel_case property.name }} | dateFormat {{'}}'}}
+        {{~ else if (get_type property) == "Date"
+          useDateTimePicker = true ~}}
+        <v-list-item-content class="d-flex align-start">
+          <date-time-picker v-model="edited{{ class.name }}.{{ camel_case property.name }}" ></date-time-picker>
+        </v-list-item-content>
+        {{~ else ~}}
+        <v-list-item-content class="align-end">
+        {{~ if property.name == "Id" ~}}
+          {{'{{'}} edited{{ class.name }}.{{ camel_case property.name }} {{'}}'}}
+        {{~ else ~}}
+          {{~ if (get_type property) == "number" ~}}
+          <v-text-field type="number" v-model="edited{{ class.name }}.{{ camel_case property.name }}" dense></v-text-field>
+          {{~ else if (get_type property) == "Boolean" ~}}
+          <v-checkbox v-model="edited{{ class.name }}.{{ camel_case property.name }}"></v-checkbox>
+          {{~ else ~}}
+          <v-text-field v-model="edited{{ class.name }}.{{ camel_case property.name }}" dense></v-text-field>
+          {{~ end ~}}
+        {{~ end ~}}
+        </v-list-item-content>
+        {{~ end ~}}
+        </v-list-item>
+      {{~ end ~}}
+      {{~ end ~}}
+    </v-list>
+  </v-card>
+</template>
+
+<script lang="ts">
+import Vue from 'vue';
+import { {{ class.name }} } from '../models/{{ class.name }}';
+{{~ if useDateTimePicker ~}}
+import DateTimePicker from './DateTimePicker.vue';
+{{~ end ~}}
+
+export default Vue.extend({
+  props: {
+    {{ camel_case class.name }}: {
+      type: Object as () => {{ class.name }}
+    }
+  },
+  {{~ if useDateTimePicker ~}}
+  components: {
+    DateTimePicker
+  },
+  {{~ end ~}}
+  created: function () {
+    this.edited{{ class.name }} = {...this.{{ camel_case class.name }}};
+  },
+  data: function () {
+    return {
+      edited{{ class.name }}: null as (null | {{ class.name }})
+    };
+  },
+  methods: {
+    save: async function () {
+      Object.assign(this.{{ camel_case class.name }}, this.edited{{ class.name }});
+      await this.$store.dispatch('{{ camel_case class.name.plural }}/update{{ class.name }}', this.{{ camel_case class.name }});
+      this.$emit('close');
+    },
+    cancel: async function () {
+      this.$emit('close');
+    }
+  },
+});
+</script>
