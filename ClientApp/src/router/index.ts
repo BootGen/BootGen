@@ -56,7 +56,7 @@ const loggedOutGuard = (to: Route, from: Route, next: NavigationGuardNext) => {
     component: PrivacyStatement
   },
   {
-    path: '/',
+    path: '/editor',
     name: 'Editor',
     component: Editor
   },
@@ -67,7 +67,7 @@ const loggedOutGuard = (to: Route, from: Route, next: NavigationGuardNext) => {
     component: SavedProjects
   },
   {
-    path: '/getting-started',
+    path: '/',
     name: 'Getting Started',
     component: GettingStarted
   },
@@ -96,5 +96,10 @@ const router = new VueRouter({
   base: process.env.BASE_URL,
   routes
 })
+
+router.beforeEach((to: Route, from: Route, next: NavigationGuardNext) => {
+  document.title = `BootGen - ${to.name}`;
+  next();
+});
 
 export default router
