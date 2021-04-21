@@ -190,8 +190,8 @@ export default Vue.extend({
       this.setActiveFile();
     }else{
       this.activeProject.json = (await axios.get(`${this.$root.$data.baseUrl}/example_input.json`, {responseType: 'text'})).data;
+      await this.validateAndGenerate();
     }
-    await this.validateAndGenerate();
   },
   computed: {
     isPristine: function(){
