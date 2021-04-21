@@ -20,7 +20,7 @@
                   <ValidationObserver v-slot="{ invalid }">
                     <ValidationProvider
                       v-slot="{ errors }"
-                      name="password"
+                      name="oldPassword"
                       rules="required"
                     >
                       <v-text-field
@@ -33,7 +33,7 @@
                     <ValidationProvider
                       v-slot="{ errors }"
                       name="password"
-                      rules="required|min:8|password:@confirmation"
+                      rules="required|min:8|oldPassword:@oldPassword|password:@confirmation"
                     >
                       <v-text-field
                         v-model="newPassword"
@@ -72,7 +72,7 @@
       <v-col cols="12" md="4">
         <base-material-card
           class="v-card-profile"
-          avatar="https://demos.creative-tim.com/vue-material-dashboard/img/marc.aba54d65.jpg"
+          :avatar="true"
         >
           <v-card-text class="text-center">
             <h4 class="display-2 font-weight-light mb-3 black--text">
@@ -107,6 +107,14 @@ extend('required', {
 extend('min', {
   ...min,
   message: '{_field_} may not be less than {length} characters',
+});
+
+extend('oldPassword', {
+  params: ['target'],
+  validate(value, { target }: any) {
+    return !(value === target);
+  },
+  message: 'Password cannot match the current one',
 });
 
 extend('password', {
