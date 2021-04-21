@@ -135,24 +135,24 @@ export default {
   },
   methods: {
     acceptCookies: function(){
-      this.$gtag.event('accept-cookies');
+      this.$gtag?.event('accept-cookies');
       this.cookieConsentAnswered = true;
       this.cookiesAccepted = true;
     },
     customizeCookies: function(){
-      this.$gtag.event('customize-cookies');
+      this.$gtag?.event('customize-cookies');
       this.movedPrivacyStatementSite = true;
       this.$router.push('/privacy-statement');
     },
     selectNavItem: function(){
-      this.$gtag.event('select-nav-item');
+      this.$gtag?.event('select-nav-item');
     },
     setNavDraver: function(){
-      this.$gtag.event('set-nav-drawer');
+      this.$gtag?.event('set-nav-drawer');
       this.drawer = !this.drawer;
     },
     openGithub: function(){
-      this.$gtag.event('open-github');
+      this.$gtag?.event('open-github');
     }
   }
 };

@@ -304,7 +304,7 @@ export default Vue.extend({
       this.setHighlightedDifferences();
     },
     callPrettyPrint: function(){
-      this.$gtag.event('pretty-print');
+      this.$gtag?.event('pretty-print');
       const result = validateJson(this.activeProject.json);
       if (result.error) {
         this.jsonErrors.push({line: result.line, color: 'red'});
@@ -314,7 +314,7 @@ export default Vue.extend({
       this.hideSnackbar();
     },
     createNewProject: async function(name: string){
-      this.$gtag.event('create-new-project');
+      this.$gtag?.event('create-new-project');
       this.newProject.name = name;
       this.activeProject = {...this.newProject};
       this.callPrettyPrint();
@@ -324,7 +324,7 @@ export default Vue.extend({
       this.highlightedDifferences = [];
     },
     validateAndGenerate: async function() {
-      this.$gtag.event('generate');
+      this.$gtag?.event('generate');
       this.jsonErrors = [];
       const result = validateJson(this.activeProject.json);
       if(!result.error) {
@@ -360,7 +360,7 @@ export default Vue.extend({
       return null;
     },
     save: async function (){
-      this.$gtag.event('save-project');
+      this.$gtag?.event('save-project');
       if(this.activeProject.name){
         const exists = this.existsProjectName();
         if (!exists && this.activeProject.id === -1) {
@@ -379,7 +379,7 @@ export default Vue.extend({
       }
     },
     undo: async function () {
-      this.$gtag.event('undo');
+      this.$gtag?.event('undo');
       if (this.isPristine) {
         this.undoStack.pop();
       }
@@ -390,13 +390,13 @@ export default Vue.extend({
       this.setSnackbar('info', 'Everything restored to its previous generated state', 5000);
     },
     changeProjectName: function(name: string){
-      this.$gtag.event('change-project-name');
+      this.$gtag?.event('change-project-name');
       this.activeProject.name = name;
     },
     download: async function() {
       if(!this.downLoading){
         this.downLoading = true;
-        this.$gtag.event('download');
+        this.$gtag?.event('download');
         await Promise.all([
           this.delay(3000),
           api.download({data: this.activeProject.json, nameSpace: this.toCamelCase(this.activeProject.name)})
@@ -405,7 +405,7 @@ export default Vue.extend({
       }
     },
     openFolder: function(idx: number){
-      this.$gtag.event('open-folder');
+      this.$gtag?.event('open-folder');
       this.openPath = '';
       for(let i = 0; i < idx; i++){
         if(this.activeFile.path.split('/')[i]){
@@ -416,13 +416,13 @@ export default Vue.extend({
       this.drawer = true;
     },
     selectFile: function(data: GeneratedFile){
-      this.$gtag.event('select-file');
+      this.$gtag?.event('select-file');
       this.activeFile = data;
       this.closeDrawer();
       this.setHighlightedDifferences();
     },
     setDrawer: function(){
-      this.$gtag.event('set-drawer');
+      this.$gtag?.event('set-drawer');
       this.drawer = !this.drawer;
       if(!this.drawer){
         this.openPath = '';
@@ -430,7 +430,7 @@ export default Vue.extend({
     },
     closeDrawer: function(){
       if(this.drawer){
-        this.$gtag.event('close-drawer');
+        this.$gtag?.event('close-drawer');
         this.drawer = false;
         this.openPath = '';
       }

@@ -37,7 +37,7 @@ export default Vue.extend({
 	},
   methods: {
     closeSnackbar: function(){
-      this.$gtag.event('close-snackbar');
+      this.$gtag?.event('close-snackbar');
       this.snackbar.visible = false;
     }
   },

@@ -77,7 +77,7 @@ export default Vue.extend({
   },
   methods: {
     onInput: function(content: string) {
-      this.$gtag.event('change-json');
+      this.$gtag?.event('change-json');
       this.$emit('input', content);
       this.$emit('change-json');
       this.unsetHighlight();
@@ -128,7 +128,7 @@ export default Vue.extend({
       }
     },
     cursorIntoView: function(){
-      this.$gtag.event('cursor-into-view');
+      this.$gtag?.event('cursor-into-view');
       this.$emit('cursor-into-view');
     }
   },

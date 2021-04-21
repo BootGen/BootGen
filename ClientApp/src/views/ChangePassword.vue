@@ -134,7 +134,7 @@ export default Vue.extend({
   },
   methods: {
     savePassword: async function () {
-      this.$gtag.event('change-password');
+      this.$gtag?.event('change-password');
       this.successMsg = '';
       this.errorMsg = '';
       try {

@@ -13,14 +13,13 @@ import MaterialGeneratorCard from './components/base/MaterialGeneratorCard.vue'
 Vue.component('base-material-card', MaterialCard)
 Vue.component('base-material-generator-card', MaterialGeneratorCard)
 
-Vue.use(VueGtag, {
-  config: {
-    id: 'G-X2LQJGC8QE',
-    debug: {
-      sendHitTask: process.env.NODE_ENV === 'production'
-    }
-  },
-}, router);
+if (process.env.NODE_ENV === 'production') {
+  Vue.use(VueGtag, {
+    config: {
+      id: 'G-X2LQJGC8QE'
+    },
+  }, router);
+}
 
 Vue.config.productionTip = false
 

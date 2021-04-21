@@ -102,7 +102,7 @@ export default Vue.extend({
   },
   methods: {
     saveUser: async function () {
-      this.$gtag.event('update-profile');
+      this.$gtag?.event('update-profile');
       this.successMsg = '';
       const response = await api.updateProfile(this.$store.state.auth.user, this.$store.state.auth.jwt);
       if (response.isUserNameInUse) {

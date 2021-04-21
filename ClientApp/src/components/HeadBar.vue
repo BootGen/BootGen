@@ -83,7 +83,7 @@ export default Vue.extend({
       this.$emit('change-project-name', name);
     },
     toLogin: function(){
-      this.$gtag.event('editor-to-login');
+      this.$gtag?.event('editor-to-login');
     },
     existsProjectName: function(): boolean{
       for(const i in this.$store.state.projects.items){

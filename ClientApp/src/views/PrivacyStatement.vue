@@ -30,13 +30,13 @@ export default Vue.extend({
   },
   watch:{
     cookiesAccepted(accepted) {
-      this.$gtag.event('set-opt');
+      this.$gtag?.event('set-opt');
       if(accepted){
         localStorage.cookiesAccepted = true;
-        this.$gtag.optIn();
+        this.$gtag?.optIn();
       }else{
         localStorage.cookiesAccepted = false;
-        this.$gtag.optOut();
+        this.$gtag?.optOut();
       }
     }
   },
@@ -49,7 +49,7 @@ export default Vue.extend({
   },
   methods: {
     consent: function(){
-      this.$gtag.event('consent-privacy-statement');
+      this.$gtag?.event('consent-privacy-statement');
       localStorage.cookieConsentAnswered = true;
       this.$router.go(-1);
     }
