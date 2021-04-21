@@ -79,7 +79,7 @@ export default Vue.extend({
         const generateResult: GenerateResponse = await api.generate({data: project.json, nameSpace: this.toCamelCase(project.name)});
         this.$store.commit('projects/setLastProject', project);
         this.$store.commit('projects/setLastGeneratedFiles', generateResult.generatedFiles);
-        this.$router.push('/');
+        this.$router.push('/editor');
       }
     },
     deleteItem (project: Project) {
