@@ -391,7 +391,7 @@ export default Vue.extend({
     },
     changeProjectName: function(name: string){
       this.$gtag?.event('change-project-name');
-      this.activeProject.name = name;
+      this.activeProject.name = name.trim();
     },
     download: async function() {
       if(!this.downLoading){
