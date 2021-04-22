@@ -110,8 +110,8 @@ export default Vue.extend({
 .v-card {
   padding-top: 50px;
   padding-bottom: 50px;
-  padding-left: 18%;
-  padding-right: 18%;
+  padding-left: 12%;
+  padding-right: 12%;
 }
 .slogan {
   text-align: center;

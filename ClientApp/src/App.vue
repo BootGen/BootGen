@@ -39,7 +39,7 @@
         </div>
       </v-list>
       <div class="ma-4">
-        <div class="container-fluid d-flex flex-column navCookie" v-if="!cookieConsentAnswered && !movedPrivacyStatementSite">
+        <div class="container-fluid d-flex flex-column navCookie" v-if="!cookieConsentAnswered">
           <div class="container pl-0 align-center">
             <v-icon class="pr-2" dark large>{{ snackbar.icon }}</v-icon>
             <span>{{ snackbar.text }}</span>
@@ -67,9 +67,10 @@
     <v-main>
       <v-container fluid>
         <router-view></router-view>
+        <footer><router-link to="/privacy-policy">Privacy Policy</router-link> | Created by <a href="https://codesharp.hu" target="_blank">Code Sharp Kft.</a></footer>
       </v-container>
     </v-main>
-    <snackbar v-if="!cookieConsentAnswered && !movedPrivacyStatementSite && !drawer" :snackbar="snackbar" @accept="acceptCookies" @customize="customizeCookies"></snackbar>
+    <snackbar v-if="!cookieConsentAnswered && !drawer" :snackbar="snackbar" @accept="acceptCookies" @customize="customizeCookies"></snackbar>
   </v-app>
 </template>
 
@@ -93,8 +94,7 @@ export default {
       ]
     },
     cookieConsentAnswered: false,
-    cookiesAccepted: false,
-    movedPrivacyStatementSite: false,
+    cookiesAccepted: false
   }),
   components: {
     Snackbar,
@@ -141,8 +141,8 @@ export default {
     },
     customizeCookies: function(){
       this.$gtag?.event('customize-cookies');
-      this.movedPrivacyStatementSite = true;
-      this.$router.push('/privacy-statement');
+      this.cookieConsentAnswered = true;
+      this.$router.push('/privacy-policy');
     },
     selectNavItem: function(){
       this.$gtag?.event('select-nav-item');
@@ -188,5 +188,8 @@ export default {
   }
   a.repositoryLink:hover{
     color: #999 !important;
+  }
+  footer {
+    text-align: center;
   }
 </style>

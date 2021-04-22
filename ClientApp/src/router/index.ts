@@ -4,7 +4,7 @@ import Login from '../views/Login.vue'
 import Logout from '../views/Logout.vue'
 import SignUp from '../views/SignUp.vue'
 import Activation from '../views/Activation.vue'
-import PrivacyStatement from '../views/PrivacyStatement.vue'
+import PrivacyPolicy from '../views/PrivacyPolicy.vue'
 import Editor from '../views/Editor.vue'
 import SavedProjects from '../views/SavedProjects.vue'
 import GettingStarted from '../views/GettingStarted.vue'
@@ -51,9 +51,9 @@ const loggedOutGuard = (to: Route, from: Route, next: NavigationGuardNext) => {
     component: Activation
   },
   {
-    path: '/privacy-statement',
-    name: 'Privacy Statement',
-    component: PrivacyStatement
+    path: '/privacy-policy',
+    name: 'Privacy Policy',
+    component: PrivacyPolicy
   },
   {
     path: '/editor',

@@ -1,5 +1,5 @@
 <template>
-  <v-container id="privacy-statement" fluid tag="section">
+  <v-container id="privacy-policy" fluid tag="section">
     <v-row justify="center">
       <v-col cols="12" md="8">
         <base-material-card>
