@@ -21,8 +21,16 @@ namespace Editor.Services
 
         public void LogException(Exception e)
         {
+            dbContext.AppErrors.Add(ConvertToAppError(e));
+            if (e.InnerException != null)
+                dbContext.AppErrors.Add(ConvertToAppError(e.InnerException));
+            dbContext.SaveChanges();
+        }
+
+        private static AppError ConvertToAppError(Exception e)
+        {
             var frame = new StackTrace(e, true).GetFrame(0);
-            dbContext.AppErrors.Add(new AppError
+            return new AppError
             {
                 Kind = "C#",
                 Type = e.GetType().Name,
@@ -32,8 +40,7 @@ namespace Editor.Services
                 Message = e.Message,
                 StackTrace = e.StackTrace,
                 TimeStamp = DateTime.Now
-            });
-            dbContext.SaveChanges();
+            };
         }
     }
 }
