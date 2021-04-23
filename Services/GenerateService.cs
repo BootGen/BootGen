@@ -155,9 +155,10 @@ namespace Editor.Services
                 throw new Exception("The model must contain a user class.");
             if (userClass.Properties.Any(p => p.Name == "PasswordHash" || p.Name == "Password"))
                 throw new Exception("You must not explicitly set passwords for users. A password hash will be automatically added to the user class.");
-            if (!userClass.Properties.Any(p => p.Name == "Email" && p.BuiltInType == BuiltInType.String))
-                throw new Exception("The user class must contain a string property named 'email'.");
-            userClass.Properties.Add(new Property {
+            CheckMandatoryUserProperty(userClass, "Email");
+            CheckMandatoryUserProperty(userClass, "UserName");
+            userClass.Properties.Add(new Property
+            {
                 Name = "PasswordHash",
                 IsServerOnly = true,
                 BuiltInType = BuiltInType.String
@@ -178,6 +179,12 @@ namespace Editor.Services
                 TemplateRoot = "templates"
             };
             return project;
+        }
+
+        private static void CheckMandatoryUserProperty(ClassModel userClass, string propertyName)
+        {
+            if (!userClass.Properties.Any(p => p.Name == propertyName && p.BuiltInType == BuiltInType.String))
+                throw new Exception($"The user class must contain a string property named '{propertyName.ToCamelCase()}'.");
         }
     }
 }
