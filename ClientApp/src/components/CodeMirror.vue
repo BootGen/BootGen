@@ -34,8 +34,7 @@ export default Vue.extend({
         lineNumbers: true,
         line: true,
         readOnly: false,
-      },
-      minLine: 5000000
+      }
     }
   },
   components: {
@@ -69,7 +68,6 @@ export default Vue.extend({
   },
   updated: function() {
       this.unsetHighlight();
-      this.setMinMaxLine();
       this.highlight();
   },
   created: function(){
@@ -82,25 +80,8 @@ export default Vue.extend({
       this.$emit('change-json');
       this.unsetHighlight();
     },
-    setMinMaxLine: function(){
-      const elementById = document.getElementById(this.cmId);
-      if(!elementById){
-        return;
-      }
-      const list = elementById.getElementsByClassName('CodeMirror-linenumber');
-      this.minLine = 5000000;
-      for (let i = 0; i < list.length; i++) {
-        const textval = list[i].textContent;
-        if (textval) {
-          const lineNum = parseInt(textval, 10);
-          if (lineNum < this.minLine)
-            this.minLine = lineNum;
-        }
-      }
-    },
     onScroll: function(){
       this.unsetHighlight();
-      this.setMinMaxLine();
       this.highlight();
     },
     unsetHighlight: function (){
@@ -114,17 +95,23 @@ export default Vue.extend({
       }
     },
     highlight: function() {
-      this.linesToColor.forEach(lineToColor => {
-        this.highlightLine(lineToColor.line, lineToColor.color);
-      });
-    },
-    highlightLine: function (line: number, color: string){
       const elementById = document.getElementById(this.cmId);
-      if(!elementById || (this.minLine > line && this.minLine < 5000000)){
+      if (!elementById)
         return;
-      }
-      if(this.minLine < line){
-        elementById.getElementsByClassName('CodeMirror-line')[line-this.minLine+2]?.setAttribute('style', `background-color:${color};`);
+      const list = elementById.getElementsByClassName('CodeMirror-linenumber');
+      for (let i = 0; i < list.length; i++) {
+        const lineNumberElement = list[i];
+        const textVal = lineNumberElement.textContent;
+        if (textVal) {
+          const lineNum = parseInt(textVal, 10);
+          this.linesToColor.forEach(lineToColor => {
+            if (lineToColor.line + 1 === lineNum) {
+              const lineElement = lineNumberElement.parentElement?.parentElement?.querySelector('.CodeMirror-line');
+              if (lineElement)
+                lineElement.setAttribute('style', `background-color:${lineToColor.color};`);
+            }
+          });
+        }
       }
     },
     cursorIntoView: function(){
