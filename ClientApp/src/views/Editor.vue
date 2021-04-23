@@ -270,7 +270,7 @@ export default Vue.extend({
         this.highlightedDifferences = [];
         for(let i = 0; i < this.previousFiles.length; i++){
           if(this.previousFiles[i].name === this.activeFile.name && this.previousFiles[i].path === this.activeFile.path){
-            const compare = new Compare(this.previousFiles[i].content.split('\n'), this.activeFile.content.split('\n'));
+            const compare = new Compare(this.activeFile.content.split('\n'), this.previousFiles[i].content.split('\n'));
             const changes = compare.getChanges();
             changes.forEach(v =>{
               this.highlightedDifferences.push({ line : v, color:'#412fb3' })
