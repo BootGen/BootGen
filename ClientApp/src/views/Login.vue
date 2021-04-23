@@ -35,7 +35,6 @@
                           prepend-icon="mdi-form-textbox-password"
                         ></v-text-field>
                       </ValidationProvider>
-                      <p>email: example@email.com | pass: password123</p>
                       <v-alert class="text-left" type="error" v-if="errorMsg">{{ errorMsg }}</v-alert>
                       <v-btn color="primary" large @click="tryLogin" :disabled="invalid">Sign in</v-btn>
                     </v-col>
