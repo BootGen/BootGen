@@ -25,14 +25,6 @@
                   </template>
                   <span>Rollback to the last generated state</span>
                 </v-tooltip>
-                <v-tooltip bottom v-if="$store.state.auth.jwt">
-                  <template v-slot:activator="{ on, attrs }">
-                    <v-btn class="mr-2" color="white" elevation="1" fab small @click="save" v-bind="attrs" v-on="on" :disabled="isPristine">
-                      <v-icon color="primary">mdi-floppy</v-icon>
-                    </v-btn>
-                    </template>
-                  <span>Save</span>
-                </v-tooltip>
                 <v-tooltip bottom>
                   <template v-slot:activator="{ on, attrs }">
                     <v-btn class="mr-2" color="white" elevation="1" fab small :disabled="activeProject.json === ''" @click="callPrettyPrint" v-bind="attrs" v-on="on">
@@ -239,6 +231,7 @@ export default Vue.extend({
           this.generateLoading = false;
           return;
         }
+        this.save();
         this.previousFiles = [...this.generatedFiles];
         this.generatedFiles = generateResult.generatedFiles;
         this.$store.commit('projects/setLastProject', this.activeProject);
@@ -361,6 +354,8 @@ export default Vue.extend({
       return null;
     },
     save: async function (){
+      if (!this.$store.state.auth.jwt)
+        return;
       this.$gtag?.event('save-project');
       if(this.activeProject.name){
         const exists = this.existsProjectName();
