@@ -27,7 +27,7 @@
                 </v-tooltip>
                 <v-tooltip bottom v-if="$store.state.auth.jwt">
                   <template v-slot:activator="{ on, attrs }">
-                    <v-btn class="mr-2" color="white" elevation="1" fab small @click="save" v-bind="attrs" v-on="on">
+                    <v-btn class="mr-2" color="white" elevation="1" fab small @click="save" v-bind="attrs" v-on="on" :disabled="isPristine">
                       <v-icon color="primary">mdi-floppy</v-icon>
                     </v-btn>
                     </template>
@@ -374,6 +374,7 @@ export default Vue.extend({
         } else {
           this.setSnackbar('success', 'Project updated successfully!', 5000);
           await this.$store.dispatch('projects/updateProject', this.activeProject);
+            this.undoStack.push(this.activeProject.json);
         }
       }else{
         this.setSnackbar('error', 'This name is incorrect!', 5000);
