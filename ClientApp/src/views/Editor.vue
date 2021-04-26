@@ -190,6 +190,7 @@ export default Vue.extend({
       this.undoStack.push(this.activeProject.json);
       this.callPrettyPrint();
       this.setActiveFile();
+      this.crc32Saved = this.crc32ForSaving;
     }else{
       this.activeProject.json = (await axios.get(`${this.$root.$data.baseUrl}/example_input.json`, {responseType: 'text'})).data;
       await this.validateAndGenerate();
