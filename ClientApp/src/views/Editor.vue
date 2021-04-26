@@ -25,6 +25,14 @@
                   </template>
                   <span>Rollback to the last generated state</span>
                 </v-tooltip>
+                <v-tooltip bottom v-if="$store.state.auth.jwt">
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-btn class="mr-2" color="white" elevation="1" fab small @click="save" v-bind="attrs" v-on="on" :disabled="saveDisabled">
+                      <v-icon color="primary">mdi-floppy</v-icon>
+                    </v-btn>
+                    </template>
+                  <span>Save</span>
+                </v-tooltip>
                 <v-tooltip bottom>
                   <template v-slot:activator="{ on, attrs }">
                     <v-btn class="mr-2" color="white" elevation="1" fab small :disabled="activeProject.json === ''" @click="callPrettyPrint" v-bind="attrs" v-on="on">
@@ -153,6 +161,7 @@ export default Vue.extend({
       previousFiles: Array<GeneratedFile>(),
       undoStack: new UndoStack(),
       crc32ProjectName: CRC32.str('My Project'),
+      crc32Saved: 0,
       activeProject: {id: -1, ownerId: -1, name: 'My Project', json: ''},
       newProject: {id: -1, ownerId: -1, name: 'My Project', json: ''},
       activeFile: {} as GeneratedFile,
@@ -176,7 +185,7 @@ export default Vue.extend({
   created: async function(){
     this.newProject.json = JSON.stringify((await axios.get(`${this.$root.$data.baseUrl}/new_project_input.json`, {responseType: 'json'})).data);
     if(this.$store.state.projects.lastProject.json){
-      this.activeProject = {...this.$store.state.projects.lastProject};
+      this.activeProject = this.$store.state.projects.lastProject;
       this.generatedFiles = [...this.$store.state.projects.lastGeneratedFiles];
       this.undoStack.push(this.activeProject.json);
       this.callPrettyPrint();
@@ -187,7 +196,7 @@ export default Vue.extend({
     }
   },
   computed: {
-    isPristine: function(){
+    isPristine: function(): boolean {
       const top = this.undoStack.top();
       if(top){
         if((top.crc32 === CRC32.str(this.activeProject.json)) && (this.crc32ProjectName === CRC32.str(this.activeProject.name))){
@@ -196,7 +205,7 @@ export default Vue.extend({
       }
       return false;
     },
-    isJsonPristine: function(){
+    isJsonPristine: function(): boolean {
       const top = this.undoStack.top();
       if(top){
         if(top.crc32 === CRC32.str(this.activeProject.json)){
@@ -205,15 +214,22 @@ export default Vue.extend({
       }
       return false;
     },
+    crc32ForSaving: function(): number {
+      return CRC32.str(this.activeProject.name + this.activeProject.json);
+    },
+    saveDisabled: function(): boolean {
+      return this.crc32Saved === this.crc32ForSaving;
+    }
   },
   methods: {
-    delay: function(ms: number) {
+    delay: function(ms: number): Promise<void> {
       return new Promise(resolve => setTimeout(resolve, ms));
     },
-    getMode: function(){
+    getMode: function(): string {
       if(this.activeFile.name){
         return this.activeFile.name.split('.')[1];
       }
+      return '';
     },
     removeErrors: function(){
       this.jsonErrors = [];
@@ -231,7 +247,6 @@ export default Vue.extend({
           this.generateLoading = false;
           return;
         }
-        this.save();
         this.previousFiles = [...this.generatedFiles];
         this.generatedFiles = generateResult.generatedFiles;
         this.$store.commit('projects/setLastProject', this.activeProject);
@@ -345,9 +360,9 @@ export default Vue.extend({
     hideSnackbar: function(){
       this.snackbar.visible = false;
     },
-    existsProjectName: function(): Project | null{
+    getProjectByName: function(projectName: string): Project | null{
       for(const i in this.$store.state.projects.items){
-        if(this.activeProject.name === this.$store.state.projects.items[i].name){
+        if(projectName === this.$store.state.projects.items[i].name){
           return this.$store.state.projects.items[i];
         }
       }
@@ -358,15 +373,17 @@ export default Vue.extend({
         return;
       this.$gtag?.event('save-project');
       if(this.activeProject.name){
-        const exists = this.existsProjectName();
-        if (!exists && this.activeProject.id === -1) {
+        const project = this.getProjectByName(this.activeProject.name);
+        if (!project && this.activeProject.id === -1) {
           this.setSnackbar('success', 'The new project was successfully created!', 5000);
+          this.crc32Saved = this.crc32ForSaving;
           this.activeProject.id = 0;
           this.activeProject.ownerId = this.$store.state.auth.user.id;
           this.activeProject = await this.$store.dispatch('projects/addProject', this.activeProject);
-        } else if(exists && exists.id !== this.activeProject.id) {
+        } else if(project && project.id !== this.activeProject.id) {
           this.setSnackbar('error', 'This name is already in use, please enter another name!', 5000);
         } else {
+          this.crc32Saved = this.crc32ForSaving;
           this.setSnackbar('success', 'Project updated successfully!', 5000);
           await this.$store.dispatch('projects/updateProject', this.activeProject);
             this.undoStack.push(this.activeProject.json);
