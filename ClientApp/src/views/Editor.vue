@@ -387,7 +387,6 @@ export default Vue.extend({
           this.crc32Saved = this.crc32ForSaving;
           this.setSnackbar('success', 'Project updated successfully!', 5000);
           await this.$store.dispatch('projects/updateProject', this.activeProject);
-            this.undoStack.push(this.activeProject.json);
         }
       }else{
         this.setSnackbar('error', 'This name is incorrect!', 5000);
