@@ -187,10 +187,11 @@ export default Vue.extend({
     if(this.$store.state.projects.lastProject.json){
       this.activeProject = this.$store.state.projects.lastProject;
       this.generatedFiles = [...this.$store.state.projects.lastGeneratedFiles];
-      this.undoStack.push(this.activeProject.json);
       this.callPrettyPrint();
+      this.undoStack.push(this.activeProject.json);
       this.setActiveFile();
       this.crc32Saved = this.crc32ForSaving;
+      this.crc32ProjectName = CRC32.str(this.activeProject.name);
     }else{
       this.activeProject.json = (await axios.get(`${this.$root.$data.baseUrl}/example_input.json`, {responseType: 'text'})).data;
       await this.validateAndGenerate();
@@ -253,13 +254,7 @@ export default Vue.extend({
         this.$store.commit('projects/setLastProject', this.activeProject);
         this.$store.commit('projects/setLastGeneratedFiles', this.generatedFiles);
         this.crc32ProjectName = CRC32.str(this.activeProject.name);
-        if(this.undoStack.length() > 0){
-          if(!this.isJsonPristine){
-            this.undoStack.push(this.activeProject.json);
-          }
-        }else{
-          this.undoStack.push(this.activeProject.json);
-        }
+        this.undoStack.push(this.activeProject.json);
         this.setActiveFile();
         this.setHighlightedDifferences();
         this.generateLoading = false;
