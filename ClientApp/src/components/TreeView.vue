@@ -1,8 +1,7 @@
 <template>
   <div>
     <v-treeview
-      class="text-break"
-      active-class="info--text"
+      active-class="activeFile"
       :items="tree.children"
       :open.sync="tree.open"
       @update:active="selectFile"
@@ -138,3 +137,13 @@ export default Vue.extend({
   },
 });
 </script>
+
+<style>
+  .activeFile{
+    background-color: #22195B!important;
+    border-radius: 4px;
+  }
+  .activeFile .v-treeview-node__content{
+    color: #fff!important;
+  }
+</style>

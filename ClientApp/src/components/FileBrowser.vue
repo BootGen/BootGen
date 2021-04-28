@@ -1,0 +1,54 @@
+<template>
+  <v-row class="d-flex align-center">
+    <v-col cols="12" class="pr-0 pl-0">
+      <base-material-generator-card>
+        <template v-slot:heading>
+          <div class="d-flex align-center justify-space-between pa-2">
+            <div class="display-1 font-weight-light pa-2">
+              Browse Files
+            </div>
+          </div>
+        </template>
+        <tree-view class="treeView" v-if="generatedFiles.length > 0" :files="generatedFiles" :openPath="openPath" @select-file="selectFile"></tree-view>
+      </base-material-generator-card>
+    </v-col>
+  </v-row>
+</template>
+
+<script lang="ts">
+import Vue from 'vue';
+import TreeView from './TreeView.vue';
+import {GeneratedFile} from '../models/GeneratedFile';
+
+export default Vue.extend({
+  components: {
+    TreeView,
+  },
+  props: {
+    generatedFiles: {
+      type: Array as () => GeneratedFile[]
+    },
+    openPath: String,
+  },
+  data: function () {
+    return {
+    };
+  },
+  methods: {
+    selectFile: function(data: GeneratedFile){
+      this.$gtag?.event('select-file');
+      this.$emit('select-file', data);
+    },
+  },
+});
+</script>
+
+<style>
+  .treeView{
+    height: calc(100% - 40px);
+    overflow: auto;
+  }
+  .v-treeview-node__label{
+    overflow: unset!important;
+  }
+</style>

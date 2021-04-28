@@ -9,7 +9,7 @@
       </v-col>
     </v-row>
     <v-row class="d-flex align-center">
-      <v-col cols="12" md="6" class="pr-0 pl-0">
+      <v-col cols="12" md="5" class="pr-0 pl-0">
         <base-material-generator-card>
           <template v-slot:heading>
             <div class="d-flex align-center justify-space-between pa-2">
@@ -63,69 +63,63 @@
           <code-mirror cmId="cm0" v-model="activeProject.json" mode="json" :readOnly="false" :linesToColor="jsonErrors" @cursor-into-view="closeDrawer" @change-json="removeErrors"></code-mirror>
         </base-material-generator-card>
       </v-col>
-
-      <v-col cols="12" md="6" class="pa-0">
-        <base-material-generator-card>
-          <template v-slot:heading>
-            <div class="d-flex display-1 font-weight-light align-center justify-space-between pa-2">
-              <div class="text-break" v-if="activeFile.path && activeFile.path !== ''">
-                <span class="pathElement" v-for="(part, i) in activeFile.path.split('/')" :key="i" @click="openFolder(i+1)">
-                  {{ part }} /
-                </span>
-                <span class="pathElement" @click="openFolder(activeFile.path.split('/').length)">
-                  {{ activeFile.name }}
-                </span>
-              </div>
-              <div v-else>
-                <span class="pathElement" @click="openFolder(0)">
-                  {{ activeFile.name }}
-                </span>
-              </div>
-              <div class="d-flex">
-                <v-tooltip bottom>
-                  <template v-slot:activator="{ on, attrs }">
-                    <v-btn color="white" v-if="isCompare" class="mr-2" elevation="1" @click="setCompare()" fab small v-bind="attrs" v-on="on">
-                      <v-icon color="primary">mdi-file-compare</v-icon>
-                    </v-btn>
-                    <v-btn color="blue-grey" v-else class="mr-2" elevation="1" @click="setCompare()" fab small v-bind="attrs" v-on="on">
-                      <v-icon color="primary">mdi-file-compare</v-icon>
-                    </v-btn>
-                  </template>
-                  <span v-if="isCompare">Show Changes: On</span>
-                  <span v-else>Show Changes: Off</span>
-                </v-tooltip>
-                <v-tooltip bottom>
-                  <template v-slot:activator="{ on, attrs }">
-                    <v-btn color="white" class="mr-2" elevation="1" :disabled="!isPristine || downLoading || activeProject.name === ''" @click="download" fab small v-bind="attrs" v-on="on">
-                      <v-icon color="primary" v-if="!downLoading">mdi-download</v-icon>
-                      <div v-if="downLoading">
-                        <v-progress-circular
-                          indeterminate
-                          :size="25"
-                          color="primary"
-                        ></v-progress-circular>
-                      </div>
-                    </v-btn>
-                  </template>
-                  <span>Download</span>
-                </v-tooltip>
-                <v-tooltip bottom>
-                  <template v-slot:activator="{ on, attrs }">
-                    <v-btn color="white" @click="setDrawer()" elevation="1" fab small v-bind="attrs" v-on="on">
-                      <v-icon color="primary" v-if="drawer">mdi-folder-open</v-icon>
-                      <v-icon color="primary" v-else>mdi-folder</v-icon>
-                    </v-btn>
-                  </template>
-                  <span>Files</span>
-                </v-tooltip>
-                <v-col class="d-flex fileSelector" v-if="drawer">
-                  <tree-view :files="generatedFiles" :openPath="openPath" @select-file="selectFile"></tree-view>
-                </v-col>
-              </div>
-            </div>
-          </template>
-          <code-mirror cmId="cm1" :value="activeFile.content" :mode="getMode()" :readOnly="true" :linesToColor="highlightedDifferences" @cursor-into-view="closeDrawer"></code-mirror>
-        </base-material-generator-card>
+      <v-col cols="12" md="7" class="pr-0 pl-0">
+        <v-row>
+          <v-col cols="9" class="pl-0">
+            <base-material-generator-card>
+              <template v-slot:heading>
+                <div class="d-flex display-1 font-weight-light align-center justify-space-between pa-2">
+                  <div class="text-break" v-if="activeFile.path && activeFile.path !== ''">
+                    <span class="pathElement" v-for="(part, i) in activeFile.path.split('/')" :key="i" @click="openFolder(i+1)">
+                      {{ part }} /
+                    </span>
+                    <span class="pathElement" @click="openFolder(activeFile.path.split('/').length)">
+                      {{ activeFile.name }}
+                    </span>
+                  </div>
+                  <div v-else>
+                    <span class="pathElement" @click="openFolder(0)">
+                      {{ activeFile.name }}
+                    </span>
+                  </div>
+                  <div class="d-flex">
+                    <v-tooltip bottom>
+                      <template v-slot:activator="{ on, attrs }">
+                        <v-btn color="white" v-if="isCompare" class="mr-2" elevation="1" @click="setCompare()" fab small v-bind="attrs" v-on="on">
+                          <v-icon color="primary">mdi-file-compare</v-icon>
+                        </v-btn>
+                        <v-btn color="blue-grey" v-else class="mr-2" elevation="1" @click="setCompare()" fab small v-bind="attrs" v-on="on">
+                          <v-icon color="primary">mdi-file-compare</v-icon>
+                        </v-btn>
+                      </template>
+                      <span v-if="isCompare">Show Changes: On</span>
+                      <span v-else>Show Changes: Off</span>
+                    </v-tooltip>
+                    <v-tooltip bottom>
+                      <template v-slot:activator="{ on, attrs }">
+                        <v-btn color="white" class="mr-2" elevation="1" :disabled="!isPristine || downLoading || activeProject.name === ''" @click="download" fab small v-bind="attrs" v-on="on">
+                          <v-icon color="primary" v-if="!downLoading">mdi-download</v-icon>
+                          <div v-if="downLoading">
+                            <v-progress-circular
+                              indeterminate
+                              :size="25"
+                              color="primary"
+                            ></v-progress-circular>
+                          </div>
+                        </v-btn>
+                      </template>
+                      <span>Download</span>
+                    </v-tooltip>
+                  </div>
+                </div>
+              </template>
+              <code-mirror cmId="cm1" :value="activeFile.content" :mode="getMode()" :readOnly="true" :linesToColor="highlightedDifferences" @cursor-into-view="closeDrawer"></code-mirror>
+            </base-material-generator-card>
+          </v-col>
+          <v-col cols="3" class="pl-0">
+            <file-browser :generatedFiles="generatedFiles" :openPath="openPath" @select-file="selectFile"></file-browser>
+          </v-col>
+        </v-row>
       </v-col>
     </v-row>
     <snackbar v-if="snackbar.visible" :snackbar="snackbar"></snackbar>
@@ -135,7 +129,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import CodeMirror from '../components/CodeMirror.vue';
-import TreeView from '../components/TreeView.vue';
+import FileBrowser from '../components/FileBrowser.vue';
 import {validateJson, prettyPrint} from '../utils/PrettyPrint';
 import {UndoStack} from '../utils/UndoStack';
 import HeadBar from '../components/HeadBar.vue';
@@ -153,7 +147,7 @@ export default Vue.extend({
     HeadBar,
     Snackbar,
     CodeMirror,
-    TreeView,
+    FileBrowser,
   },
   data: function () {
     return {
@@ -479,18 +473,6 @@ export default Vue.extend({
     .icons button{
       margin-top: 5px;
     }
-  }
-  .fileSelector {
-    max-height: calc(100vh - 230px);
-    overflow: auto;
-    position: absolute;
-    background:#412fb3;
-    top: 60px;
-    right: 0px;
-    width: fit-content;
-    border-radius: 3px;
-    word-wrap: break-word!important;
-    z-index: 1;
   }
   .pathElement{
     cursor: pointer!important;
