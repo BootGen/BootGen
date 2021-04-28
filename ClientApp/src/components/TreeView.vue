@@ -11,7 +11,17 @@
       hoverable
       dense
       open-on-click
-    ></v-treeview>
+      expand-icon
+    >
+     <template v-slot:prepend="{ item, open }">
+        <v-icon v-if="item.type == 'folder'">
+          {{ open ? 'mdi-folder-open' : 'mdi-folder' }}
+        </v-icon>
+        <v-icon v-else>
+          {{ icons[item.type] }}
+        </v-icon>
+      </template>
+    </v-treeview>
   </div>
 </template>
 
@@ -22,6 +32,7 @@ import { GeneratedFile } from '../models/GeneratedFile';
 interface Node {
   id: number;
   name: string;
+  type: string;
   children?: Array<Node>;
 }
 
@@ -44,12 +55,19 @@ export default Vue.extend({
       tree: {
         id: 0,
         name: 'Root',
+        type: '',
         children: Array<Node>(),
         open: Array<Node>(),
       },
       activeNodes: Array<Node>(),
       filesById: Array<GeneratedFile>(),
       id: 0,
+      icons: {
+        cs: 'mdi-language-csharp ',
+        vue: 'mdi-vuejs',
+        ts: 'mdi-language-typescript',
+        yml: 'mdi-api',
+      },
     };
   },
   created: function () {
@@ -82,12 +100,13 @@ export default Vue.extend({
     },
     addToTree: function (file: GeneratedFile) {
       const path = file.path.split('/');
+      const type = file.name.split('.')[file.name.split('.').length-1];
       let currentNode: Node = this.tree;
       if (path[0] !== '') {
         path.forEach((part) => {
           const childNode = this.getChild(currentNode, part);
           if (!childNode) {
-            const node: Node = { id: ++this.id, name: part };
+            const node: Node = { id: ++this.id, name: part, type: 'folder' };
             if (!currentNode.children) {
               currentNode.children = [node];
             } else {
@@ -100,9 +119,9 @@ export default Vue.extend({
         });
       }
       if (!currentNode.children) {
-        currentNode.children = [{ id: ++this.id, name: file.name }];
+        currentNode.children = [{ id: ++this.id, name: file.name, type: type }];
       } else {
-        currentNode.children.push({ id: ++this.id, name: file.name });
+        currentNode.children.push({ id: ++this.id, name: file.name, type: type });
       }
       this.filesById[this.id] = file;
     },
@@ -153,4 +172,10 @@ export default Vue.extend({
   .activeFile .v-treeview-node__content{
     color: #fff!important;
   }
+  .activeFile .v-icon{
+    color: #fff!important;
+  }
+  button.v-icon.notranslate {
+    display: none;
+}
 </style>
