@@ -64,9 +64,9 @@ The application comes with an email / password authentication. Every user in you
    * Property and class names should be camelCase. Casing will be set in the generated code according to the type of file generated. In C# PascalCase will be used, in TypeScript property names will remain camelCase.
    * Array names should be plural nouns, everything else should be in singular form. In the generated code the fitting plural or singular form of names will be used.
 
-### Hinting
+### Annotations
 
-You can give hints in the form of comments for the generator. Hints can be placed at the beginning of arrays. Possible hints:
+Although comments are non-standard feature in JSON, many JSON processing libraries support it. We use them as annotations. Annotations can be placed at the beginning of arrays. Possible annotations:
   * `timestamps`: Adds a `Created` and an `Updated` timestamp property to the class.
   * `manyToMany`: Declears that the given relation is a Many-To-Many relation, as opposed to the default One-To-Many relation.
   * `class:[name]`: Substitute `[name]` with the intended name of the class. Example:
