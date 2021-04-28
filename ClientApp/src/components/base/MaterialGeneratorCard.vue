@@ -3,7 +3,7 @@
     v-bind="$attrs"
     :class="classes"
     style="height: calc(100vh - 185px);"
-    class="v-card--material pa-2 mb-0 mr-2 ml-2"
+    class="v-card--material pa-2 mb-0 mr-1 ml-1"
   >
     <div class="d-flex grow flex-wrap">
       <v-avatar
