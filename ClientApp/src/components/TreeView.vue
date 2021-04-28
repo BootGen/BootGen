@@ -3,6 +3,7 @@
     <v-treeview
       active-class="activeFile"
       :items="tree.children"
+      :active.sync="activeNodes"
       :open.sync="tree.open"
       @update:active="selectFile"
       return-object
@@ -46,6 +47,7 @@ export default Vue.extend({
         children: Array<Node>(),
         open: Array<Node>(),
       },
+      activeNodes: Array<Node>(),
       filesById: Array<GeneratedFile>(),
       id: 0,
     };
@@ -54,6 +56,11 @@ export default Vue.extend({
     const files = this.sortFiles();
     files.forEach((file) => this.addToTree(file));
     this.init();
+    this.tree.children.forEach(node => {
+      if (node.name === 'restapi.yml') {
+        this.activeNodes.push(node);
+      }
+    });
   },
   methods: {
     init: function () {
