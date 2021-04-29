@@ -1,7 +1,7 @@
 <template>
   <v-container fluid class="cm">
-    <codemirror v-if="mode == 'json'" :id="cmId" :value="value" @input="onInput" return-object :options="cmOptions" @scroll="onScroll"  @scrollCursorIntoView="cursorIntoView()" />
-    <codemirror v-else :id="cmId" :value="value" :options="cmOptions" @scroll="onScroll" @scrollCursorIntoView="cursorIntoView()" />
+    <codemirror v-if="mode == 'json'" :id="cmId" :value="value" @input="onInput" return-object :options="cmOptions" @scroll="onScroll" />
+    <codemirror v-else :id="cmId" :value="value" :options="cmOptions" @scroll="onScroll" />
   </v-container>
 </template>
 
@@ -75,7 +75,6 @@ export default Vue.extend({
   },
   methods: {
     onInput: function(content: string) {
-      this.$gtag?.event('change-json');
       this.$emit('input', content);
       this.$emit('change-json');
       this.unsetHighlight();
@@ -113,10 +112,6 @@ export default Vue.extend({
           });
         }
       }
-    },
-    cursorIntoView: function(){
-      this.$gtag?.event('cursor-into-view');
-      this.$emit('cursor-into-view');
     }
   },
 });

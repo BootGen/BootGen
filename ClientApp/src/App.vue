@@ -12,7 +12,7 @@
         />
       </template>
       <v-list nav>
-        <div v-for="item in items" :key="item.title" link  @click="selectNavItem()">
+        <div v-for="item in items" :key="item.title" link>
           <div v-if="item.children">
             <v-list-group active-class="primary white--text" :prepend-icon="item.icon">
               <template v-slot:activator>
@@ -144,11 +144,8 @@ export default {
       this.cookieConsentAnswered = true;
       this.$router.push('/privacy-policy');
     },
-    selectNavItem: function(){
-      this.$gtag?.event('select-nav-item');
-    },
     setNavDraver: function(){
-      this.$gtag?.event('set-nav-drawer');
+      this.$gtag?.event('toggle-drawer');
       this.drawer = !this.drawer;
     },
     openGithub: function(){

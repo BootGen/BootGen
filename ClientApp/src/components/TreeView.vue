@@ -139,12 +139,16 @@ export default Vue.extend({
         }
       }
     },
-    getFile: function (node: Node) {
+    getFile: function (node: Node): GeneratedFile {
       return this.filesById[node.id];
     },
     selectFile: function (node: Node[]) {
       if (node[0]) {
-        this.$emit('select-file', this.getFile(node[0]));
+        const file = this.getFile(node[0]);
+        this.$gtag?.event('select-file', {
+              'event_label' : file.name
+        });
+        this.$emit('select-file', file);
       }
     },
     sortFiles: function () {

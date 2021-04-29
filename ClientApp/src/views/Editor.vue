@@ -35,7 +35,7 @@
                 </v-tooltip>
                 <v-tooltip bottom>
                   <template v-slot:activator="{ on, attrs }">
-                    <v-btn class="mr-2" color="white" elevation="1" fab small :disabled="activeProject.json === ''" @click="callPrettyPrint" v-bind="attrs" v-on="on">
+                    <v-btn class="mr-2" color="white" elevation="1" fab small :disabled="activeProject.json === ''" @click="onPrettyPrintClicked" v-bind="attrs" v-on="on">
                       <v-icon color="primary">mdi-format-align-left</v-icon>
                     </v-btn>
                   </template>
@@ -44,7 +44,7 @@
 
                 <v-tooltip bottom>
                   <template v-slot:activator="{ on, attrs }">
-                    <v-btn class="mr-2" color="white" elevation="1" fab small :disabled="isPristine || generateLoading || activeProject.name === ''" @click="validateAndGenerate()" v-bind="attrs" v-on="on">
+                    <v-btn class="mr-2" color="white" elevation="1" fab small :disabled="isPristine || generateLoading || activeProject.name === ''" @click="onGenerateClicked" v-bind="attrs" v-on="on">
                       <v-icon color="primary" v-if="!generateLoading">mdi-arrow-right-bold</v-icon>
                       <div v-if="generateLoading">
                         <v-progress-circular
@@ -60,7 +60,7 @@
               </div>
             </div>
           </template>
-          <code-mirror cmId="cm0" v-model="activeProject.json" mode="json" :readOnly="false" :linesToColor="jsonErrors" @cursor-into-view="closeDrawer" @change-json="removeErrors"></code-mirror>
+          <code-mirror cmId="cm0" v-model="activeProject.json" mode="json" :readOnly="false" :linesToColor="jsonErrors" @change-json="removeErrors"></code-mirror>
         </base-material-generator-card>
       </v-col>
       <v-col xl="5" lg="5" md="8" sm="8" class="pr-0 pl-0">
@@ -111,7 +111,7 @@
               </div>
             </div>
           </template>
-          <code-mirror cmId="cm1" :value="activeFile.content" :mode="getMode()" :readOnly="true" :linesToColor="highlightedDifferences" @cursor-into-view="closeDrawer"></code-mirror>
+          <code-mirror cmId="cm1" :value="activeFile.content" :mode="getMode()" :readOnly="true" :linesToColor="highlightedDifferences"></code-mirror>
         </base-material-generator-card>
       </v-col>
       <v-col xl="2" lg="2" md="4" sm="4" class="pr-0 pl-0">
@@ -298,8 +298,11 @@ export default Vue.extend({
       }
       this.setHighlightedDifferences();
     },
-    callPrettyPrint: function(){
+    onPrettyPrintClicked: function(){
       this.$gtag?.event('pretty-print');
+      this.callPrettyPrint();
+    },
+    callPrettyPrint: function(){
       const result = validateJson(this.activeProject.json);
       if (result.error) {
         this.jsonErrors.push({line: result.line, color: 'red'});
@@ -318,8 +321,11 @@ export default Vue.extend({
       await this.generate();
       this.highlightedDifferences = [];
     },
-    validateAndGenerate: async function() {
+    onGenerateClicked: function () {
       this.$gtag?.event('generate');
+      this.validateAndGenerate();
+    },
+    validateAndGenerate: async function() {
       this.jsonErrors = [];
       const result = validateJson(this.activeProject.json);
       if(!result.error) {
@@ -404,7 +410,7 @@ export default Vue.extend({
       }
     },
     openFolder: function(idx: number){
-      this.$gtag?.event('open-folder');
+      this.$gtag?.event('click-on-path-element');
       this.openPath = '';
       for(let i = 0; i < idx; i++){
         if(this.activeFile.path.split('/')[i]){
@@ -415,24 +421,8 @@ export default Vue.extend({
       this.drawer = true;
     },
     selectFile: function(data: GeneratedFile){
-      this.$gtag?.event('select-file');
       this.activeFile = data;
-      this.closeDrawer();
       this.setHighlightedDifferences();
-    },
-    setDrawer: function(){
-      this.$gtag?.event('set-drawer');
-      this.drawer = !this.drawer;
-      if(!this.drawer){
-        this.openPath = '';
-      }
-    },
-    closeDrawer: function(){
-      if(this.drawer){
-        this.$gtag?.event('close-drawer');
-        this.drawer = false;
-        this.openPath = '';
-      }
     },
     toCamelCase: function(str: string): string {
       const nameSpace = str.replace(/(?:^\w|[A-Z]|\b\w)/g, function(word, index) {

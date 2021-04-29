@@ -510,11 +510,12 @@ export default Vue.extend({
   },
   watch: {
     cookiesAccepted(accepted) {
-      this.$gtag?.event('set-opt');
       if (accepted) {
+        this.$gtag?.event('analytics-opt-in');
         localStorage.cookiesAccepted = true;
         this.$gtag?.optIn();
       } else {
+        this.$gtag?.event('analytics-opt-out');
         localStorage.cookiesAccepted = false;
         this.$gtag?.optOut();
       }
