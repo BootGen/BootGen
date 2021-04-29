@@ -14,56 +14,52 @@
           </template>
 
           <v-form>
-            <v-container class="py-0">
-              <v-row>
-                <v-col cols="12">
-                  <ValidationObserver v-slot="{ invalid }">
-                    <ValidationProvider
-                      v-slot="{ errors }"
-                      name="oldPassword"
-                      rules="required"
-                    >
-                      <v-text-field
-                        v-model="oldPassword"
-                        :error-messages="errors"
-                        placeholder="old password"
-                        type="password"
-                      ></v-text-field>
-                    </ValidationProvider>
-                    <ValidationProvider
-                      v-slot="{ errors }"
-                      name="password"
-                      rules="required|min:8|oldPassword:@oldPassword|password:@confirmation"
-                    >
-                      <v-text-field
-                        v-model="newPassword"
-                        :error-messages="errors"
-                        placeholder="new password"
-                        type="password"
-                      ></v-text-field>
-                    </ValidationProvider>
-                    <ValidationProvider
-                      v-slot="{ errors }"
-                      name="confirmation"
-                      rules="required|min:8"
-                    >
-                      <v-text-field
-                        v-model="confirmPassword"
-                        :error-messages="errors"
-                        placeholder="confirm password"
-                        type="password"
-                      ></v-text-field>
-                    </ValidationProvider>
-                    <v-alert type="error" v-if="errorMsg">{{ errorMsg }}</v-alert>
-                    <v-alert type="success" v-if="successMsg">{{ successMsg }}</v-alert>
-                    <v-col cols="12" class="text-right">
-                      <v-btn color="primary" class="mr-0"  @click="savePassword" :disabled="invalid">
-                        Change Password
-                      </v-btn>
-                    </v-col>
-                  </ValidationObserver>
-                </v-col>
-              </v-row>
+            <v-container>
+              <ValidationObserver v-slot="{ invalid }">
+                <ValidationProvider
+                  v-slot="{ errors }"
+                  name="oldPassword"
+                  rules="required"
+                >
+                  <v-text-field
+                    v-model="oldPassword"
+                    :error-messages="errors"
+                    placeholder="old password"
+                    type="password"
+                  ></v-text-field>
+                </ValidationProvider>
+                <ValidationProvider
+                  v-slot="{ errors }"
+                  name="password"
+                  rules="required|min:8|oldPassword:@oldPassword|password:@confirmation"
+                >
+                  <v-text-field
+                    v-model="newPassword"
+                    :error-messages="errors"
+                    placeholder="new password"
+                    type="password"
+                  ></v-text-field>
+                </ValidationProvider>
+                <ValidationProvider
+                  v-slot="{ errors }"
+                  name="confirmation"
+                  rules="required|min:8"
+                >
+                  <v-text-field
+                    v-model="confirmPassword"
+                    :error-messages="errors"
+                    placeholder="confirm password"
+                    type="password"
+                  ></v-text-field>
+                </ValidationProvider>
+                <v-alert type="error" v-if="errorMsg">{{ errorMsg }}</v-alert>
+                <v-alert type="success" v-if="successMsg">{{ successMsg }}</v-alert>
+                <div class="text-right">
+                  <v-btn color="primary" class="mr-0"  @click="savePassword" :disabled="invalid">
+                    Change Password
+                  </v-btn>
+                </div>
+              </ValidationObserver>
             </v-container>
           </v-form>
         </base-material-card>
@@ -78,11 +74,9 @@
             <h4 class="display-2 font-weight-light mb-3 black--text">
               {{ $store.state.auth.user.userName }}
             </h4>
-
             <p class="font-weight-light grey--text">
               {{ $store.state.auth.user.email }}
             </p>
-
             <v-btn color="primary" rounded class="mr-0" to="/profile">
               Edit Profile
             </v-btn>
@@ -97,7 +91,7 @@
 import Vue from 'vue';
 import { required, min } from 'vee-validate/dist/rules';
 import { extend, ValidationObserver, ValidationProvider } from 'vee-validate';
-import api from '@/api';
+import api from '../api';
 
 extend('required', {
   ...required,
