@@ -9,7 +9,7 @@
       </v-col>
     </v-row>
     <v-row class="d-flex align-center">
-      <v-col xl="5" lg="5" md="12" sl="12" class="pr-0 pl-0">
+      <v-col xl="5" lg="5" md="12" class="pr-0 pl-0">
         <base-material-generator-card>
           <template v-slot:heading>
             <div class="d-flex align-center justify-space-between pa-2">
@@ -63,7 +63,7 @@
           <code-mirror cmId="cm0" v-model="activeProject.json" mode="json" :readOnly="false" :linesToColor="jsonErrors" @cursor-into-view="closeDrawer" @change-json="removeErrors"></code-mirror>
         </base-material-generator-card>
       </v-col>
-      <v-col xl="5" lg="5" md="8" sl="8" class="pr-0 pl-0">
+      <v-col xl="5" lg="5" md="8" sm="8" class="pr-0 pl-0">
         <base-material-generator-card>
           <template v-slot:heading>
             <div class="d-flex display-1 font-weight-light align-center justify-space-between pa-2">
@@ -114,7 +114,7 @@
           <code-mirror cmId="cm1" :value="activeFile.content" :mode="getMode()" :readOnly="true" :linesToColor="highlightedDifferences" @cursor-into-view="closeDrawer"></code-mirror>
         </base-material-generator-card>
       </v-col>
-      <v-col xl="2" lg="2" md="4" sl="4" class="pr-0 pl-0">
+      <v-col xl="2" lg="2" md="4" sm="4" class="pr-0 pl-0">
         <file-browser :generatedFiles="generatedFiles" :openPath="openPath" @select-file="selectFile"></file-browser>
       </v-col>
     </v-row>

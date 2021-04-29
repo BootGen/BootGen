@@ -11,7 +11,6 @@
       hoverable
       dense
       open-on-click
-      expand-icon
     >
      <template v-slot:prepend="{ item, open }">
         <v-icon v-if="item.type == 'folder'">
@@ -165,17 +164,14 @@ export default Vue.extend({
 </script>
 
 <style>
-  .activeFile{
-    background-color: #22195B!important;
-    border-radius: 4px;
-  }
   .activeFile .v-treeview-node__content{
-    color: #fff!important;
+    color: #412fb3!important;
+    font-weight: 900;
   }
   .activeFile .v-icon{
-    color: #fff!important;
+    color: #412fb3!important;
   }
   button.v-icon.notranslate {
     display: none;
-}
+  }
 </style>
