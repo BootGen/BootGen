@@ -14,35 +14,31 @@
           </template>
 
           <v-form>
-            <v-container class="py-0">
-              <v-row>
-                <v-col cols="12">
-                  <ValidationObserver v-slot="{ invalid }">
-                    <ValidationProvider v-slot="{ errors }" name="user name" rules="required">
-                      <v-text-field
-                        label="User Name"
-                        v-model="$store.state.auth.user.userName"
-                        :error-messages="errors"
-                      ></v-text-field>
-                    </ValidationProvider>
-                    <ValidationProvider v-slot="{ errors }" name="email" rules="required|email">
-                      <v-text-field
-                        label="Email Address"
-                        v-model="$store.state.auth.user.email"
-                        :error-messages="errors"
-                      ></v-text-field>
-                    </ValidationProvider>
-                    <v-checkbox v-model="$store.state.auth.user.newsletter" label="Sign me up for the newsletter!"></v-checkbox>
-                    <v-alert type="error" v-if="errorMsg">{{ errorMsg }}</v-alert>
-                    <v-alert type="success" v-if="successMsg">{{ successMsg }}</v-alert>
-                    <v-col cols="12" class="text-right">
-                      <v-btn color="primary" class="mr-0"  @click="saveUser" :disabled="invalid">
-                        Update Profile
-                      </v-btn>
-                    </v-col>
-                  </ValidationObserver>
-                </v-col>
-              </v-row>
+            <v-container>
+              <ValidationObserver v-slot="{ invalid }">
+                <ValidationProvider v-slot="{ errors }" name="user name" rules="required">
+                  <v-text-field
+                    label="User Name"
+                    v-model="$store.state.auth.user.userName"
+                    :error-messages="errors"
+                  ></v-text-field>
+                </ValidationProvider>
+                <ValidationProvider v-slot="{ errors }" name="email" rules="required|email">
+                  <v-text-field
+                    label="Email Address"
+                    v-model="$store.state.auth.user.email"
+                    :error-messages="errors"
+                  ></v-text-field>
+                </ValidationProvider>
+                <v-checkbox v-model="$store.state.auth.user.newsletter" label="Sign me up for the newsletter!"></v-checkbox>
+                <v-alert type="error" v-if="errorMsg">{{ errorMsg }}</v-alert>
+                <v-alert type="success" v-if="successMsg">{{ successMsg }}</v-alert>
+                <div class="text-right">
+                  <v-btn color="primary" class="mr-0"  @click="saveUser" :disabled="invalid">
+                    Update Profile
+                  </v-btn>
+                </div>
+              </ValidationObserver>
             </v-container>
           </v-form>
         </base-material-card>
