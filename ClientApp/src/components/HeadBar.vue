@@ -11,34 +11,28 @@
         <v-btn class="mr-0 ml-3" color="primary" small @click="dialog = true" v-if="$store.state.auth.jwt">New project</v-btn>
         <v-spacer v-if="!$store.state.auth.jwt"></v-spacer>
         <div class="d-flex align-center" @click="toLogin()" v-if="!$store.state.auth.jwt"><span class="pr-1">for save</span><router-link to="/login">sign in</router-link></div>
-        <v-dialog v-model="dialog" width="500" persistent>
-          <v-card>
-            <v-card-title>
-              <span class="headline">Create new project</span>
-            </v-card-title>
-            <ValidationObserver v-slot="{ invalid }">
-              <v-card-text>
-                <v-container>
-                  <v-row>
-                    <v-col cols="12">
-                        <ValidationProvider v-slot="{ errors }" name="Project name" rules="required">
-                          <v-text-field v-model="projectName" placeholder="Name your project" type="text" :error-messages="errors" required></v-text-field>
-                        </ValidationProvider>
-                    </v-col>
-                  </v-row>
-                </v-container>
-                <v-alert class="text-left" type="error" v-if="errorMsg">This name is already in use, please enter another name!</v-alert>
-              </v-card-text>
-              <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn class="mr-0 ml-3" color="primary" @click="dialog = false">Cancel</v-btn>
-                <v-btn class="mr-0 ml-3" color="primary" @click="newProject" :disabled="invalid">Save</v-btn>
-              </v-card-actions>
-            </ValidationObserver>
-          </v-card>
-        </v-dialog>
       </v-col>
     </v-row>
+    <v-dialog v-model="dialog" width="400" persistent>
+      <v-card class="pa-0 ma-0">
+        <v-card-title>
+          <span class="headline">Create new project</span>
+        </v-card-title>
+        <ValidationObserver v-slot="{ invalid }">
+          <v-card-text class="pb-0">
+            <ValidationProvider v-slot="{ errors }" name="Project name" rules="required">
+              <v-text-field v-model="projectName" placeholder="Name your project" type="text" :error-messages="errors" required></v-text-field>
+            </ValidationProvider>
+            <v-alert class="text-left" type="error" v-if="errorMsg">This name is already in use, please enter another name!</v-alert>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn class="mr-0 ml-3" color="primary" @click="dialog = false">Cancel</v-btn>
+            <v-btn class="mr-0 ml-3" color="primary" @click="newProject" :disabled="invalid">Save</v-btn>
+          </v-card-actions>
+        </ValidationObserver>
+      </v-card>
+    </v-dialog>
   </v-container>
 </template>
 
