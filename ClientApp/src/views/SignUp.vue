@@ -16,52 +16,48 @@
             <p class="caption text-center">Please check your e-mail account and click on the link in the message. If you do not find the confirmation e-mail, please check your spam folder.</p>
           </div>
           <v-form v-else>
-            <v-container class="py-0">
-              <v-row>
-                <v-col cols="12">
-                  <ValidationObserver v-slot="{ invalid }">
-                    <v-col cols="12" class="text-center">
-                      <ValidationProvider v-slot="{ errors }" name="user name" rules="required">
-                        <v-text-field
-                          v-model="userName"
-                          :error-messages="errors"
-                          placeholder="User Name"
-                        prepend-icon="mdi-face-outline"
-                        ></v-text-field>
-                      </ValidationProvider>
-                      <ValidationProvider v-slot="{ errors }" name="email" rules="required|email">
-                        <v-text-field
-                          v-model="email"
-                          :error-messages="errors"
-                          placeholder="E-mail"
-                        prepend-icon="mdi-email-outline"
-                        ></v-text-field>
-                      </ValidationProvider>
-                      <ValidationProvider v-slot="{ errors }" name="password" rules="required|min:8|password:@confirmation">
-                        <v-text-field
-                          v-model="password"
-                          :error-messages="errors"
-                          placeholder="Password"
-                          type="password"
-                          prepend-icon="mdi-form-textbox-password"
-                        ></v-text-field>
-                      </ValidationProvider>
-                      <ValidationProvider v-slot="{ errors }" name="confirmation" rules='required|min:8'>
-                        <v-text-field
-                          v-model="confirmPassword"
-                          :error-messages="errors"
-                          placeholder="Confirm Password"
-                          type="password"
-                          prepend-icon="mdi-form-textbox-password"
-                        ></v-text-field>
-                      </ValidationProvider>
-                      <v-checkbox v-model="newsletter" label="Sign me up for the newsletter!"></v-checkbox>
-                      <v-alert class="text-left" type="error" v-if="errorMsg">{{ errorMsg }}</v-alert>
-                      <v-btn color="primary" large @click="trySignUp" :disabled="invalid">Sign up</v-btn>
-                    </v-col>
-                  </ValidationObserver>
-                </v-col>
-              </v-row>
+            <v-container>
+              <ValidationObserver v-slot="{ invalid }">
+                <ValidationProvider v-slot="{ errors }" name="user name" rules="required">
+                  <v-text-field
+                    v-model="userName"
+                    :error-messages="errors"
+                    placeholder="User Name"
+                  prepend-icon="mdi-face-outline"
+                  ></v-text-field>
+                </ValidationProvider>
+                <ValidationProvider v-slot="{ errors }" name="email" rules="required|email">
+                  <v-text-field
+                    v-model="email"
+                    :error-messages="errors"
+                    placeholder="E-mail"
+                  prepend-icon="mdi-email-outline"
+                  ></v-text-field>
+                </ValidationProvider>
+                <ValidationProvider v-slot="{ errors }" name="password" rules="required|min:8|password:@confirmation">
+                  <v-text-field
+                    v-model="password"
+                    :error-messages="errors"
+                    placeholder="Password"
+                    type="password"
+                    prepend-icon="mdi-form-textbox-password"
+                  ></v-text-field>
+                </ValidationProvider>
+                <ValidationProvider v-slot="{ errors }" name="confirmation" rules='required|min:8'>
+                  <v-text-field
+                    v-model="confirmPassword"
+                    :error-messages="errors"
+                    placeholder="Confirm Password"
+                    type="password"
+                    prepend-icon="mdi-form-textbox-password"
+                  ></v-text-field>
+                </ValidationProvider>
+                <v-checkbox v-model="newsletter" label="Sign me up for the newsletter!"></v-checkbox>
+                <v-alert class="text-left" type="error" v-if="errorMsg">{{ errorMsg }}</v-alert>
+                <div class="text-center">
+                  <v-btn color="primary" large @click="trySignUp" :disabled="invalid">Sign up</v-btn>
+                </div>
+              </ValidationObserver>
             </v-container>
           </v-form>
         </base-material-card>
