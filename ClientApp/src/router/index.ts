@@ -10,6 +10,7 @@ import SavedProjects from '../views/SavedProjects.vue'
 import GettingStarted from '../views/GettingStarted.vue'
 import Profile from '../views/Profile.vue'
 import ChangePassword from '../views/ChangePassword.vue'
+import NotFound from '../views/NotFound.vue'
 
 import store from '../store/index'
 import {NavigationGuardNext, Route} from 'vue-router/types/router';
@@ -88,6 +89,11 @@ const loggedOutGuard = (to: Route, from: Route, next: NavigationGuardNext) => {
     name: 'Logout',
     beforeEnter: loggedInGuard,
     component: Logout
+  },
+  {
+    path: '*',
+    name: 'Not Found',
+    component: NotFound
   }
 ]
 
