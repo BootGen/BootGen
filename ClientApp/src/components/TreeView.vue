@@ -45,11 +45,8 @@ export default Vue.extend({
     },
   },
   watch: {
-    files: function () {
-      this.init();
-    },
     openPath: function() {
-      this.setOpenPath();
+      this.init();
     }
   },
   data: function () {
@@ -73,6 +70,8 @@ export default Vue.extend({
     };
   },
   created: function () {
+    const files = this.sortFiles();
+    files.forEach((file) => this.addToTree(file));
     this.init();
     this.tree.children.forEach(node => {
       if (node.name === 'restapi.yml') {
@@ -82,13 +81,6 @@ export default Vue.extend({
   },
   methods: {
     init: function () {
-      this.tree.children = [];
-      this.tree.open = [];
-      const files = this.sortFiles();
-      files.forEach((file) => this.addToTree(file));
-      this.setOpenPath();
-    },
-    setOpenPath: function() {
       if (this.openPath) {
         this.tree.open = [];
         this.setOpenFolder(this.openPath.split('/'), this.tree.children);
@@ -159,7 +151,7 @@ export default Vue.extend({
         this.$emit('select-file', file);
       }
     },
-    sortFiles: function (): Array<GeneratedFile> {
+    sortFiles: function () {
       this.files.sort(function (a: GeneratedFile, b: GeneratedFile) {
         if (a.path === '') {
           return b.path.localeCompare(a.path) || a.name.localeCompare(b.name);
