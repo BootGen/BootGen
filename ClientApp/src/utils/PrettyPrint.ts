@@ -20,7 +20,8 @@ export interface JsonValidationResult {
 }
 
 export function validateJson(text: string): JsonValidationResult {
-  const json = text.split('\n').filter(line => !line.trim().startsWith('//')).join('\n');
+  let json = text.replace(/\*(\*(?!\/)|[^*])*\*/g, '');
+  json = json.split('\n').filter(line => !line.trim().startsWith('//')).join('\n');
   try {
     JSON.parse(json);
     return {error: false, line: -1, message: ''};
@@ -39,6 +40,7 @@ export function validateJson(text: string): JsonValidationResult {
 export function formatJson(json: string): string{
   json = json.replaceAll(/\s/g,'');
   json = json.replaceAll('//','\n//\n');
+  json = json.replaceAll('/**/','\n/**/\n');
   json = json.replaceAll('{','{\n');
   json = json.replaceAll('}','\n}');
   json = json.replaceAll('[','[\n');
@@ -75,6 +77,19 @@ function replaceToComment(comments: string[], lines: string[]): string[]{
   });
   return lines;
 }
+function replaceToCommentBlock(comments: string[], lines: string[]): string[]{
+  let startIdx = 0;
+  comments.forEach(comment => {
+    for(let i = startIdx; i < lines.length; i++){
+      if(lines[i].includes('/**/')){
+        startIdx = i+1;
+        lines[i] = lines[i].replace('/**/', `/${comment}/`);
+        break;
+      }
+    }
+  });
+  return lines;
+}
 function replaceToString(strings: string[], lines: string[]): string[]{
   strings.forEach(comment => {
     for(let i = 0; i < lines.length; i++){
@@ -93,8 +108,13 @@ export function prettyPrint(json: string): string {
   json = json.replace(/"[^"]*"/g, '""');
   const comments = json.match(/\/\/.+?(?=\n)/g);
   json = json.replace(/\/\/.+(?=\n)/g, '//');
+  const commentBlocks = json.match(/\*(\*(?!\/)|[^*])*\*/g);
+  json = json.replace(/\*(\*(?!\/)|[^*])*\*/g, '**');
   json = formatJson(json);
   let lines = indentLines(json.split('\n'));
+  if(commentBlocks) {
+    lines = replaceToCommentBlock(commentBlocks, lines);
+  }
   if (comments) {
     lines = replaceToComment(comments, lines);
   }
