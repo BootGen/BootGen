@@ -1,7 +1,7 @@
 <template>
   <v-container fluid class="cm">
     <codemirror v-if="mode == 'json'" :id="cmId" :value="value" @input="onInput" return-object :options="cmOptions" @scroll="onScroll" />
-    <codemirror v-else :id="cmId" :value="value" :options="cmOptions" @scroll="onScroll" />
+    <codemirror v-else :id="cmId" :value="value" :options="cmOptions" @scroll="onScroll" ref="vueCm" />
   </v-container>
 </template>
 
@@ -41,39 +41,43 @@ export default Vue.extend({
     codemirror,
   },
   watch: {
-    mode: {
-      handler(mode: string) {
-        if(mode === 'json'){
-          this.cmOptions.mode = 'text/javascript';
-        }if(mode === 'cs'){
-          this.cmOptions.mode = 'text/x-csharp';
-        }else if(mode === 'ts'){
-          this.cmOptions.mode = 'text/typescript';
-        }else if(mode === 'vue'){
-          this.cmOptions.mode = 'text/x-vue';
-        }else{
-          this.cmOptions.mode = 'text/x-yaml';
-        }
+    mode: function (mode: string) {
+      if(mode === 'json'){
+        this.cmOptions.mode = 'text/javascript';
+      }if(mode === 'cs'){
+        this.cmOptions.mode = 'text/x-csharp';
+      }else if(mode === 'ts'){
+        this.cmOptions.mode = 'text/typescript';
+      }else if(mode === 'vue'){
+        this.cmOptions.mode = 'text/x-vue';
+      }else{
+        this.cmOptions.mode = 'text/x-yaml';
       }
     },
-    linesToColor: {
-      handler(linesToColor: {line: number; color: string}[]) {
-        if(linesToColor.length === 0){
-          this.unsetHighlight();
-        }else{
-          this.highlight();
-        }
+    linesToColor: function (linesToColor: {line: number; color: string}[]) {
+      if(linesToColor.length === 0){
+        this.unsetHighlight();
+      }else{
+        this.highlight();
       }
     }
   },
   updated: function() {
-      this.unsetHighlight();
-      this.highlight();
+    this.unsetHighlight();
+    this.highlight();
   },
   created: function(){
     this.cmOptions.readOnly = this.readOnly;
   },
   methods: {
+    focus: function() {
+      const comp: any = this.$refs?.vueCm;
+      const cm: any = comp?.codemirror;
+      if(cm){
+        cm.focus();
+        cm.setCursor(this.linesToColor[0].line, 0);
+      }
+    },
     onInput: function(content: string) {
       this.$emit('input', content);
       this.$emit('change-json');
@@ -111,6 +115,9 @@ export default Vue.extend({
             }
           });
         }
+      }
+      if(this.linesToColor.length > 0){
+        this.focus();
       }
     }
   },
