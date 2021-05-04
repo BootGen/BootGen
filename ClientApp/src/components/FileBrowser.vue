@@ -9,6 +9,7 @@
       class="treeView"
       v-if="generatedFiles.length > 0"
       :files="generatedFiles"
+      :previousFiles="previousFiles"
       :openPath="openPath"
       @select-file="selectFile"
     ></tree-view>
@@ -26,6 +27,9 @@ export default Vue.extend({
   },
   props: {
     generatedFiles: {
+      type: Array as () => GeneratedFile[],
+    },
+    previousFiles: {
       type: Array as () => GeneratedFile[],
     },
     openPath: String,

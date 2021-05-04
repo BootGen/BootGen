@@ -20,6 +20,13 @@
           {{ icons[item.type] }}
         </v-icon>
       </template>
+     <template v-slot:append="{ item }">
+        <p class="orange--text pa-0 ma-0" v-if="item.change">M</p>
+      </template>
+     <template v-slot:label="{ item }">
+        <p class="green--text pa-0 ma-0" v-if="item.change">{{item.name}}</p>
+        <p class="pa-0 ma-0" v-else>{{item.name}}</p>
+      </template>
     </v-treeview>
   </div>
 </template>
@@ -27,17 +34,22 @@
 <script lang="ts">
 import Vue from 'vue';
 import { GeneratedFile } from '../models/GeneratedFile';
+import { Compare } from '../utils/TextCompare';
 
 interface Node {
   id: number;
   name: string;
   type: string;
+  change: boolean;
   children?: Array<Node>;
 }
 
 export default Vue.extend({
   props: {
     files: {
+      type: Array as () => GeneratedFile[],
+    },
+    previousFiles: {
       type: Array as () => GeneratedFile[],
     },
     openPath: {
@@ -58,6 +70,7 @@ export default Vue.extend({
         id: 0,
         name: 'Root',
         type: '',
+        change: false,
         children: Array<Node>(),
         open: Array<Node>(),
       },
@@ -74,18 +87,42 @@ export default Vue.extend({
   },
   created: function () {
     this.init();
-    this.tree.children.forEach(node => {
-      if (node.name === 'restapi.yml') {
-        this.activeNodes.push(node);
-      }
-    });
   },
   methods: {
     init: function () {
       this.tree.children = [];
       this.tree.open = [];
-      this.sortedFiles().forEach(file => this.addToTree(file));
+      const files = this.sortedFiles();
+      const changedFiles: {file: GeneratedFile; changes: number[]}[] = [];
+      if(this.previousFiles.length > 0){
+        files.forEach(file => {
+          for(let j = 0; j < this.previousFiles.length; j++){
+            if(file.name === this.previousFiles[j].name && file.path === this.previousFiles[j].path){
+              const compare = new Compare(file.content.split('\n'), this.previousFiles[j].content.split('\n'));
+              changedFiles.push({file: file, changes: compare.getChanges()});
+            }
+          }
+        });
+      }
+      if(this.previousFiles.length > 0){
+        changedFiles.forEach((node) => {
+          const isChange = node.changes.length > 0 ? true : false;
+          this.addToTree(node.file, isChange);
+        });
+      }else{
+        files.forEach((file) => {
+          this.addToTree(file, false);
+        });
+      }
       this.setOpenPath();
+      this.setDefaultNodes();
+    },
+    setDefaultNodes: function(){
+      this.tree.children.forEach(node => {
+        if (node.name === 'restapi.yml') {
+          this.activeNodes.push(node);
+        }
+      });
     },
     setOpenPath: function() {
       if (this.openPath) {
@@ -104,7 +141,7 @@ export default Vue.extend({
       }
       return null;
     },
-    addToTree: function (file: GeneratedFile) {
+    addToTree: function (file: GeneratedFile, change: boolean) {
       const path = file.path.split('/');
       const type = file.name.split('.')[file.name.split('.').length-1];
       let currentNode: Node = this.tree;
@@ -112,7 +149,7 @@ export default Vue.extend({
         path.forEach((part) => {
           const childNode = this.getChild(currentNode, part);
           if (!childNode) {
-            const node: Node = { id: ++this.id, name: part, type: 'folder' };
+            const node: Node = { id: ++this.id, name: part, type: 'folder', change: change };
             if (!currentNode.children) {
               currentNode.children = [node];
             } else {
@@ -122,12 +159,15 @@ export default Vue.extend({
           } else {
             currentNode = childNode;
           }
+          if(change){
+            currentNode.change = true;
+          }
         });
       }
       if (!currentNode.children) {
-        currentNode.children = [{ id: ++this.id, name: file.name, type: type }];
+        currentNode.children = [{ id: ++this.id, name: file.name, type: type, change: change }];
       } else {
-        currentNode.children.push({ id: ++this.id, name: file.name, type: type });
+        currentNode.children.push({ id: ++this.id, name: file.name, type: type, change: change });
       }
       this.filesById[this.id] = file;
     },
