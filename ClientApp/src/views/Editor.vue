@@ -115,7 +115,7 @@
         </base-material-generator-card>
       </v-col>
       <v-col xl="2" lg="2" md="4" sm="4" class="pr-0 pl-0">
-        <file-browser :generatedFiles="generatedFiles" :previousFiles="previousFiles" :openPath="openPath" @select-file="selectFile"></file-browser>
+        <file-browser :generatedFiles="generatedFiles" :previousFiles="previousFiles" :openPath="openPath" :isCompare="isCompare" @select-file="selectFile"></file-browser>
       </v-col>
     </v-row>
     <snackbar v-if="snackbar.visible" :snackbar="snackbar"></snackbar>

@@ -55,6 +55,7 @@ export default Vue.extend({
     openPath: {
       type: String,
     },
+    isCompare: Boolean,
   },
   watch: {
     files: function () {
@@ -62,6 +63,9 @@ export default Vue.extend({
     },
     openPath: function() {
       this.setOpenPath();
+    },
+    isCompare: function() {
+      this.init();
     }
   },
   data: function () {
@@ -87,35 +91,41 @@ export default Vue.extend({
   },
   created: function () {
     this.init();
+    this.setDefaultNodes();
   },
   methods: {
     init: function () {
       this.tree.children = [];
       this.tree.open = [];
       const files = this.sortedFiles();
-      const changedFiles: {file: GeneratedFile; changes: number[]}[] = [];
-      if(this.previousFiles.length > 0){
-        files.forEach(file => {
-          for(let j = 0; j < this.previousFiles.length; j++){
-            if(file.name === this.previousFiles[j].name && file.path === this.previousFiles[j].path){
-              const compare = new Compare(file.content.split('\n'), this.previousFiles[j].content.split('\n'));
-              changedFiles.push({file: file, changes: compare.getChanges()});
+      if(this.isCompare){
+        const changedFiles: {file: GeneratedFile; changes: number[]}[] = [];
+        if(this.previousFiles.length > 0){
+          files.forEach(file => {
+            for(let j = 0; j < this.previousFiles.length; j++){
+              if(file.name === this.previousFiles[j].name && file.path === this.previousFiles[j].path){
+                const compare = new Compare(file.content.split('\n'), this.previousFiles[j].content.split('\n'));
+                changedFiles.push({file: file, changes: compare.getChanges()});
+              }
             }
-          }
-        });
-      }
-      if(this.previousFiles.length > 0){
-        changedFiles.forEach((node) => {
-          const isChange = node.changes.length > 0 ? true : false;
-          this.addToTree(node.file, isChange);
-        });
+          });
+        }
+        if(this.previousFiles.length > 0){
+          changedFiles.forEach((node) => {
+            const isChange = node.changes.length > 0 ? true : false;
+            this.addToTree(node.file, isChange);
+          });
+        }else{
+          files.forEach((file) => {
+            this.addToTree(file, false);
+          });
+        } 
       }else{
         files.forEach((file) => {
           this.addToTree(file, false);
         });
-      }
+      } 
       this.setOpenPath();
-      this.setDefaultNodes();
     },
     setDefaultNodes: function(){
       this.tree.children.forEach(node => {

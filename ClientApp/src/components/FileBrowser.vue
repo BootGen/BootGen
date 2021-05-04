@@ -11,6 +11,7 @@
       :files="generatedFiles"
       :previousFiles="previousFiles"
       :openPath="openPath"
+      :isCompare="isCompare"
       @select-file="selectFile"
     ></tree-view>
   </base-material-generator-card>
@@ -33,6 +34,7 @@ export default Vue.extend({
       type: Array as () => GeneratedFile[],
     },
     openPath: String,
+    isCompare: Boolean,
   },
   data: function () {
     return {};
