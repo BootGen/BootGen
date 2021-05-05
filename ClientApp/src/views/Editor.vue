@@ -280,21 +280,19 @@ export default Vue.extend({
       json = json.replace(/[\n\t\r]/g, '');
       return json.length;
     },
+    setSelectedFile: function (fileName: string, filePath: string) {
+      for (let i = 0; i < this.generatedFiles.length; i++) {
+        if (this.generatedFiles[i].name === fileName && this.generatedFiles[i].path === filePath) {
+          this.activeFile = this.generatedFiles[i];
+          break;
+        }
+      }
+    },
     setActiveFile: function(){
       if(!this.activeFile.name){
-        for(let i = 0; i < this.generatedFiles.length; i++){
-          if(this.generatedFiles[i].name === 'restapi.yml' && this.generatedFiles[i].path === ''){
-            this.activeFile = this.generatedFiles[i];
-            break;
-          }
-        }
+        this.setSelectedFile('restapi.yml', '');
       }else{
-        for(let i = 0; i < this.generatedFiles.length; i++){
-          if(this.generatedFiles[i].name === this.activeFile.name && this.generatedFiles[i].path === this.activeFile.path){
-            this.activeFile = this.generatedFiles[i];
-            break;
-          }
-        }
+        this.setSelectedFile(this.activeFile.name, this.activeFile.path);
       }
       this.setHighlightedDifferences();
     },
