@@ -59,6 +59,9 @@ export default Vue.extend({
         this.unsetHighlight();
       }else{
         this.highlight();
+        if(this.linesToColor.length > 0){
+          this.focus();
+        }
       }
     }
   },
@@ -115,9 +118,6 @@ export default Vue.extend({
             }
           });
         }
-      }
-      if(this.linesToColor.length > 0){
-        this.focus();
       }
     }
   },
