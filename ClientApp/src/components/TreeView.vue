@@ -16,7 +16,7 @@
         <v-icon v-if="item.type == 'folder'">
           {{ open ? 'mdi-folder-open' : 'mdi-folder' }}
         </v-icon>
-        <v-icon v-else>
+        <v-icon :color="color[item.type]" v-else>
           {{ icons[item.type] }}
         </v-icon>
       </template>
@@ -89,8 +89,14 @@ export default Vue.extend({
       activeNodes: Array<Node>(),
       filesById: Array<GeneratedFile>(),
       id: 0,
+      color: {
+        cs: '#007aff',
+        vue: '#4dba87',
+        ts: '#007acc',
+        yml: '#cb171e',
+      },
       icons: {
-        cs: 'mdi-language-csharp ',
+        cs: 'mdi-language-csharp',
         vue: 'mdi-vuejs',
         ts: 'mdi-language-typescript',
         yml: 'mdi-api',
@@ -245,9 +251,6 @@ export default Vue.extend({
   .activeFile .v-treeview-node__content{
     color: #412fb3!important;
     font-weight: 900;
-  }
-  .activeFile .v-icon{
-    color: #412fb3!important;
   }
   button.v-icon.notranslate {
     display: none;
