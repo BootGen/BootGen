@@ -10,6 +10,8 @@ const theme = {
   third: '#22195b',
   accent: '#412fb3',
   info: '#00CAE3',
+  orange: '#F78C6C',
+  green: '#C3E88D',
 }
 
 export default new Vuetify({

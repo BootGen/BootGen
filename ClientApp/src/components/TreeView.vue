@@ -21,11 +21,13 @@
         </v-icon>
       </template>
      <template v-slot:append="{ item }">
-        <p class="orange--text pa-0 ma-0" v-if="item.change">M</p>
+        <p class="orange--text text--darken-1 pa-0 ma-0" v-if="item.change == ChangeType.Edited">M</p>
+        <p class="green--text text--darken-2 pa-0 ma-0" v-if="item.change == ChangeType.Created">A</p>
       </template>
      <template v-slot:label="{ item }">
-        <p class="green--text pa-0 ma-0" v-if="item.change">{{item.name}}</p>
-        <p class="pa-0 ma-0" v-else>{{item.name}}</p>
+        <p class="orange--text text--darken-1 pa-0 ma-0" v-if="item.change == ChangeType.Edited">{{item.name}}</p>
+        <p class="green--text text--darken-2 pa-0 ma-0" v-if="item.change == ChangeType.Created">{{item.name}}</p>
+        <p class="pa-0 ma-0" v-if="item.change == ChangeType.Unchanged">{{item.name}}</p>
       </template>
     </v-treeview>
   </div>
@@ -36,11 +38,17 @@ import Vue from 'vue';
 import { GeneratedFile } from '../models/GeneratedFile';
 import { Compare } from '../utils/TextCompare';
 
+enum ChangeType {
+    Created,
+    Edited,
+    Unchanged,
+}
+
 interface Node {
   id: number;
   name: string;
   type: string;
-  change: boolean;
+  change: ChangeType;
   children?: Array<Node>;
 }
 
@@ -74,7 +82,7 @@ export default Vue.extend({
         id: 0,
         name: 'Root',
         type: '',
-        change: false,
+        change: ChangeType.Unchanged,
         children: Array<Node>(),
         open: Array<Node>(),
       },
@@ -87,6 +95,7 @@ export default Vue.extend({
         ts: 'mdi-language-typescript',
         yml: 'mdi-api',
       },
+      ChangeType: ChangeType,
     };
   },
   created: function () {
@@ -99,30 +108,39 @@ export default Vue.extend({
       this.tree.open = [];
       const files = this.sortedFiles();
       if(this.isCompare){
-        const changedFiles: {file: GeneratedFile; changes: number[]}[] = [];
+        const changedFiles: {file: GeneratedFile; changes: ChangeType}[] = [];
         if(this.previousFiles.length > 0){
           files.forEach(file => {
+            let exists = false;
             for(let j = 0; j < this.previousFiles.length; j++){
               if(file.name === this.previousFiles[j].name && file.path === this.previousFiles[j].path){
                 const compare = new Compare(file.content.split('\n'), this.previousFiles[j].content.split('\n'));
-                changedFiles.push({file: file, changes: compare.getChanges()});
+                if(compare.getChanges().length > 0){
+                  changedFiles.push({file: file, changes: ChangeType.Edited});
+                }else{
+                  changedFiles.push({file: file, changes: ChangeType.Unchanged});
+                }
+                exists = true;
+                break;
               }
+            }
+            if(!exists){
+              changedFiles.push({file: file, changes: ChangeType.Created});
             }
           });
         }
         if(this.previousFiles.length > 0){
           changedFiles.forEach((node) => {
-            const isChange = node.changes.length > 0 ? true : false;
-            this.addToTree(node.file, isChange);
+            this.addToTree(node.file, node.changes);
           });
         }else{
           files.forEach((file) => {
-            this.addToTree(file, false);
+            this.addToTree(file, ChangeType.Unchanged);
           });
         } 
       }else{
         files.forEach((file) => {
-          this.addToTree(file, false);
+          this.addToTree(file, ChangeType.Unchanged);
         });
       } 
       this.setOpenPath();
@@ -151,7 +169,7 @@ export default Vue.extend({
       }
       return null;
     },
-    addToTree: function (file: GeneratedFile, change: boolean) {
+    addToTree: function (file: GeneratedFile, change: ChangeType) {
       const path = file.path.split('/');
       const type = file.name.split('.')[file.name.split('.').length-1];
       let currentNode: Node = this.tree;
@@ -169,8 +187,8 @@ export default Vue.extend({
           } else {
             currentNode = childNode;
           }
-          if(change){
-            currentNode.change = true;
+          if(change !== ChangeType.Unchanged){
+            currentNode.change = ChangeType.Edited;
           }
         });
       }
