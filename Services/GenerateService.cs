@@ -161,13 +161,17 @@ namespace Editor.Services
             });
             var seedStore = new SeedDataStore(collection);
             seedStore.Load(jObject);
+            var clientExtension = "ts";
+            if(request.Frontend.Contains("JS")){
+                clientExtension = "js";
+            }
             var project = new BootGen.Project
             {
                 ControllerFolder = "Controllers",
                 ServiceFolder = "Services",
                 EntityFolder = "Entities",
                 ClientFolder = "ClientApp/src",
-                ClientExtension = "ts",
+                ClientExtension = clientExtension,
                 ClientComponentExtension = "vue",
                 Disk = disk,
                 ResourceCollection = collection,

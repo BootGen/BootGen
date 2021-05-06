@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import VueRouter, {NavigationGuardNext, Route, RouteConfig} from 'vue-router'
+import VueRouter from 'vue-router'
 import Login from '../views/Login.vue'
 import Logout from '../views/Logout.vue'
 import SignUp from '../views/SignUp.vue'
@@ -13,7 +13,7 @@ import {{ class.name }}List from '../views/{{ class.name }}List.vue'
 
 Vue.use(VueRouter)
 
-const loggedInGuard = (to: Route, from: Route, next: NavigationGuardNext) => {
+const loggedInGuard = (to, from, next) => {
   if(store.state.auth.jwt){
     next();
   }else{
@@ -21,14 +21,14 @@ const loggedInGuard = (to: Route, from: Route, next: NavigationGuardNext) => {
   }
 };
 
-const loggedOutGuard = (to: Route, from: Route, next: NavigationGuardNext) => {
+const loggedOutGuard = (to, from, next) => {
   if(store.state.auth.jwt){
     next('/profile');
   }else{
     next();
   }
 };
-  const routes: Array<RouteConfig> = [
+  const routes = [
   {
     path: '/',
     name: 'Login',

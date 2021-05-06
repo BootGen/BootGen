@@ -20,17 +20,17 @@
   </v-container>
 </template>
 
-<script lang="ts">
+<script>
 import Vue from 'vue';
 import {{ class.name }}View from '../components/{{ class.name }}View.vue';
 import {{ class.name }}Edit from '../components/{{ class.name }}Edit.vue';
-import { {{ class.name }} } from '../models/{{ class.name }}';
+
 export default Vue.extend({
   components: { {{ class.name }}View, {{ class.name }}Edit },
   data: function () {
     return {
-        {{ camel_case class.name.plural }}: Array<{{ class.name }}>(),
-        edited{{ class.name }}: null as ({{ class.name }}|null)
+        {{ camel_case class.name.plural }}: [],
+        edited{{ class.name }}: null
     };
   },
   created: async function () {

@@ -51,6 +51,8 @@ export default Vue.extend({
           this.cmOptions.mode = 'text/x-csharp';
         }else if(mode === 'ts'){
           this.cmOptions.mode = 'text/typescript';
+        }else if(mode === 'js'){
+          this.cmOptions.mode = 'text/javascript';
         }else if(mode === 'vue'){
           this.cmOptions.mode = 'text/x-vue';
         }else{

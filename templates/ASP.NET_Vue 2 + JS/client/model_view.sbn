@@ -20,15 +20,12 @@
   </v-card>
 </template>
 
-<script lang="ts">
+<script>
 import Vue from 'vue';
-import { {{ class.name }} } from '../models/{{ class.name }}';
 
 export default Vue.extend({
-  props: {
-    {{ camel_case class.name }}: {
-      type: Object as () => {{ class.name }}
-    }
-  }
+  props: [
+    '{{ camel_case class.name }}'
+  ],
 });
 </script>

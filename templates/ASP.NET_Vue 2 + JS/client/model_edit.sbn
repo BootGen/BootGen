@@ -41,19 +41,16 @@
   </v-card>
 </template>
 
-<script lang="ts">
+<script>
 import Vue from 'vue';
-import { {{ class.name }} } from '../models/{{ class.name }}';
 {{~ if useDateTimePicker ~}}
 import DateTimePicker from './DateTimePicker.vue';
 {{~ end ~}}
 
 export default Vue.extend({
-  props: {
-    {{ camel_case class.name }}: {
-      type: Object as () => {{ class.name }}
-    }
-  },
+  props: [
+    '{{ camel_case class.name }}'
+  ],
   {{~ if useDateTimePicker ~}}
   components: {
     DateTimePicker
@@ -64,7 +61,7 @@ export default Vue.extend({
   },
   data: function () {
     return {
-      edited{{ class.name }}: null as (null | {{ class.name }})
+      edited{{ class.name }}: null
     };
   },
   methods: {

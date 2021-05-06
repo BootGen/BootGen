@@ -1,34 +1,26 @@
 import axios from 'axios';
-import { ProfileResponse } from '@/models/ProfileResponse';
-import { ChangePasswordData } from '@/models/ChangePasswordData';
-import { AuthenticationData } from '@/models/AuthenticationData';
-import { RegistrationData } from '@/models/RegistrationData';
-import { LoginResponse } from '@/models/LoginResponse';
-{{~ for class in classes ~}}
-import { {{class.name}} } from '@/models/{{class.name}}';
-{{~ end ~}}
 const dateFormat = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/;
 
-function reviver(key: string, value: string) {
+function reviver(key, value) {
   if (dateFormat.test(value)) {
     return new Date(value);
   }
   return value;
 }
 
-function transformResponse(response: string) {
+function transformResponse(response) {
   if (response && response.trim()) {
     return JSON.parse(response, reviver);
   }
   return null;
 }
 
-function config(jwt: string) {
+function config(jwt) {
   return {headers: {'Authorization': 'Bearer ' + jwt}, transformResponse: transformResponse };
 }
 
 {{~ for resource in resources ~}}
-function {{ camel_case resource.class.name }}ToDto({{ camel_case resource.class.name }}: {{ resource.class.name }}): {{ resource.class.name }} {
+function {{ camel_case resource.class.name }}ToDto({{ camel_case resource.class.name }}) {
   return {
     {{~ for property in resource.class.common_properties~}}
     {{ camel_case property.name }}: {{ camel_case resource.class.name }}.{{ camel_case property.name }},
@@ -39,49 +31,49 @@ function {{ camel_case resource.class.name }}ToDto({{ camel_case resource.class.
 {{~ end ~}}
 
 const api = {
-  login: async function (data: AuthenticationData): Promise<LoginResponse> {
+  login: async function (data) {
     const response = await axios.post('authentication/login', data);
     return response.data;
   },
-  register: async function (data: RegistrationData): Promise<ProfileResponse> {
+  register: async function (data) {
     const response = await axios.post('registration/register', data);
     return response.data;
   },
-  activate: async function (activationToken: string): Promise<boolean> {
+  activate: async function (activationToken) {
     const response = await axios.post(`registration/activate?activationToken=${activationToken}`);
     return response.data;
   },
-  profile: async function (jwt: string): Promise<User> {
+  profile: async function (jwt) {
     const response = await axios.get('profile', config(jwt));
     return response.data;
   },
-  updateProfile: async function (user: User, jwt: string): Promise<ProfileResponse> {
+  updateProfile: async function (user, jwt) {
     const response = await axios.post('profile', userToDto(user), config(jwt));
     return response.data;
   },
-  changePassword: async function (data: ChangePasswordData, jwt: string): Promise<void> {
+  changePassword: async function (data, jwt) {
     const response = await axios.post('profile/change-password', data, config(jwt));
     return response.data;
   },
   {{~ for resource in resources ~}}
-  get{{ resource.name.plural }}: async function(jwt: string): Promise<Array<{{ resource.class.name }}>> {
+  get{{ resource.name.plural }}: async function(jwt) {
     const response = await axios.get('{{ kebab_case resource.name.plural }}', config(jwt));
     return response.data;
   },
-  get{{ resource.name }}: async function(id: number, jwt: string): Promise<{{ resource.class.name }}> {
+  get{{ resource.name }}: async function(id, jwt) {
     const response = await axios.get(`{{ kebab_case resource.name.plural }}/${id}`, config(jwt));
     return response.data;
   },
   {{~ if !resource.is_readonly ~}}
-  add{{ resource.name }}: async function({{ camel_case resource.name }}: {{ resource.class.name }}, jwt: string): Promise<{{ resource.class.name }}> {
+  add{{ resource.name }}: async function({{ camel_case resource.name }}, jwt) {
     const response = await axios.post(`{{ kebab_case resource.name.plural }}`, {{ camel_case resource.class.name }}ToDto({{ camel_case resource.name }}), config(jwt));
     return response.data;
   },
-  update{{ resource.name }}: async function({{ camel_case resource.name }}: {{ resource.class.name }}, jwt: string): Promise<{{ resource.class.name }}> {
+  update{{ resource.name }}: async function({{ camel_case resource.name }}, jwt) {
     const response = await axios.put(`{{ kebab_case resource.name.plural }}/${ {{ camel_case resource.name }}.id }`, {{ camel_case resource.class.name }}ToDto({{ camel_case resource.name }}), config(jwt));
     return response.data;
   },
-  delete{{ resource.name }}: async function({{ camel_case resource.name }}: {{ resource.class.name }}, jwt: string): Promise<void> {
+  delete{{ resource.name }}: async function({{ camel_case resource.name }}, jwt) {
     const response = await axios.delete(`{{ kebab_case resource.name.plural }}/${ {{ camel_case resource.name }}.id }`, config(jwt));
     return response.data;
   },
@@ -89,16 +81,16 @@ const api = {
   {{~ for alternate in resource.alternate_resources
     parent = alternate.parent_resource
   ~}}
-  get{{ resource.name.plural }}Of{{ parent.name }}: async function({{camel_case parent.name}}: {{parent.class.name}}, jwt: string): Promise<Array<{{alternate.class.name}}>> {
+  get{{ resource.name.plural }}Of{{ parent.name }}: async function({{camel_case parent.name}}, jwt) {
     const response = await axios.get(`{{ kebab_case parent.name.plural }}/${ {{ camel_case parent.name }}.id }/{{ kebab_case alternate.name.plural }}`, config(jwt));
     return response.data;
   },
-  add{{ resource.name }}To{{ parent.name }}: async function({{camel_case resource.name}}: {{resource.class.name}}, {{camel_case parent.name}}: {{parent.class.name}}, jwt: string): Promise<{{alternate.class.name}}> {
+  add{{ resource.name }}To{{ parent.name }}: async function({{camel_case resource.name}}, {{camel_case parent.name}}, jwt) {
     const response = await axios.post(`{{ kebab_case parent.name.plural }}/${ {{ camel_case parent.name }}.id }/{{ kebab_case alternate.name.plural }}`, {{ camel_case resource.class.name}}ToDto({{ camel_case resource.name}}), config(jwt));
     return response.data;
   },
   {{~ if alternate.pivot ~}}
-  delete{{ resource.name }}Of{{ parent.name }}: async function({{camel_case alternate.name}}: {{alternate.class.name}}, {{camel_case parent.name}}: {{parent.class.name}}, jwt: string): Promise<void> {
+  delete{{ resource.name }}Of{{ parent.name }}: async function({{camel_case alternate.name}}, {{camel_case parent.name}}, jwt) {
     const response = await axios.delete(`{{ kebab_case parent.name.plural }}/${ {{ camel_case parent.name }}.id }/{{ kebab_case alternate.name.plural }}/${ {{ camel_case alternate.name }}.id }`, config(jwt));
     return response.data;
   },
