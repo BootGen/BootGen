@@ -1,0 +1,63 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
+using {{ name_space }}.Services;
+
+namespace {{ name_space }}.Controllers
+{
+    {{~
+        parent = resource.parent_resource
+        controller_name = parent.name.plural + resource.name.plural + 'Controller'
+        service_name = 'I' + resource.name.plural + 'Service'
+    ~}}
+    [ApiController]
+    [Route("{{ kebab_case parent.name.plural }}/{{'{' + (camel_case parent.name) + 'Id}' }}/{{ kebab_case resource.name.plural }}")]
+    {{~ if resource.authenticate ~}}
+    [Authorize]
+    {{~ end ~}}
+    public class {{ controller_name }} : ControllerBase
+    {
+        private {{ service_name  }} dataService;
+        public {{ controller_name }}({{ service_name }} dataService)
+        {
+            this.dataService = dataService;
+        }
+
+        {{~
+        parent = resource.parent_resource
+        ~}}
+
+        [HttpGet]
+        public IActionResult Get{{ resource.name.plural }}([FromRoute] int {{ camel_case parent.class.name }}Id)
+        {
+            return Ok(dataService.Get{{ resource.name.plural }}Of{{ parent.class.name }}({{ camel_case parent.class.name }}Id));
+        }
+        {{~ if !resource.is_readonly ~}}
+
+        [HttpPost]
+        public IActionResult Add{{ resource.name }}([FromRoute] int {{ camel_case parent.class.name }}Id, [FromBody] {{ resource.class.name }} {{ camel_case resource.name }})
+        {
+            if (dataService.Add{{ resource.class.name }}To{{ parent.class.name }}({{ camel_case resource.name }}.Id, {{ camel_case parent.class.name }}Id))
+                return Ok(dataService.Get{{ resource.class.name }}({{ camel_case resource.name }}.Id));
+            return BadRequest();
+        }
+
+        {{~
+        path_parameter = "{" + (camel_case resource.name) + "Id}"
+        ~}}
+        [HttpDelete]
+        [Route("{{path_parameter}}")]
+        public IActionResult Remove{{ resource.name }}([FromRoute] int {{ camel_case parent.class.name }}Id, [FromRoute] int {{ camel_case resource.name }}Id)
+        {
+            if (dataService.Remove{{ resource.class.name }}From{{ parent.class.name }}({{ camel_case resource.name }}Id, {{ camel_case parent.class.name }}Id))
+                return Ok();
+            return BadRequest();
+        }
+        {{~ end ~}}
+    }
+}

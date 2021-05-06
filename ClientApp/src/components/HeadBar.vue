@@ -83,7 +83,7 @@ export default Vue.extend({
       dialog: false,
       projectName: 'My Project',
       backend: 'ASP.NET',
-      frontend: 'Vue 2',
+      frontend: 'Vue 2 + JS',
     };
   },
   methods: {

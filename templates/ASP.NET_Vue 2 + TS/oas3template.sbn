@@ -1,0 +1,340 @@
+openapi: '3.0.0'
+info:
+  version: 1.0.0
+  title: '{{ project_title }}'
+  license:
+    name: MIT
+servers:
+  - url: {{ base_url }}
+paths:
+  /authentication/login:
+    post:
+      summary: login with email and password
+      operationId: login
+      responses:
+        '200':
+          description: successful login
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LoginSuccess'
+        '401':
+          description: login error
+  /registration/register:
+    post:
+      summary: register with email and password
+      operationId: register
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+                $ref: '#/components/schemas/RegistrationData'
+      responses:
+        '200':
+          description: response to registration request
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProfileResponse'
+  /profile:
+    get:
+      summary: get current user
+      security:
+      - bearerAuth: []
+      operationId: profile
+      responses:
+        '200':
+          description: successful login
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+    post:
+      summary: update profile
+      security:
+      - bearerAuth: []
+      operationId: updateProfile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+                $ref: '#/components/schemas/User'
+      responses:
+        '200':
+          description: response to update profile request
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProfileResponse'
+  /profile/change-password:
+    post:
+      summary: change password
+      security:
+      - bearerAuth: []
+      operationId: changePassword
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+                $ref: '#/components/schemas/ChangePasswordData'
+      responses:
+        '200':
+          description: response to update profile request
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ChangePasswordResponse'
+{{~ for resource in resources ~}}
+  /{{ kebab_case resource.name.plural }}:
+    get:
+      summary: get the list of {{ to_words resource.name.plural }}
+      operationId: get{{ resource.name.plural }}
+      responses:
+        '200':
+          description: successful query
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/{{ resource.name }}'
+    post:
+      summary: add a new element to the collection
+      operationId: add{{ resource.name }}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+                $ref: '#/components/schemas/{{ resource.name }}'
+      responses:
+        '200':
+          description: successful insertion
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/{{ resource.name }}'
+  /{{ kebab_case resource.name.plural }}/{{'{'}}{{ camel_case resource.name }}Id{{'}'}}:
+    get:
+      summary: get a {{ to_words resource.name }} by id
+      operationId: get{{ resource.name }}
+      parameters:
+        - name: {{ camel_case resource.name }}Id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: successful query
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/{{ resource.name }}'
+    put:
+      summary: update a {{ to_words resource.name }}
+      operationId: update{{ resource.name }}
+      parameters:
+        - name: {{ camel_case resource.name }}Id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+                $ref: '#/components/schemas/{{ resource.name }}'
+      responses:
+        '200':
+          description: successful update
+    delete:
+      summary: delete a {{ to_words resource.name }} by id
+      operationId: delete{{ resource.name }}
+      parameters:
+        - name: {{ camel_case resource.name }}Id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: successful deletion
+  {{~ for nested in resource.nested_resources ~}}
+  /{{ kebab_case resource.name.plural }}/{{'{'}}{{ camel_case resource.name }}Id{{'}'}}/{{ kebab_case nested.name.plural }}:
+    get:
+      summary: get the list of {{ to_words nested.name.plural }} that belong to the given {{ to_words resource.name }}
+      operationId: get{{ nested.name.plural }}Of{{ resource.name }}
+      parameters:
+        - name: {{ camel_case resource.name }}Id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: successful query
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/{{ nested.name }}'
+    post:
+      summary: add a new element to the collection
+      operationId: add{{ nested.name }}To{{ resource.name }}
+      parameters:
+        - name: {{ camel_case resource.name }}Id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+                $ref: '#/components/schemas/{{ nested.name }}'
+      responses:
+        '200':
+          description: successful insertion
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/{{ nested.name }}'
+  {{~ if nested.pivot ~}}
+  /{{ kebab_case resource.name.plural }}/{{'{'}}{{ camel_case resource.name }}Id{{'}'}}/{{ kebab_case nested.name.plural }}/{{'{'}}{{ camel_case nested.name }}Id{{'}'}}:
+    delete:
+      summary: remove a {{ to_words nested.name }} by id from the given {{ to_words resource.name }}
+      operationId: delete{{ nested.name.plural }}Of{{ resource.name }}
+      parameters:
+        - name: {{ camel_case resource.name }}Id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: {{ camel_case nested.name }}Id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: successful deletion
+    {{~ end ~}}
+    {{~ end ~}}
+{{~ end ~}}
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT 
+  schemas:
+    LoginSuccess:
+      type: object
+      required:
+        - jwt
+      properties:
+        jwt:
+          type: string
+    RegistrationData:
+      type: object
+      required:
+        - userName
+        - email
+        - password
+      properties:
+        userName:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+    ProfileResponse:
+      type: object
+      required:
+        - success
+        - isUserNameInUse
+        - isEmailInUse
+      properties:
+        success:
+          type: boolean
+        isUserNameInUse:
+          type: boolean
+        isEmailInUse:
+          type: boolean
+    ChangePasswordData:
+      type: object
+      required:
+        - oldPassword
+        - newPassword
+      properties:
+        oldPassword:
+          type: string
+        newPassword:
+          type: string
+    ChangePasswordResponse:
+      type: object
+      required:
+        - success
+      properties:
+        success:
+          type: boolean
+  {{~ for class in classes ~}}
+    {{ class.name }}:
+      type: object
+      required:
+        {{~ for property in class.common_properties ~}}
+        - {{ snake_case property.name }}
+        {{~ end ~}}
+      properties:
+      {{~ for property in class.common_properties ~}}
+        {{ snake_case property.name }}:
+          {{~ if property.is_collection ~}}
+          type: array
+          items:
+            {{~ if property.class ~}}
+            $ref: '#/components/schemas/{{ property.class.name }}'
+            {{~ else ~}}
+            type: {{ get_type property }}
+            {{~ if get_format property ~}}
+            format: {{ get_format property }}
+            {{~ end ~}}
+            {{~ end ~}}
+          {{~ else ~}}
+          {{~ if property.class ~}}
+          $ref: '#/components/schemas/{{ property.class.name }}'
+          {{~ else ~}}
+          type: {{ get_type property }}
+          {{~ if get_format property ~}}
+          format: {{ get_format property }}
+          {{~ end ~}}
+          {{~ end ~}}
+          {{~ end ~}}
+          {{~ if property.is_client_readonly ~}}
+          readOnly: true
+          {{~ end ~}}
+      {{~ end ~}}
+    {{~ end ~}}

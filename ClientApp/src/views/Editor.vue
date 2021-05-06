@@ -15,6 +15,7 @@
             <div class="d-flex align-center justify-space-between pa-2">
               <div class="d-flex">
                 <span class="display-1 font-weight-light pa-2">JSON</span>
+                <v-icon class="mr-2">mdi-arrow-right</v-icon>
                 <div class="d-flex select">
                   <v-select
                     v-model="activeProject.backend"
@@ -175,8 +176,8 @@ export default Vue.extend({
       previousFiles: Array<GeneratedFile>(),
       undoStack: new UndoStack(),
       crc32ProjectName: CRC32.str('My Project'),
-      activeProject: {id: -1, ownerId: -1, name: 'My Project', json: '', backend: 'ASP.NET', frontend: 'Vue 2'},
-      newProject: {id: -1, ownerId: -1, name: 'My Project', json: '', backend: 'ASP.NET', frontend: 'Vue 2'},
+      activeProject: {id: -1, ownerId: -1, name: 'My Project', json: '', backend: 'ASP.NET', frontend: 'Vue 2 + JS'},
+      newProject: {id: -1, ownerId: -1, name: 'My Project', json: '', backend: 'ASP.NET', frontend: 'Vue 2 + JS'},
       activeFile: {} as GeneratedFile,
       snackbar: {
         dismissible: true,
@@ -194,9 +195,9 @@ export default Vue.extend({
       downLoading: false,
       isCompare: true,
       backends: ['ASP.NET'],
-      frontends: ['Vue 2', 'Vue 3', 'React'],
+      frontends: ['Vue 2 + JS', 'Vue 2 + TS', 'Vue 3', 'React'],
       backend: 'ASP.NET',
-      frontend: 'Vue 2'
+      frontend: 'Vue 2 + JS'
     };
   },
   created: async function(){
@@ -548,6 +549,6 @@ export default Vue.extend({
     opacity: 0.6;
   }
   .select{
-    max-width: 200px;
+    max-width: 250px;
   }
 </style>
