@@ -56,8 +56,8 @@ namespace Editor
                 Name = "First Project",
                 Json = "{'users': [{'userName': 'Test User', 'email': 'aa@bb@cc'}]}",
                 OwnerId = 1,
-                BackendFramework = "ASP.NET",
-                FrontendFramework = "Vue 2"
+                Backend = "ASP.NET",
+                Frontend= "Vue 2"
             });
         }
     }

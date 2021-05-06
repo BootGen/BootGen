@@ -107,7 +107,7 @@ namespace Editor.Services
             if (!Directory.Exists(tempRoot))
                 Directory.CreateDirectory(tempRoot);
             Directory.CreateDirectory(tempDir);
-            ZipFile.ExtractToDirectory($"templates/{request.BackendFramework}_{request.FrontendFramework}/WebProject.zip", tempDir);
+            ZipFile.ExtractToDirectory($"templates/{request.Backend}_{request.Frontend}/WebProject.zip", tempDir);
             File.Move(Path.Combine(tempDir, "WebProject.csproj"), Path.Combine(tempDir, $"{request.NameSpace}.csproj"));
             ReplaceNamespace(tempDir, request.NameSpace);
             var disk = new Disk(tempDir);
@@ -172,7 +172,7 @@ namespace Editor.Services
                 Disk = disk,
                 ResourceCollection = collection,
                 SeedStore = seedStore,
-                TemplateRoot = $"templates/{request.BackendFramework}_{request.FrontendFramework}"
+                TemplateRoot = $"templates/{request.Backend}_{request.Frontend}"
             };
             return project;
         }

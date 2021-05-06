@@ -8,7 +8,7 @@ namespace Editor
     {
         public string Data { get; set; }
         public string NameSpace { get; set;}
-        public string BackendFramework { get; set;}
-        public string FrontendFramework { get; set;}
+        public string Backend { get; set;}
+        public string Frontend { get; set;}
     }
 }

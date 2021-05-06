@@ -27,13 +27,13 @@
                     </v-col>
                   </v-row>
                   <v-select
-                    v-model="backendFramework"
-                    :items="backendFrameworks"
+                    v-model="backend"
+                    :items="backends"
                     label="Backend"              
                   ></v-select>
                   <v-select
-                    v-model="frontendFramework"
-                    :items="frontendFrameworks"
+                    v-model="frontend"
+                    :items="frontends"
                     label="Frontend"             
                   ></v-select>
                 </v-container>
@@ -70,10 +70,10 @@ export default Vue.extend({
   },
   props: {
     activeProjectName: String,
-    backendFrameworks: {
+    backends: {
       type: Array as () => Array<string>
     },
-    frontendFrameworks: {
+    frontends: {
       type: Array as () => Array<string>
     },
   },
@@ -82,8 +82,8 @@ export default Vue.extend({
       errorMsg: false,
       dialog: false,
       projectName: 'My Project',
-      backendFramework: 'ASP.NET',
-      frontendFramework: 'Vue 2',
+      backend: 'ASP.NET',
+      frontend: 'Vue 2',
     };
   },
   methods: {
@@ -91,7 +91,7 @@ export default Vue.extend({
       if(this.existsProjectName()){
         this.errorMsg = true;
       }else{
-        this.$emit('new-project', this.projectName, this.backendFramework, this.frontendFramework);
+        this.$emit('new-project', this.projectName, this.backend, this.frontend);
         this.dialog = false;
       }
     },
