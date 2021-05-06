@@ -1,42 +1,45 @@
 <template>
-  <div>
-    <v-treeview
-      active-class="activeFile"
-      :items="tree.children"
-      :active.sync="activeNodes"
-      :open.sync="tree.open"
-      @update:active="selectFile"
-      return-object
-      activatable
-      hoverable
-      dense
-      open-on-click
-    >
-     <template v-slot:prepend="{ item, open }">
-        <v-icon v-if="item.type == 'folder'">
-          {{ open ? 'mdi-folder-open' : 'mdi-folder' }}
-        </v-icon>
-        <v-icon :color="color[item.type]" v-else>
-          {{ icons[item.type] }}
-        </v-icon>
-      </template>
-     <template v-slot:append="{ item }">
-        <p class="orange--text text--darken-1 pa-0 ma-0" v-if="item.change == ChangeType.Edited">M</p>
-        <p class="green--text text--darken-2 pa-0 ma-0" v-if="item.change == ChangeType.Created">A</p>
-      </template>
-     <template v-slot:label="{ item }">
-        <p class="orange--text text--darken-1 pa-0 ma-0" v-if="item.change == ChangeType.Edited">{{item.name}}</p>
-        <p class="green--text text--darken-2 pa-0 ma-0" v-if="item.change == ChangeType.Created">{{item.name}}</p>
-        <p class="pa-0 ma-0" v-if="item.change == ChangeType.Unchanged">{{item.name}}</p>
-      </template>
-    </v-treeview>
-  </div>
+  <v-treeview
+    dark
+    active-class="activeFile"
+    :items="tree.children"
+    :active.sync="activeNodes"
+    :open.sync="tree.open"
+    @update:active="selectFile"
+    return-object
+    activatable
+    hoverable
+    dense
+    open-on-click
+  >
+    <template v-slot:prepend="{ item, open }">
+      <v-icon color="#ffd661" v-if="item.type == 'folder'">
+        {{ open ? 'mdi-folder-open' : 'mdi-folder' }}
+      </v-icon>
+      <v-icon :color="color[item.type]" v-else>
+        {{ icons[item.type] }}
+      </v-icon>
+    </template>
+    <template v-slot:append="{ item }">
+      <p class="secondary--text text--lighten-2 pa-0 ma-0 mr-2" v-if="item.change == ChangeType.Edited && activeNodes[0] == item">M</p>
+      <p class="orange--text pa-0 ma-0 mr-2" v-else-if="item.change == ChangeType.Edited">M</p>
+      <p class="secondary--text text--lighten-2 pa-0 ma-0 mr-2" v-if="item.change == ChangeType.Created  && activeNodes[0] == item">A</p>
+      <p class="green--text pa-0 ma-0 mr-2" v-else-if="item.change == ChangeType.Created">A</p>
+    </template>
+    <template v-slot:label="{ item }">
+      <p class="secondary--text text--lighten-2 pa-0 ma-0" v-if="item.change == ChangeType.Edited && activeNodes[0] == item">{{item.name}}</p>
+      <p class="orange--text pa-0 ma-0" v-else-if="item.change == ChangeType.Edited">{{item.name}}</p>
+      <p class="secondary--text text--lighten-2 pa-0 ma-0" v-if="item.change == ChangeType.Created && activeNodes[0] == item">{{item.name}}</p>
+      <p class="green--text pa-0 ma-0" v-else-if="item.change == ChangeType.Created">{{item.name}}</p>
+      <p class="secondary--text text--lighten-2 pa-0 ma-0" v-if="item.change == ChangeType.Unchanged && activeNodes[0] == item">{{item.name}}</p>
+      <p class="pa-0 ma-0" v-else-if="item.change == ChangeType.Unchanged">{{item.name}}</p>
+    </template>
+  </v-treeview>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
 import { GeneratedFile } from '../models/GeneratedFile';
-import { Compare } from '../utils/TextCompare';
 
 enum ChangeType {
     Created,
@@ -120,8 +123,7 @@ export default Vue.extend({
             let exists = false;
             for(let j = 0; j < this.previousFiles.length; j++){
               if(file.name === this.previousFiles[j].name && file.path === this.previousFiles[j].path){
-                const compare = new Compare(file.content.split('\n'), this.previousFiles[j].content.split('\n'));
-                if(compare.getChanges().length > 0){
+                if(file.content !== this.previousFiles[j].content){
                   changedFiles.push({file: file, changes: ChangeType.Edited});
                 }else{
                   changedFiles.push({file: file, changes: ChangeType.Unchanged});
@@ -249,10 +251,12 @@ export default Vue.extend({
 
 <style>
   .activeFile .v-treeview-node__content{
-    color: #412fb3!important;
     font-weight: 900;
   }
   button.v-icon.notranslate {
     display: none;
+  }
+  .v-treeview {
+    background-color: #263238;
   }
 </style>
