@@ -21,17 +21,17 @@
       </v-icon>
     </template>
     <template v-slot:append="{ item }">
-      <p class="secondary--text text--lighten-2 pa-0 ma-0 mr-2" v-if="item.change == ChangeType.Edited && activeNodes[0] == item">M</p>
+      <p class="purple--text pa-0 ma-0 mr-2" v-if="item.change == ChangeType.Edited && activeNodes[0] == item">M</p>
       <p class="orange--text pa-0 ma-0 mr-2" v-else-if="item.change == ChangeType.Edited">M</p>
-      <p class="secondary--text text--lighten-2 pa-0 ma-0 mr-2" v-if="item.change == ChangeType.Created  && activeNodes[0] == item">A</p>
+      <p class="purple--text pa-0 ma-0 mr-2" v-if="item.change == ChangeType.Created  && activeNodes[0] == item">A</p>
       <p class="green--text pa-0 ma-0 mr-2" v-else-if="item.change == ChangeType.Created">A</p>
     </template>
     <template v-slot:label="{ item }">
-      <p class="secondary--text text--lighten-2 pa-0 ma-0" v-if="item.change == ChangeType.Edited && activeNodes[0] == item">{{item.name}}</p>
+      <p class="purple--text pa-0 ma-0" v-if="item.change == ChangeType.Edited && activeNodes[0] == item">{{item.name}}</p>
       <p class="orange--text pa-0 ma-0" v-else-if="item.change == ChangeType.Edited">{{item.name}}</p>
-      <p class="secondary--text text--lighten-2 pa-0 ma-0" v-if="item.change == ChangeType.Created && activeNodes[0] == item">{{item.name}}</p>
+      <p class="purple--text pa-0 ma-0" v-if="item.change == ChangeType.Created && activeNodes[0] == item">{{item.name}}</p>
       <p class="green--text pa-0 ma-0" v-else-if="item.change == ChangeType.Created">{{item.name}}</p>
-      <p class="secondary--text text--lighten-2 pa-0 ma-0" v-if="item.change == ChangeType.Unchanged && activeNodes[0] == item">{{item.name}}</p>
+      <p class="purple--text pa-0 ma-0" v-if="item.change == ChangeType.Unchanged && activeNodes[0] == item">{{item.name}}</p>
       <p class="pa-0 ma-0" v-else-if="item.change == ChangeType.Unchanged">{{item.name}}</p>
     </template>
   </v-treeview>
@@ -93,10 +93,10 @@ export default Vue.extend({
       filesById: Array<GeneratedFile>(),
       id: 0,
       color: {
-        cs: '#007aff',
-        vue: '#4dba87',
-        ts: '#007acc',
-        yml: '#cb171e',
+        cs: '#82AAFF',
+        vue: '#C3E88D',
+        ts: '#82AAFF',
+        yml: '#F07178',
       },
       icons: {
         cs: 'mdi-language-csharp',

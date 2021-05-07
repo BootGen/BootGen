@@ -12,6 +12,7 @@ const theme = {
   info: '#00CAE3',
   orange: '#F78C6C',
   green: '#C3E88D',
+  purple: '#C792EA',
 }
 
 export default new Vuetify({
