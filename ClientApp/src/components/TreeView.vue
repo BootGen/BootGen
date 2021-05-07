@@ -13,20 +13,22 @@
     open-on-click
   >
     <template v-slot:prepend="{ item, open }">
-      <v-icon color="#ffd661" v-if="item.type == 'folder'">
-        {{ open ? 'mdi-folder-open' : 'mdi-folder' }}
+      <v-icon color="#fff" v-if="item.type == 'folder'">
+        {{ open ? 'mdi-chevron-down ' : 'mdi-chevron-right' }}
       </v-icon>
       <v-icon :color="color[item.type]" v-else>
         {{ icons[item.type] }}
       </v-icon>
     </template>
     <template v-slot:append="{ item }">
+      <p class="purple--text pa-0 ma-0 mr-1" v-if="item.change == ChangeType.Folder"><v-icon color="orange">mdi-circle-medium </v-icon></p>
       <p class="purple--text pa-0 ma-0 mr-2" v-if="item.change == ChangeType.Edited && activeNodes[0] == item">M</p>
       <p class="orange--text pa-0 ma-0 mr-2" v-else-if="item.change == ChangeType.Edited">M</p>
       <p class="purple--text pa-0 ma-0 mr-2" v-if="item.change == ChangeType.Created  && activeNodes[0] == item">A</p>
       <p class="green--text pa-0 ma-0 mr-2" v-else-if="item.change == ChangeType.Created">A</p>
     </template>
     <template v-slot:label="{ item }">
+      <p class="orange--text pa-0 ma-0" v-if="item.change == ChangeType.Folder">{{item.name}}</p>
       <p class="purple--text pa-0 ma-0" v-if="item.change == ChangeType.Edited && activeNodes[0] == item">{{item.name}}</p>
       <p class="orange--text pa-0 ma-0" v-else-if="item.change == ChangeType.Edited">{{item.name}}</p>
       <p class="purple--text pa-0 ma-0" v-if="item.change == ChangeType.Created && activeNodes[0] == item">{{item.name}}</p>
@@ -42,9 +44,10 @@ import Vue from 'vue';
 import { GeneratedFile } from '../models/GeneratedFile';
 
 enum ChangeType {
-    Created,
-    Edited,
-    Unchanged,
+  Created,
+  Edited,
+  Folder,
+  Unchanged,
 }
 
 interface Node {
@@ -196,7 +199,7 @@ export default Vue.extend({
             currentNode = childNode;
           }
           if(change !== ChangeType.Unchanged){
-            currentNode.change = ChangeType.Edited;
+            currentNode.change = ChangeType.Folder;
           }
         });
       }
