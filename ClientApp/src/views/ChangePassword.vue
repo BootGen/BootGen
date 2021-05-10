@@ -71,7 +71,7 @@
           :avatar="true"
         >
           <v-card-text class="text-center">
-            <h4 class="display-2 font-weight-light mb-3 black--text">
+            <h4 class="display-2 mb-3">
               {{ $store.state.auth.user.userName }}
             </h4>
             <p class="font-weight-light grey--text">

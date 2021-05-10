@@ -35,7 +35,7 @@ export default Vue.extend({
     font-size: 10rem;
     color: #22195B;
     line-height: 1;
-    text-shadow: 3px 3px 0px #fff, 6px 6px 0px #412fb3;
+    text-shadow: 3px 3px 0px #eee, 6px 6px 0px #412fb3;
   }
   .response{
     font-size: 3.75rem;

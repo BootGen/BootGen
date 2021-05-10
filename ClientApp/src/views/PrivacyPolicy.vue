@@ -6,6 +6,7 @@
             We use Google Analytics cookies. You can turn them on or off with this checkbox:
           </p>
           <v-checkbox
+            color="secondary"
             v-model="cookiesAccepted"
             label="Accept Google Analytics cookies"
           ></v-checkbox>
@@ -531,11 +532,14 @@ export default Vue.extend({
 });
 </script>
 
-<style>
+<style scoped>
 .v-card {
   padding-top: 50px;
   padding-bottom: 50px;
   padding-left: 12%;
   padding-right: 12%;
+}
+.theme--dark a{
+  color: #8b949e!important;
 }
 </style>

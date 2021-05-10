@@ -125,9 +125,13 @@ export default Vue.extend({
 .CodeMirror {
   height: auto;
 }
-.code {
+.theme--light .code{
   font-family: 'Inconsolata';
   background-color: #eee;
+}
+.theme--dark .code{
+  font-family: 'Inconsolata';
+  background-color: #666;
 }
 h3, h2 {
   margin-top: 30px;

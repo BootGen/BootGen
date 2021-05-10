@@ -90,3 +90,9 @@ export default Vue.extend({
   }
 });
 </script>
+<style scoped>
+
+.theme--dark a{
+  color: #8b949e!important;
+}
+</style>

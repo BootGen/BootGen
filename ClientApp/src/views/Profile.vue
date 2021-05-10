@@ -30,7 +30,7 @@
                     :error-messages="errors"
                   ></v-text-field>
                 </ValidationProvider>
-                <v-checkbox v-model="$store.state.auth.user.newsletter" label="Sign me up for the newsletter!"></v-checkbox>
+                <v-checkbox color="secondary" v-model="$store.state.auth.user.newsletter" label="Sign me up for the newsletter!"></v-checkbox>
                 <v-alert type="error" v-if="errorMsg">{{ errorMsg }}</v-alert>
                 <v-alert type="success" v-if="successMsg">{{ successMsg }}</v-alert>
                 <div class="text-right">
@@ -50,7 +50,7 @@
           :avatar="true"
         >
           <v-card-text class="text-center">
-            <h4 class="display-2 font-weight-light mb-3 black--text">
+            <h4 class="display-2 font-weight-light mb-3">
               {{ $store.state.auth.user.userName }}
             </h4>
 

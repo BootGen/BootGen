@@ -13,7 +13,7 @@
     open-on-click
   >
     <template v-slot:prepend="{ item, open }">
-      <v-icon color="#fff" v-if="item.type == 'folder'">
+      <v-icon color="#eee" v-if="item.type == 'folder'">
         {{ open ? 'mdi-chevron-down ' : 'mdi-chevron-right' }}
       </v-icon>
       <v-icon :color="color[item.type]" v-else>
@@ -259,7 +259,10 @@ export default Vue.extend({
   button.v-icon.notranslate {
     display: none;
   }
-  .v-treeview {
+  .theme--light .v-treeview {
     background-color: #263238;
+  }
+  .theme--dark .v-treeview {
+    background-color: #222;
   }
 </style>

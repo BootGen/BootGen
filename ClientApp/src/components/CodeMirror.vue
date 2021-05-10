@@ -1,7 +1,9 @@
 <template>
   <v-container fluid class="cm">
-    <codemirror v-if="mode == 'json'" :id="cmId" :value="value" @input="onInput" return-object :options="cmOptions" @scroll="onScroll" />
-    <codemirror v-else :id="cmId" :value="value" :options="cmOptions" @scroll="onScroll" ref="vueCm" />
+    <codemirror v-if="mode == 'json' && !$vuetify.theme.dark" :id="cmId" :value="value" @input="onInput" return-object :options="cmOptions" @scroll="onScroll" />
+    <codemirror v-else-if="mode == 'json' && $vuetify.theme.dark" :id="cmId" :value="value" @input="onInput" return-object :options="cmOptionsDark" @scroll="onScroll" />
+    <codemirror v-else-if="!$vuetify.theme.dark" :id="cmId" :value="value" :options="cmOptions" @scroll="onScroll" ref="vueCm" />
+    <codemirror v-else :id="cmId" :value="value" :options="cmOptionsDark" @scroll="onScroll" ref="vueCm" />
   </v-container>
 </template>
 
@@ -9,6 +11,7 @@
 import Vue from 'vue';
 import { codemirror } from 'vue-codemirror';
 import 'codemirror/theme/material.css';
+import 'codemirror/theme/material-darker.css';
 import 'codemirror/lib/codemirror.css';
 import 'codemirror/mode/clike/clike.js';
 import 'codemirror/mode/yaml/yaml.js';
@@ -29,6 +32,14 @@ export default Vue.extend({
     return {
       cmOptions: {
         theme: 'material',
+        tabSize: 2,
+        mode: 'text/javascript',
+        lineNumbers: true,
+        line: true,
+        readOnly: false,
+      },
+      cmOptionsDark: {
+        theme: 'material-darker',
         tabSize: 2,
         mode: 'text/javascript',
         lineNumbers: true,
