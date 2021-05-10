@@ -49,6 +49,10 @@
             <v-btn color="secondary" @click="customizeCookies()" small>customize</v-btn>
           </div>
         </div>
+        <v-switch
+          v-model="$vuetify.theme.dark"
+          label="Dark Mode"
+        ></v-switch>
         <a class="repositoryLink" href="https://github.com/BootGen/Editor" target="_blank" @click="openGithub()">
           <v-icon class="pr-2">mdi-github</v-icon>
           github.com/BootGen/Editor
