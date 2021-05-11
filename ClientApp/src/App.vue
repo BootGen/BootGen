@@ -50,7 +50,7 @@
           </div>
         </div>
         <v-switch
-          v-model="$vuetify.theme.dark"
+          v-model="darkTheme"
           label="Dark Mode"
         ></v-switch>
         <a class="repositoryLink" href="https://github.com/BootGen/Editor" target="_blank" @click="openGithub()">
@@ -95,10 +95,11 @@ export default {
       buttons: [
         {name: 'accept', color: 'secondary'},
         {name: 'customize', color: 'secondary'}
-      ]
+      ],
     },
     cookieConsentAnswered: false,
-    cookiesAccepted: false
+    cookiesAccepted: false,
+    darkTheme: false
   }),
   components: {
     Snackbar,
@@ -106,6 +107,11 @@ export default {
   mounted(){
     if(localStorage.cookieConsentAnswered) this.cookieConsentAnswered = localStorage.cookieConsentAnswered;
     if(localStorage.cookiesAccepted) this.cookiesAccepted = localStorage.cookiesAccepted;
+    if(localStorage.darkTheme === 'true'){
+      this.darkTheme = true;
+    }else{
+      this.darkTheme = false;
+    }
   },
   watch:{
     cookieConsentAnswered(answered) {
@@ -113,6 +119,11 @@ export default {
     },
     cookiesAccepted(accepted) {
       localStorage.cookiesAccepted = accepted;
+    },
+    darkTheme(dark){
+      this.$gtag?.event('change-theme');
+      localStorage.darkTheme = dark;
+      this.$vuetify.theme.dark = dark;
     }
   },
   computed: {
