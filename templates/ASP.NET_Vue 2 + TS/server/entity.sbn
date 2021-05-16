@@ -1,0 +1,15 @@
+using System;
+using System.Text.Json.Serialization;
+using System.Collections.Generic;
+namespace {{ name_space }}
+{
+    public class {{ class.name }}
+    {
+        {{~ for property in class.properties ~}}
+        {{~ if property.is_server_only ~}}
+        [JsonIgnore]
+        {{~ end ~}}
+        public {{ get_type property }} {{ property.name }} { get; set; }
+        {{~ end ~}}
+    }
+}

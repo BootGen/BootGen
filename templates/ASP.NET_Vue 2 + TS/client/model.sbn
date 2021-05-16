@@ -1,0 +1,13 @@
+{{~ for property in class.common_properties ~}}
+{{~ if property.class ~}}
+{{~ if property.class.name != class.name ~}}
+import { {{ property.class.name }} } from './{{ property.class.name }}';
+{{~ end ~}}
+{{~ end ~}}
+{{~ end ~}}
+
+export interface {{ class.name }} {
+    {{~ for property in class.common_properties ~}}
+    {{ camel_case property.name }}: {{ get_type property }};
+    {{~ end ~}}
+}

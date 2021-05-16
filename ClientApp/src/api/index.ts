@@ -44,6 +44,8 @@ function projectToDto(project: Project): Project {
     name: project.name,
     json: project.json,
     ownerId: project.ownerId,
+    backend: project.backend,
+    frontend: project.frontend
   };
 }
 

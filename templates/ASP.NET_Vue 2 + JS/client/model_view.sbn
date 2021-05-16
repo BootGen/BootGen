@@ -1,0 +1,31 @@
+<template>
+  <v-card elevation="2">
+    <v-list dense>
+      <v-list-item class="justify-end">
+        <v-btn @click="$emit('edit')"><v-icon>mdi-pencil</v-icon></v-btn>
+      </v-list-item>
+    {{~ for property in class.common_properties ~}}
+      <v-list-item>
+        <v-list-item-content>{{ camel_case property.name }}:</v-list-item-content>
+        <v-list-item-content class="align-end">
+          {{~ if (get_type property) == "Date" ~}}
+          {{'{{'}} {{ camel_case class.name }}.{{ camel_case property.name }} | dateFormat {{'}}'}}
+          {{~ else ~}}
+          {{'{{'}} {{ camel_case class.name }}.{{ camel_case property.name }} {{'}}'}}
+          {{~ end ~}}
+        </v-list-item-content>
+      </v-list-item>
+    {{~ end ~}}
+    </v-list>
+  </v-card>
+</template>
+
+<script>
+import Vue from 'vue';
+
+export default Vue.extend({
+  props: [
+    '{{ camel_case class.name }}'
+  ],
+});
+</script>

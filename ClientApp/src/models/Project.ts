@@ -4,4 +4,6 @@ export interface Project {
     name: string;
     json: string;
     ownerId: number;
+    backend: string,
+    frontend: string
 }

@@ -1,0 +1,72 @@
+import { findById, patchArray, setArray, setItem } from './util';
+import api from '../api';
+
+export default {
+  namespaced: true,
+  state: () => ({
+    items: []
+  }),
+  mutations: {
+    set{{ resource.name.plural }}: function(state, {{ camel_case resource.name.plural }}) {
+      state.items = setArray(state.items,{{ camel_case resource.name.plural }});
+    },
+    patch{{ resource.name.plural }}: function(state, {{ camel_case resource.name.plural }}) {
+      patchArray(state.items,{{ camel_case resource.name.plural }});
+    },
+    set{{ resource.name }}: function(state, {{ camel_case resource.name }}) {
+      setItem(state.items, {{ camel_case resource.name }});
+    }
+  },
+  actions: {
+    get{{ resource.name.plural }}: async function(context) {
+      const {{ camel_case resource.name.plural }} = await api.get{{ resource.name.plural }}(context.rootState.auth.jwt);
+      context.commit('set{{ resource.name.plural }}', {{ camel_case resource.name.plural }});
+      return context.state.items;
+    },
+    get{{ resource.name }}: async function(context, id) {
+      const {{ camel_case resource.name }} = await api.get{{ resource.name }}(id, context.rootState.auth.jwt);
+      context.commit('set{{resource.name}}', {{ camel_case resource.name }});
+      return findById(context.state.items, {{ camel_case resource.name }}.id);
+    },
+    {{~ if !resource.is_readonly ~}}
+    add{{ resource.name }}: async function(context, {{ camel_case resource.name}}) {
+      {{ camel_case resource.name }} = await api.add{{ resource.name }}({{ camel_case resource.name}}, context.rootState.auth.jwt);
+      context.commit('set{{ resource.name }}', {{ camel_case resource.name }});
+      return findById(context.state.items, {{ camel_case resource.name }}.id);
+    },
+    update{{ resource.name }}: async function(context, {{ camel_case resource.name}}) {
+      {{ camel_case resource.name }} = await api.update{{ resource.name }}({{ camel_case resource.name}}, context.rootState.auth.jwt);
+      context.commit('set{{ resource.name }}', {{ camel_case resource.name }});
+      return findById(context.state.items, {{ camel_case resource.name }}.id);
+    },
+    delete{{ resource.name }}: async function(context, {{ camel_case resource.name}}) {
+      context.commit('set{{ resource.name.plural }}', context.state.items.filter(i => i !== {{ camel_case resource.name}}));
+      await api.delete{{ resource.name }}({{ camel_case resource.name}}, context.rootState.auth.jwt);
+    },
+    {{~ end ~}}
+    {{~ for alternate in resource.alternate_resources
+    parent = alternate.parent_resource
+    ~}}
+    get{{ resource.name.plural }}Of{{ parent.name }}: async function(context, {{camel_case parent.name}}) {
+      const {{ camel_case resource.name.plural }} = await api.get{{ resource.name.plural }}Of{{ parent.name }}({{camel_case parent.name}}, context.rootState.auth.jwt);
+      context.commit('patch{{alternate.name.plural}}', {{ camel_case resource.name.plural }});
+      return context.state.items;
+    },
+    add{{ resource.name }}To{{ parent.name }}: async function(context, data) {
+      let {{camel_case resource.name}} = data.{{camel_case resource.name}};
+      const {{camel_case parent.name}} = data.{{camel_case parent.name}};
+      {{ camel_case resource.name }} = await api.add{{ resource.name }}To{{ parent.name }}({{ camel_case resource.name}}, {{camel_case parent.name}}, context.rootState.auth.jwt);
+      context.commit('set{{ resource.name }}', {{ camel_case resource.name }});
+      return findById(context.state.items, {{ camel_case resource.name }}.id);
+    },
+    {{~ if alternate.pivot ~}}
+    delete{{ resource.name }}Of{{ parent.name }}: async function(context, data) {
+      const {{camel_case alternate.name}} = data.{{camel_case alternate.name}};
+      const {{camel_case parent.name}} = data.{{camel_case parent.name}};
+      context.commit('set{{ alternate.name.plural }}', context.state.items.filter(i => i !== {{ camel_case alternate.name}}));
+      await api.delete{{ resource.name }}Of{{ parent.name }}({{ camel_case resource.name}}, {{camel_case parent.name}}, context.rootState.auth.jwt);
+    },
+    {{~ end ~}}
+    {{~ end ~}}
+  }
+}

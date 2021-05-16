@@ -53,17 +53,19 @@ export default Vue.extend({
   },
   watch: {
     mode: function (mode: string) {
-      if(mode === 'json'){
-        this.cmOptions.mode = 'text/javascript';
-      }if(mode === 'cs'){
-        this.cmOptions.mode = 'text/x-csharp';
-      }else if(mode === 'ts'){
-        this.cmOptions.mode = 'text/typescript';
-      }else if(mode === 'vue'){
-        this.cmOptions.mode = 'text/x-vue';
-      }else{
-        this.cmOptions.mode = 'text/x-yaml';
-      }
+        if(mode === 'json'){
+          this.cmOptions.mode = 'text/javascript';
+        }if(mode === 'cs'){
+          this.cmOptions.mode = 'text/x-csharp';
+        }else if(mode === 'ts'){
+          this.cmOptions.mode = 'text/typescript';
+        }else if(mode === 'js'){
+          this.cmOptions.mode = 'text/javascript';
+        }else if(mode === 'vue'){
+          this.cmOptions.mode = 'text/x-vue';
+        }else{
+          this.cmOptions.mode = 'text/x-yaml';
+        }
     },
     linesToColor: function (linesToColor: {line: number; color: string}[]) {
       if(linesToColor.length === 0){

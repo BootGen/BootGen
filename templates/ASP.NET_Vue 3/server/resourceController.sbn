@@ -1,0 +1,77 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+using {{ name_space }}.Services;
+
+namespace {{ name_space }}.Controllers
+{
+    {{~
+        controller_name = resource.name.plural + 'Controller'
+        service_name = 'I' + resource.name.plural + 'Service'
+    ~}}
+    [ApiController]
+    [Route("{{ kebab_case resource.name.plural }}")]
+    [Authorize]
+    public class {{ controller_name }} : ControllerBase
+    {
+        private {{ service_name }} service;
+        public {{ controller_name }}({{ service_name }} service)
+        {
+            this.service = service;
+        }
+        
+        [HttpGet]
+        public IActionResult Get{{ resource.name.plural }}()
+        {
+            return Ok(service.Get{{ resource.name.plural }}());
+        }
+
+        {{~
+        path_parameter = "{" + (camel_case resource.name) + "Id}"
+        ~}}
+        [HttpGet]
+        [Route("{{path_parameter}}")]
+        public IActionResult Get{{ resource.name }}([FromRoute] int {{ camel_case resource.name }}Id)
+        {
+            var {{ camel_case resource.name }} = service.Get{{ resource.name }}({{ camel_case resource.name }}Id);
+            if ({{ camel_case resource.name }} == null)
+                return NotFound();
+            return Ok({{ camel_case resource.name }});
+        }
+        {{~ if !resource.is_readonly ~}}
+
+        [HttpPost]
+        public IActionResult Add{{ resource.name }}([FromBody] {{ resource.class.name }} {{ camel_case resource.name }})
+        {
+            var new{{ resource.name }} = service.Add{{ resource.name }}({{ camel_case resource.name }});
+            return Ok(new{{ resource.name }});
+        }
+
+        [HttpPut]
+        [Route("{{path_parameter}}")]
+        public IActionResult Update{{ resource.name }}([FromRoute] int {{ camel_case resource.name }}Id, [FromBody] {{ resource.class.name }} {{ camel_case resource.name }})
+        {
+            var updated{{ resource.name }} = service.Update{{ resource.name }}({{ camel_case resource.name }}Id, {{ camel_case resource.name }});
+            if (updated{{ resource.name }} == null)
+                return BadRequest();
+            return Ok(updated{{ resource.name }});
+        }
+
+        [HttpDelete]
+        [Route("{{path_parameter}}")]
+        public IActionResult Delete{{ resource.name }}([FromRoute] int {{ camel_case resource.name }}Id)
+        {
+            if (service.Delete{{ resource.name }}({{ camel_case resource.name }}Id))
+                return Ok();
+            else
+                return BadRequest();
+        }
+        {{~ end ~}}
+    }
+}

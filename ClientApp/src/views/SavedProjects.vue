@@ -76,7 +76,12 @@ export default Vue.extend({
       if(!this.dialog && !this.inLoading){
         this.inLoading = true;
         this.projectInLoading = project;
-        const generateResult: GenerateResponse = await api.generate({data: project.json, nameSpace: this.toCamelCase(project.name)});
+        const generateResult: GenerateResponse = await api.generate({
+          data: project.json,
+          nameSpace: this.toCamelCase(project.name),
+          backend: project.backend,
+          frontend: project.frontend
+        });
         this.$store.commit('projects/setLastProject', project);
         this.$store.commit('projects/setLastGeneratedFiles', generateResult.generatedFiles);
         this.$router.push('/editor');

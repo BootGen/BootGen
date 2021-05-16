@@ -51,6 +51,8 @@ namespace Editor.Services
                 original.Name = project.Name;
                 original.Json = project.Json;
                 original.OwnerId = project.OwnerId;
+                original.Backend = project.Backend;
+                original.Frontend = project.Frontend;
                 dbContext.SaveChanges();
                 return entityEntry.Entity;
             }

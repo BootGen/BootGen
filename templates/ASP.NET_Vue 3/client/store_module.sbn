@@ -1,0 +1,91 @@
+import { ActionContext } from 'vuex';
+import { findById, patchArray, setArray, setItem } from './util';
+import { State } from '.';
+import { {{resource.class.name}} } from '@/models/{{resource.class.name}}';
+{{~ for r in resource.alternate_resources ~}}
+import { {{r.parent_resource.class.name}} } from '@/models/{{r.parent_resource.class.name}}';
+{{~ end ~}}
+import api from '../api';
+
+export interface {{resource.class.name}}sState {
+  items: Array<{{resource.class.name}}>;
+}
+
+type Context = ActionContext<{{resource.class.name}}sState, State>;
+
+{{~ for r in resource.alternate_resources ~}}
+interface {{resource.class.name}}{{r.parent_resource.class.name}}Pair {
+  {{ camel_case resource.name}}: {{ resource.class.name}};
+  {{ camel_case r.parent_resource.name}}: {{ r.parent_resource.class.name}};
+}
+{{~ end ~}}
+
+export default {
+  namespaced: true,
+  state: () => ({
+    items: Array<{{resource.class.name}}>()
+  }),
+  mutations: {
+    set{{ resource.name.plural }}: function(state: {{resource.class.name}}sState, {{ camel_case resource.name.plural }}: Array<{{resource.class.name}}>) {
+      state.items = setArray(state.items,{{ camel_case resource.name.plural }});
+    },
+    patch{{ resource.name.plural }}: function(state: {{resource.class.name}}sState, {{ camel_case resource.name.plural }}: Array<{{resource.class.name}}>) {
+      patchArray(state.items,{{ camel_case resource.name.plural }});
+    },
+    set{{ resource.name }}: function(state: {{resource.class.name}}sState, {{ camel_case resource.name }}: {{resource.class.name}}) {
+      setItem(state.items, {{ camel_case resource.name }});
+    }
+  },
+  actions: {
+    get{{ resource.name.plural }}: async function(context: Context): Promise<Array<{{resource.class.name}}>> {
+      const {{ camel_case resource.name.plural }} = await api.get{{ resource.name.plural }}(context.rootState.auth.jwt);
+      context.commit('set{{ resource.name.plural }}', {{ camel_case resource.name.plural }});
+      return context.state.items;
+    },
+    get{{ resource.name }}: async function(context: Context, id: number): Promise<{{resource.class.name}}> {
+      const {{ camel_case resource.name }} = await api.get{{ resource.name }}(id, context.rootState.auth.jwt);
+      context.commit('set{{resource.name}}', {{ camel_case resource.name }});
+      return findById<{{resource.class.name}}>(context.state.items, {{ camel_case resource.name }}.id) as {{resource.class.name}};
+    },
+    {{~ if !resource.is_readonly ~}}
+    add{{ resource.name }}: async function(context: Context, {{ camel_case resource.name}}: {{ resource.class.name}}): Promise<{{resource.class.name}}> {
+      {{ camel_case resource.name }} = await api.add{{ resource.name }}({{ camel_case resource.name}}, context.rootState.auth.jwt);
+      context.commit('set{{ resource.name }}', {{ camel_case resource.name }});
+      return findById<{{resource.class.name}}>(context.state.items, {{ camel_case resource.name }}.id) as {{resource.class.name}};
+    },
+    update{{ resource.name }}: async function(context: Context, {{ camel_case resource.name}}: {{ resource.class.name}}): Promise<{{resource.class.name}}> {
+      {{ camel_case resource.name }} = await api.update{{ resource.name }}({{ camel_case resource.name}}, context.rootState.auth.jwt);
+      context.commit('set{{ resource.name }}', {{ camel_case resource.name }});
+      return findById<{{resource.class.name}}>(context.state.items, {{ camel_case resource.name }}.id) as {{resource.class.name}};
+    },
+    delete{{ resource.name }}: async function(context: Context, {{ camel_case resource.name}}: {{ resource.class.name}}): Promise<void> {
+      context.commit('set{{ resource.name.plural }}', context.state.items.filter((i: {{ resource.class.name}}) => i !== {{ camel_case resource.name}}));
+      await api.delete{{ resource.name }}({{ camel_case resource.name}}, context.rootState.auth.jwt);
+    },
+    {{~ end ~}}
+    {{~ for alternate in resource.alternate_resources
+    parent = alternate.parent_resource
+    ~}}
+    get{{ resource.name.plural }}Of{{ parent.name }}: async function(context: Context, {{camel_case parent.name}}: {{parent.class.name}}): Promise<Array<{{alternate.class.name}}>> {
+      const {{ camel_case resource.name.plural }} = await api.get{{ resource.name.plural }}Of{{ parent.name }}({{camel_case parent.name}}, context.rootState.auth.jwt);
+      context.commit('patch{{alternate.name.plural}}', {{ camel_case resource.name.plural }});
+      return context.state.items;
+    },
+    add{{ resource.name }}To{{ parent.name }}: async function(context: Context, data: {{resource.class.name}}{{parent.class.name}}Pair): Promise<{{alternate.class.name}}> {
+      let {{camel_case resource.name}}: {{resource.class.name}} = data.{{camel_case resource.name}};
+      const {{camel_case parent.name}}: {{parent.class.name}} = data.{{camel_case parent.name}};
+      {{ camel_case resource.name }} = await api.add{{ resource.name }}To{{ parent.name }}({{ camel_case resource.name}}, {{camel_case parent.name}}, context.rootState.auth.jwt);
+      context.commit('set{{ resource.name }}', {{ camel_case resource.name }});
+      return findById<{{resource.class.name}}>(context.state.items, {{ camel_case resource.name }}.id) as {{resource.class.name}};
+    },
+    {{~ if alternate.pivot ~}}
+    delete{{ resource.name }}Of{{ parent.name }}: async function(context: Context, data: {{resource.class.name}}{{parent.class.name}}Pair): Promise<void> {
+      const {{camel_case alternate.name}}: {{alternate.class.name}} = data.{{camel_case alternate.name}};
+      const {{camel_case parent.name}}: {{parent.class.name}} = data.{{camel_case parent.name}};
+      context.commit('set{{ alternate.name.plural }}', context.state.items.filter((i: {{ resource.class.name}}) => i !== {{ camel_case alternate.name}}));
+      await api.delete{{ resource.name }}Of{{ parent.name }}({{ camel_case resource.name}}, {{camel_case parent.name}}, context.rootState.auth.jwt);
+    },
+    {{~ end ~}}
+    {{~ end ~}}
+  }
+}
