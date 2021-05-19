@@ -17,8 +17,8 @@
             <p class="display-3">Please wait for the result!</p>
           </div>
           <div v-else-if="activeted" class="d-flex flex-column align-center">
-            <v-icon color="green" size="70">mdi-check-circle-outline</v-icon>
-            <p class="display-3">Activation was <span class="green--text">successful.</span></p>
+            <v-icon color="primary" size="70">mdi-check-circle-outline</v-icon>
+            <p class="display-3">Activation was <span class="primary--text">successful.</span></p>
           </div>
           <div v-else class="d-flex flex-column align-center">
             <v-icon color="red" size="70">mdi-close-circle-outline</v-icon>

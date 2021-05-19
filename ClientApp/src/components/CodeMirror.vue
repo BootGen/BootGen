@@ -159,4 +159,74 @@ export default Vue.extend({
     height: 100%;
     z-index: 0;
   }
+  /* light theme */
+  .cm-s-material.CodeMirror-focused div.CodeMirror-selected {
+    background: rgba(97, 97, 97, 0.2);
+  }
+  .cm-s-material .CodeMirror-gutter {
+    background-color: #fff;
+  }
+  .cm-s-material .CodeMirror-scroll {
+    background-color: #fff;
+    color: #3C4C72;
+  }
+  .cm-s-material .CodeMirror-cursor {
+    border-left: 1px solid #656867;
+  }
+  .cm-s-material .cm-keyword {
+    color: #904bbb;
+  }
+  .cm-s-material .cm-operator {
+    color: #47a1c5;
+  }
+  .cm-s-material .cm-variable-2 {
+    color: #3C4C72;
+  }
+  .cm-s-material .cm-variable-3,
+  .cm-s-material .cm-type {
+    color: #dd4850;
+  }
+  .cm-s-material .cm-builtin {
+    color: #cf8e16;
+  }
+  .cm-s-material .cm-atom {
+    color: #fc825d;
+  }
+  .cm-s-material .cm-number {
+    color: #e94f69;
+  }
+  .cm-s-material .cm-def {
+    color: #457cf3;
+  }
+  .cm-s-material .cm-string {
+    color: #29af56;
+  }
+  .cm-s-material .cm-string-2 {
+    color: #dd4850;
+  }
+  .cm-s-material .cm-comment {
+    color: #a0a1a7;
+  }
+  .cm-s-material .cm-variable {
+    color: #dd4850;
+  }
+  .cm-s-material .cm-tag {
+    color: #e94f69;
+  }
+  .cm-s-material .cm-meta {
+    color: #cf8e16;
+  }
+  .cm-s-material .cm-attribute {
+    color: #904bbb;
+  }
+  .cm-s-material .cm-property {
+    color: #904bbb;
+  }
+  .cm-s-material .cm-qualifier {
+    color: #d8b60d;
+  }
+  .cm-s-material .cm-variable-3,
+  .cm-s-material .cm-type {
+    color: #d8b60d;
+  }
 </style>

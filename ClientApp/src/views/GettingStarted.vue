@@ -21,7 +21,8 @@
       <p>To start using BootGen all you need to do, is to create a sample dataset for your next application in JSON. You do not need to install anything, and you do not need to register. Just go to the editor, and enjoy the head start for your project!</p>
 
       <h3>An Example JSON Input</h3>
-      <codemirror :value="example" :options="cmOptions" />
+      <codemirror v-if="$vuetify.theme.dark" :value="example" :options="cmOptionsDark" />
+      <codemirror v-else :value="example" :options="cmOptions" />
       <h3>Conventions</h3>
       <ul>
         <li>
@@ -54,7 +55,8 @@
           class. Example:
         </li>
       </ul>
-      <codemirror :value="friends" :options="cmOptions" />
+      <codemirror v-if="$vuetify.theme.dark" :value="friends" :options="cmOptionsDark" />
+      <codemirror v-else :value="friends" :options="cmOptions" />
     </v-card>
   </v-container>
 </template>
@@ -64,6 +66,7 @@ import Vue from 'vue';
 
 import { codemirror } from 'vue-codemirror';
 import 'codemirror/theme/material.css';
+import 'codemirror/theme/material-darker.css';
 import 'codemirror/lib/codemirror.css';
 import 'codemirror/mode/javascript/javascript.js';
 import axios from 'axios';
@@ -75,6 +78,15 @@ export default Vue.extend({
     return {
       cmOptions: {
         theme: 'material',
+        tabSize: 2,
+        mode: 'text/javascript',
+        lineNumbers: false,
+        line: true,
+        readOnly: true,
+        scrollbarStyle: null
+      },
+      cmOptionsDark: {
+        theme: 'material-darker',
         tabSize: 2,
         mode: 'text/javascript',
         lineNumbers: false,

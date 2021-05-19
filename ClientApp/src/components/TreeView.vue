@@ -13,27 +13,30 @@
     open-on-click
   >
     <template v-slot:prepend="{ item, open }">
-      <v-icon color="#eee" v-if="item.type == 'folder'">
+      <v-icon :color="$vuetify.theme.dark ? '#eee' : '#3C4C72'" v-if="item.type == 'folder'">
         {{ open ? 'mdi-chevron-down ' : 'mdi-chevron-right' }}
       </v-icon>
-      <v-icon :color="color[item.type]" v-else>
+      <v-icon :color="darkColors[item.type]" v-else-if="$vuetify.theme.dark">
+        {{ icons[item.type] }}
+      </v-icon>
+      <v-icon :color="colors[item.type]" v-else>
         {{ icons[item.type] }}
       </v-icon>
     </template>
     <template v-slot:append="{ item }">
-      <p class="purple--text pa-0 ma-0 mr-1" v-if="item.change == ChangeType.Folder"><v-icon color="orange">mdi-circle-medium </v-icon></p>
-      <p class="purple--text pa-0 ma-0 mr-2" v-if="item.change == ChangeType.Edited && activeNodes[0] == item">M</p>
-      <p class="orange--text pa-0 ma-0 mr-2" v-else-if="item.change == ChangeType.Edited">M</p>
-      <p class="purple--text pa-0 ma-0 mr-2" v-if="item.change == ChangeType.Created  && activeNodes[0] == item">A</p>
-      <p class="green--text pa-0 ma-0 mr-2" v-else-if="item.change == ChangeType.Created">A</p>
+      <p class="primary--text pa-0 ma-0 mr-1" v-if="item.change == ChangeType.Folder"><v-icon color="textOrange">mdi-circle-medium</v-icon></p>
+      <p class="primary--text pa-0 ma-0 mr-2" v-if="item.change == ChangeType.Edited && activeNodes[0] == item">M</p>
+      <p class="textOrange--text pa-0 ma-0 mr-2" v-else-if="item.change == ChangeType.Edited">M</p>
+      <p class="primary--text pa-0 ma-0 mr-2" v-if="item.change == ChangeType.Created  && activeNodes[0] == item">A</p>
+      <p class="textGreen--text pa-0 ma-0 mr-2" v-else-if="item.change == ChangeType.Created">A</p>
     </template>
     <template v-slot:label="{ item }">
-      <p class="orange--text pa-0 ma-0" v-if="item.change == ChangeType.Folder">{{item.name}}</p>
-      <p class="purple--text pa-0 ma-0" v-if="item.change == ChangeType.Edited && activeNodes[0] == item">{{item.name}}</p>
-      <p class="orange--text pa-0 ma-0" v-else-if="item.change == ChangeType.Edited">{{item.name}}</p>
-      <p class="purple--text pa-0 ma-0" v-if="item.change == ChangeType.Created && activeNodes[0] == item">{{item.name}}</p>
-      <p class="green--text pa-0 ma-0" v-else-if="item.change == ChangeType.Created">{{item.name}}</p>
-      <p class="purple--text pa-0 ma-0" v-if="item.change == ChangeType.Unchanged && activeNodes[0] == item">{{item.name}}</p>
+      <p class="textOrange--text pa-0 ma-0" v-if="item.change == ChangeType.Folder">{{item.name}}</p>
+      <p class="primary--text pa-0 ma-0" v-if="item.change == ChangeType.Edited && activeNodes[0] == item">{{item.name}}</p>
+      <p class="textOrange--text pa-0 ma-0" v-else-if="item.change == ChangeType.Edited">{{item.name}}</p>
+      <p class="primary--text pa-0 ma-0" v-if="item.change == ChangeType.Created && activeNodes[0] == item">{{item.name}}</p>
+      <p class="textGreen--text pa-0 ma-0" v-else-if="item.change == ChangeType.Created">{{item.name}}</p>
+      <p class="primary--text pa-0 ma-0" v-if="item.change == ChangeType.Unchanged && activeNodes[0] == item">{{item.name}}</p>
       <p class="pa-0 ma-0" v-else-if="item.change == ChangeType.Unchanged">{{item.name}}</p>
     </template>
   </v-treeview>
@@ -95,7 +98,14 @@ export default Vue.extend({
       activeNodes: Array<Node>(),
       filesById: Array<GeneratedFile>(),
       id: 0,
-      color: {
+      colors: {
+        cs: '#457cf3',
+        vue: '#29af56',
+        ts: '#457cf3',
+        yml: '#dd4850',
+        js: '#d8b60d',
+      },
+      darkColors: {
         cs: '#82AAFF',
         vue: '#C3E88D',
         ts: '#82AAFF',
@@ -262,9 +272,6 @@ export default Vue.extend({
     display: none;
   }
   .theme--light .v-treeview {
-    background-color: #263238;
-  }
-  .theme--dark .v-treeview {
-    background-color: #222;
+    color: #3C4C72!important;
   }
 </style>

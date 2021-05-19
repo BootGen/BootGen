@@ -2,15 +2,7 @@
   <v-app id="inspire">
     <v-navigation-drawer 
       v-model="drawer"
-      :dark="barColor !== 'rgba(228, 226, 226, 1), rgba(255, 255, 255, 0.7)'"
-      :src="barImage"
       app>
-      <template v-slot:img="props">
-        <v-img
-          :gradient="`to bottom, ${barColor}`"
-          v-bind="props"
-        />
-      </template>
       <v-list nav>
         <div v-for="item in items" :key="item.title" link>
           <div v-if="item.children">
@@ -41,8 +33,8 @@
       <div class="ma-4">
         <div class="container-fluid d-flex flex-column navCookie" v-if="!cookieConsentAnswered">
           <div class="container pl-0 align-center">
-            <v-icon class="pr-2" dark large>{{ snackbar.icon }}</v-icon>
-            <span>{{ snackbar.text }}</span>
+            <v-icon class="pr-2" color="primary" large>{{ snackbar.icon }}</v-icon>
+            <span class="secondary--text">{{ snackbar.text }}</span>
           </div>
           <div v-if="snackbar.buttons" class="d-flex justify-space-around pb-5">
             <v-btn color="primary" @click="acceptCookies()" small>accept</v-btn>
@@ -63,8 +55,10 @@
         </v-btn>
         <v-toolbar-title class="hidden-sm-and-down font-weight-light" v-if="$route.name !== 'Editor'">{{ $route.name }}</v-toolbar-title>
       </v-app-bar>
+      <v-spacer></v-spacer>
       <v-switch
         v-if="$route.name !== 'Editor'"
+        style="z-index:999;"
         v-model="darkTheme"
         label="Dark Mode"
       ></v-switch>
@@ -135,7 +129,6 @@ export default {
     }
   },
   computed: {
-    ...mapState(['barColor', 'barImage']),
     items: function () {
       const menuItems = [
           { title: 'Getting Started', link: '/', icon: 'mdi-rocket-launch' },
@@ -203,11 +196,11 @@ export default {
     color: #eee;
   }
   a.repositoryLink{
-    color: #eee!important;
+    color: #00A170!important;
     text-decoration: none;
   }
   a.repositoryLink:hover{
-    color: #999 !important;
+    color: #656867 !important;
   }
   footer {
     text-align: center;

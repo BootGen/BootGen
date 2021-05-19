@@ -10,9 +10,8 @@ const lightTheme = {
   third: '#00A170',
   accent: '#656867',
   info: '#00CAE3',
-  orange: '#F78C6C',
-  green: '#C3E88D',
-  purple: '#C792EA',
+  textOrange: '#fc825d',
+  textGreen: '#29af56',
 }
 
 const darkTheme = {
@@ -22,9 +21,8 @@ const darkTheme = {
   accent: '#656867',
   info: '#00CAE3',
   white: '#eee',
-  orange: '#F78C6C',
-  green: '#C3E88D',
-  purple: '#C792EA',
+  textOrange: '#F78C6C',
+  textGreen: '#C3E88D',
 }
 
 export default new Vuetify({

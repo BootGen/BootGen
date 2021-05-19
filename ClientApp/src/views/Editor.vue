@@ -266,7 +266,7 @@ export default Vue.extend({
         if(generateResult.errorMessage){
           this.setSnackbar('orange darken-2', generateResult.errorMessage, -1);
           if(generateResult.errorLine !== null){
-            this.jsonErrors.push({line: generateResult.errorLine-1, color: 'red'});
+            this.jsonErrors.push({line: generateResult.errorLine-1, color: 'rgba(255, 0, 0, 0.3)'});
           }
           this.generateLoading = false;
           return;
@@ -301,7 +301,7 @@ export default Vue.extend({
             const compare = new Compare(this.activeFile.content.split('\n'), this.previousFiles[i].content.split('\n'));
             const changes = compare.getChanges();
             changes.forEach(v =>{
-              this.highlightedDifferences.push({ line : v, color:'#656867' })
+              this.highlightedDifferences.push({ line : v, color:'rgba(0, 161, 112, 0.3)' })
             })
             break;
           }
@@ -337,7 +337,7 @@ export default Vue.extend({
     callPrettyPrint: function(){
       const result = validateJson(this.activeProject.json);
       if (result.error) {
-        this.jsonErrors.push({line: result.line, color: 'red'});
+        this.jsonErrors.push({line: result.line, color: 'rgba(255, 0, 0, 0.3)'});
         this.setSnackbar('orange darken-2', result.message, -1);
       }
       this.activeProject.json = prettyPrint(this.activeProject.json);
@@ -372,7 +372,7 @@ export default Vue.extend({
         }
         await this.generate();
       } else {
-        this.jsonErrors.push({line: result.line, color: 'red'});
+        this.jsonErrors.push({line: result.line, color: 'rgba(255, 0, 0, 0.3)'});
         this.setSnackbar('orange darken-2', result.message, -1);
       }
     },
@@ -427,7 +427,7 @@ export default Vue.extend({
       if(top) {
         this.activeProject.json = top.content;
       }
-      this.setSnackbar('info', 'Everything restored to its previous generated state', 5000);
+      this.setSnackbar('info', 'Everything restorgba(255, 0, 0, 0.3) to its previous generated state', 5000);
     },
     change: function(page: string){
       this.$gtag.event(`change-${page}`);
