@@ -100,11 +100,13 @@ export default Vue.extend({
         vue: '#C3E88D',
         ts: '#82AAFF',
         yml: '#F07178',
+        js: '#DECB6B',
       },
       icons: {
         cs: 'mdi-language-csharp',
         vue: 'mdi-vuejs',
         ts: 'mdi-language-typescript',
+        js: 'mdi-language-javascript',
         yml: 'mdi-api',
       },
       ChangeType: ChangeType,
