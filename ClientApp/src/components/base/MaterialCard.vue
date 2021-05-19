@@ -9,7 +9,7 @@
         v-if="avatar"
         size="128"
         class="mx-auto v-card--material__avatar elevation-6"
-        color="#9090f9"
+        color="#9fe0ab"
       >
         <v-img
           max-height="128"

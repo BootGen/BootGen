@@ -1,7 +1,7 @@
 <template>
   <v-container fluid class="editor">
     <v-row class="d-flex align-center ma-0 pa-0">
-      <v-col lg="5" md="6" sm="8" cols="12" class="pa-0 headBar" v-if="$store.state.auth.jwt">
+      <v-col cols="12" class="pa-0 headBar" v-if="$store.state.auth.jwt">
         <head-bar :activeProjectName="activeProject.name" :backends="backends" :frontends="frontends" @new-project="createNewProject" @change-project-name="changeProjectName"></head-bar>
       </v-col>
       <v-col cols="12" class="pa-0 headBar" v-else>
@@ -301,7 +301,7 @@ export default Vue.extend({
             const compare = new Compare(this.activeFile.content.split('\n'), this.previousFiles[i].content.split('\n'));
             const changes = compare.getChanges();
             changes.forEach(v =>{
-              this.highlightedDifferences.push({ line : v, color:'#412fb3' })
+              this.highlightedDifferences.push({ line : v, color:'#656867' })
             })
             break;
           }

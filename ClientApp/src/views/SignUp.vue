@@ -52,7 +52,7 @@
                     prepend-icon="mdi-form-textbox-password"
                   ></v-text-field>
                 </ValidationProvider>
-                <v-checkbox color="secondary" v-model="newsletter" label="Sign me up for the newsletter!"></v-checkbox>
+                <v-checkbox color="primary" v-model="newsletter" label="Sign me up for the newsletter!"></v-checkbox>
                 <v-alert class="text-left" type="error" v-if="errorMsg">{{ errorMsg }}</v-alert>
                 <div class="text-center">
                   <v-btn color="primary" large @click="trySignUp" :disabled="invalid">Sign up</v-btn>

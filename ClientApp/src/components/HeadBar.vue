@@ -1,16 +1,23 @@
 <template>
   <v-container fluid>
     <v-row>
-      <v-col cols="12" class="pa-0 d-flex align-center">
-        <v-toolbar-title class="font-weight-light mr-2">Editor -</v-toolbar-title>
-        <ValidationObserver>
-          <ValidationProvider v-slot="{ errors }" name="Project name" rules="required">
-            <v-text-field v-model="activeProjectName" placeholder="Name your project" type="text" :error-messages="errors" required @input="changeName"></v-text-field>
-          </ValidationProvider>
-        </ValidationObserver>
-        <v-btn class="mr-0 ml-3" color="primary" small @click="dialog = true" v-if="$store.state.auth.jwt">New project</v-btn>
-        <v-spacer v-if="!$store.state.auth.jwt"></v-spacer>
-        <div class="d-flex align-center" @click="toLogin()" v-if="!$store.state.auth.jwt"><span class="pr-1">for save</span><router-link to="/login">sign in</router-link></div>
+      <v-col cols="12" class="pa-0 d-flex align-center justify-space-between flex-wrap">
+        <div class="d-flex align-center">
+          <v-toolbar-title class="font-weight-light mr-2">Editor -</v-toolbar-title>
+          <ValidationObserver>
+            <ValidationProvider v-slot="{ errors }" name="Project name" rules="required">
+              <v-text-field v-model="activeProjectName" placeholder="Name your project" type="text" :error-messages="errors" required @input="changeName"></v-text-field>
+            </ValidationProvider>
+          </ValidationObserver>
+          <v-btn class="mr-0 ml-3" color="primary" small @click="dialog = true" v-if="$store.state.auth.jwt">New project</v-btn>
+        </div>
+        <div class="d-flex align-center mr-5">
+          <span class="mr-5" v-if="!$store.state.auth.jwt">for save<router-link class="pl-2" to="/login" @click="toLogin()">sign in</router-link></span>
+          <v-switch
+            v-model="darkTheme"
+            label="Dark Mode"
+          ></v-switch>
+        </div>
       </v-col>
     </v-row>
     <v-dialog v-model="dialog" width="400" persistent>
@@ -48,7 +55,6 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { Project } from '../models/Project';
 import { required } from 'vee-validate/dist/rules';
 import { extend, ValidationObserver, ValidationProvider } from 'vee-validate';
 
@@ -71,6 +77,20 @@ export default Vue.extend({
       type: Array as () => Array<string>
     },
   },
+  mounted(){
+    if(localStorage.darkTheme === 'true'){
+      this.darkTheme = true;
+    }else{
+      this.darkTheme = false;
+    }
+  },
+  watch:{
+    darkTheme(dark){
+      this.$gtag?.event('change-theme');
+      localStorage.darkTheme = dark;
+      this.$vuetify.theme.dark = dark;
+    }
+  },
   data: function () {
     return {
       errorMsg: false,
@@ -78,6 +98,7 @@ export default Vue.extend({
       projectName: 'My Project',
       backend: 'ASP.NET',
       frontend: 'Vue 2 + JS',
+      darkTheme: false
     };
   },
   methods: {
@@ -106,9 +127,3 @@ export default Vue.extend({
   }
 });
 </script>
-<style scoped>
-
-.theme--dark a{
-  color: #8b949e!important;
-}
-</style>

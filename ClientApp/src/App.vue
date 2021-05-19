@@ -49,25 +49,26 @@
             <v-btn color="primary" @click="customizeCookies()" small>customize</v-btn>
           </div>
         </div>
-        <v-switch
-          v-model="darkTheme"
-          label="Dark Mode"
-        ></v-switch>
         <a class="repositoryLink" href="https://github.com/BootGen/Editor" target="_blank" @click="openGithub()">
           <v-icon class="pr-2">mdi-github</v-icon>
           github.com/BootGen/Editor
         </a>
       </div>
     </v-navigation-drawer>
-
-    <v-app-bar app color="transparent" flat height="75" class="navPosition" :data-value="$route.name !== 'Editor'">
-      <v-btn class="mr-3" @click="setNavDraver()" elevation="1" fab small>
-        <v-icon v-if="drawer">mdi-dots-vertical</v-icon>
-        <v-icon v-else>mdi-view-quilt</v-icon>
-      </v-btn>
-      <v-toolbar-title class="hidden-sm-and-down font-weight-light" v-if="$route.name !== 'Editor'">{{ $route.name }}</v-toolbar-title>
-    </v-app-bar>
-
+    <div class="d-flex mr-5">
+      <v-app-bar app color="transparent" flat height="75" class="navPosition" :data-value="$route.name !== 'Editor'">
+        <v-btn class="mr-3" @click="setNavDraver()" elevation="1" fab small>
+          <v-icon v-if="drawer">mdi-dots-vertical</v-icon>
+          <v-icon v-else>mdi-view-quilt</v-icon>
+        </v-btn>
+        <v-toolbar-title class="hidden-sm-and-down font-weight-light" v-if="$route.name !== 'Editor'">{{ $route.name }}</v-toolbar-title>
+      </v-app-bar>
+      <v-switch
+        v-if="$route.name !== 'Editor'"
+        v-model="darkTheme"
+        label="Dark Mode"
+      ></v-switch>
+    </div>
     <v-main>
       <v-container fluid>
         <router-view></router-view>
@@ -107,6 +108,13 @@ export default {
   mounted(){
     if(localStorage.cookieConsentAnswered) this.cookieConsentAnswered = localStorage.cookieConsentAnswered;
     if(localStorage.cookiesAccepted) this.cookiesAccepted = localStorage.cookiesAccepted;
+    if(localStorage.darkTheme === 'true'){
+      this.darkTheme = true;
+    }else{
+      this.darkTheme = false;
+    }
+  },
+  updated: function(){
     if(localStorage.darkTheme === 'true'){
       this.darkTheme = true;
     }else{
@@ -188,10 +196,7 @@ export default {
   main{
     padding-top: unset!important;
   }
-  .navPosition[data-value=true]{
-    position: inherit!important;
-  }
-  .navPosition[data-value=false]{
+  .navPosition{
     position: absolute!important;
   }
   .navCookie{
