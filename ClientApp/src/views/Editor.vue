@@ -103,8 +103,8 @@
                     <v-btn color="white" v-if="isCompare" class="mr-2" elevation="1" @click="setCompare()" fab small v-bind="attrs" v-on="on">
                       <v-icon color="primary">mdi-file-compare</v-icon>
                     </v-btn>
-                    <v-btn color="blue-grey" v-else class="mr-2" elevation="1" @click="setCompare()" fab small v-bind="attrs" v-on="on">
-                      <v-icon color="primary">mdi-file-compare</v-icon>
+                    <v-btn color="rgba(255, 255, 255, 0.2)" v-else class="mr-2" elevation="0" @click="setCompare()" fab small v-bind="attrs" v-on="on">
+                      <v-icon color="rgba(255, 255, 255, 0.7)">mdi-file-compare</v-icon>
                     </v-btn>
                   </template>
                   <span v-if="isCompare">Show Changes: On</span>
@@ -132,7 +132,7 @@
         </base-material-generator-card>
       </v-col>
       <v-col xl="2" lg="2" md="4" sm="4" class="pr-0 pl-0">
-        <file-browser :generatedFiles="generatedFiles" :previousFiles="previousFiles" :openPath="openPath" :isCompare="isCompare" @select-file="selectFile"></file-browser>
+        <file-browser :generatedFiles="generatedFiles" :previousFiles="previousFiles" :openPath="openPath" :isCompare="showChanges" @select-file="selectFile"></file-browser>
       </v-col>
     </v-row>
     <snackbar v-if="snackbar.visible" :snackbar="snackbar"></snackbar>
@@ -187,6 +187,7 @@ export default Vue.extend({
       generateLoading: false,
       downLoading: false,
       isCompare: true,
+      showChanges: true,
       backends: ['ASP.NET'],
       frontends: ['Vue 2 + JS', 'Vue 2 + TS', 'Vue 3', 'React'],
       backend: 'ASP.NET',
@@ -276,34 +277,43 @@ export default Vue.extend({
         this.$store.commit('projects/setLastProject', this.activeProject);
         this.$store.commit('projects/setLastGeneratedFiles', this.generatedFiles);
         this.crc32ProjectName = CRC32.str(this.activeProject.name);
+        if(this.activeProject.backend === this.backend && this.activeProject.frontend === this.frontend){
+          this.showChanges = true;
+          this.highlightedDifferences = [];
+        }else{1
+          this.showChanges = false;
+        }
         this.backend = this.activeProject.backend;
         this.frontend = this.activeProject.frontend;
         this.undoStack.push(this.activeProject.json);
         this.setActiveFile();
-        this.setHighlightedDifferences();
         this.generateLoading = false;
       }
     },
     setCompare: function(){
       if(this.isCompare){
         this.isCompare = false;
+        this.showChanges = false;
         this.highlightedDifferences = [];
       }else{
         this.isCompare = true;
+        this.showChanges = true;
         this.setHighlightedDifferences();
       }
     },
     setHighlightedDifferences: function(){
       if(this.previousFiles.length > 0 && this.isCompare){
         this.highlightedDifferences = [];
-        for(let i = 0; i < this.previousFiles.length; i++){
-          if(this.previousFiles[i].name === this.activeFile.name && this.previousFiles[i].path === this.activeFile.path){
-            const compare = new Compare(this.activeFile.content.split('\n'), this.previousFiles[i].content.split('\n'));
-            const changes = compare.getChanges();
-            changes.forEach(v =>{
-              this.highlightedDifferences.push({ line : v, color:'rgba(0, 161, 112, 0.3)' })
-            })
-            break;
+        if(this.showChanges){
+          for(let i = 0; i < this.previousFiles.length; i++){
+            if(this.previousFiles[i].name === this.activeFile.name && this.previousFiles[i].path === this.activeFile.path){
+              const compare = new Compare(this.activeFile.content.split('\n'), this.previousFiles[i].content.split('\n'));
+              const changes = compare.getChanges();
+              changes.forEach(v =>{
+                this.highlightedDifferences.push({ line : v, color:'rgba(0, 161, 112, 0.3)' })
+              })
+              break;
+            }
           }
         }
       }
@@ -427,10 +437,10 @@ export default Vue.extend({
       if(top) {
         this.activeProject.json = top.content;
       }
-      this.setSnackbar('info', 'Everything restorgba(255, 0, 0, 0.3) to its previous generated state', 5000);
+      this.setSnackbar('info', 'Everything restored to its previous generated state', 5000);
     },
     change: function(page: string){
-      this.$gtag.event(`change-${page}`);
+      this.$gtag?.event(`change-${page}`);
     },
     changeProjectName: function(name: string){
       this.$gtag?.event('change-project-name');
