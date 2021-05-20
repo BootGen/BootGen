@@ -517,6 +517,6 @@ export default Vue.extend({
     opacity: 0.6;
   }
   .select{
-    max-width: 250px;
+    max-width: 220px;
   }
 </style>
