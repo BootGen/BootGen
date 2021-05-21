@@ -2,8 +2,7 @@
   <v-container fluid>
     <v-card>
       <v-img
-        width="600"
-        height="90"
+        max-width="600"
         src="@/assets/img/bootgen_full.png"
         alt="BootGen logo"
       ></v-img>
@@ -148,5 +147,11 @@ export default Vue.extend({
 h3, h2 {
   margin-top: 30px;
   margin-bottom: 30px;
+}
+
+@media screen and (max-width: 576px) {
+  .v-image {
+    margin-bottom: 50px;
+  }
 }
 </style>

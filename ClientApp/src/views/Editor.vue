@@ -1,11 +1,9 @@
 <template>
   <v-container fluid class="editor">
-    <v-row class="d-flex align-center ma-0 pa-0">
-      <v-col cols="12" class="pa-0 headBar" v-if="$store.state.auth.jwt">
-        <head-bar :activeProjectName="activeProject.name" :backends="backends" :frontends="frontends" @new-project="createNewProject" @change-project-name="changeProjectName"></head-bar>
-      </v-col>
-      <v-col cols="12" class="pa-0 headBar" v-else>
-        <head-bar :activeProjectName="activeProject.name" @new-project="createNewProject" @change-project-name="changeProjectName"></head-bar>
+    <v-row class="d-flex">
+      <v-col cols="12" class="head pa-0">
+        <head-bar v-if="$store.state.auth.jwt" :activeProjectName="activeProject.name" :backends="backends" :frontends="frontends" @new-project="createNewProject" @change-project-name="changeProjectName"></head-bar>
+        <head-bar v-else :activeProjectName="activeProject.name" @new-project="createNewProject" @change-project-name="changeProjectName"></head-bar>
       </v-col>
     </v-row>
     <v-row class="d-flex align-center">
@@ -15,7 +13,16 @@
             <div class="d-flex align-center justify-space-between pa-2">
               <div class="d-flex">
                 <span class="display-1 font-weight-light pa-2">JSON</span>
-                <v-icon class="mr-2">mdi-arrow-right</v-icon>
+                <v-icon class="mr-1">mdi-arrow-right</v-icon>
+                <v-tooltip bottom>
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-btn class="mr-1 freamworkSettings" color="white" elevation="1" @click="prjectSettings = true" fab small v-bind="attrs" v-on="on">
+                      <v-icon color="primary">mdi-cog</v-icon>
+                    </v-btn>
+                  </template>
+                  <span>Project settings</span>
+                </v-tooltip>
+                <project-settings v-if="prjectSettings" @save="saveProjectSettings" @cancel="cancelProjectSettings" title="Project Settings" :activeProject="activeProject" :backends="backends" :frontends="frontends"></project-settings>
                 <div class="d-flex select">
                   <v-select
                     v-model="activeProject.backend"
@@ -36,7 +43,7 @@
               <div>
                 <v-tooltip bottom>
                   <template v-slot:activator="{ on, attrs }">
-                    <v-btn class="mr-2" color="white" elevation="1" fab small @click="undo" v-bind="attrs" v-on="on" :disabled="undoStack.length() < 2 && isJsonPristine">
+                    <v-btn class="mr-1" color="white" elevation="1" fab small @click="undo" v-bind="attrs" v-on="on" :disabled="undoStack.length() < 2 && isJsonPristine">
                       <v-icon color="primary">mdi-undo</v-icon>
                     </v-btn>
                   </template>
@@ -44,7 +51,7 @@
                 </v-tooltip>
                 <v-tooltip bottom v-if="$store.state.auth.jwt">
                   <template v-slot:activator="{ on, attrs }">
-                    <v-btn class="mr-2" color="white" elevation="1" fab small @click="save" v-bind="attrs" v-on="on" :disabled="saveDisabled">
+                    <v-btn class="mr-1" color="white" elevation="1" fab small @click="save" v-bind="attrs" v-on="on" :disabled="saveDisabled">
                       <v-icon color="primary">mdi-floppy</v-icon>
                     </v-btn>
                     </template>
@@ -52,7 +59,7 @@
                 </v-tooltip>
                 <v-tooltip bottom>
                   <template v-slot:activator="{ on, attrs }">
-                    <v-btn class="mr-2" color="white" elevation="1" fab small :disabled="activeProject.json === ''" @click="onPrettyPrintClicked" v-bind="attrs" v-on="on">
+                    <v-btn class="mr-1" color="white" elevation="1" fab small :disabled="activeProject.json === ''" @click="onPrettyPrintClicked" v-bind="attrs" v-on="on">
                       <v-icon color="primary">mdi-format-align-left</v-icon>
                     </v-btn>
                   </template>
@@ -61,7 +68,7 @@
 
                 <v-tooltip bottom>
                   <template v-slot:activator="{ on, attrs }">
-                    <v-btn class="mr-2" color="white" elevation="1" fab small :disabled="isPristine || generateLoading || activeProject.name === ''" @click="onGenerateClicked" v-bind="attrs" v-on="on">
+                    <v-btn class="mr-1" color="white" elevation="1" fab small :disabled="isPristine || generateLoading || activeProject.name === ''" @click="onGenerateClicked" v-bind="attrs" v-on="on">
                       <v-icon color="primary" v-if="!generateLoading">mdi-arrow-right-bold</v-icon>
                       <div v-if="generateLoading">
                         <v-progress-circular
@@ -100,10 +107,10 @@
               <div class="d-flex">
                 <v-tooltip bottom>
                   <template v-slot:activator="{ on, attrs }">
-                    <v-btn color="white" v-if="isCompare" class="mr-2" elevation="1" @click="setCompare()" fab small v-bind="attrs" v-on="on">
+                    <v-btn color="white" v-if="isCompare" class="mr-1" elevation="1" @click="setCompare()" fab small v-bind="attrs" v-on="on">
                       <v-icon color="primary">mdi-file-compare</v-icon>
                     </v-btn>
-                    <v-btn color="rgba(255, 255, 255, 0.2)" v-else class="mr-2" elevation="0" @click="setCompare()" fab small v-bind="attrs" v-on="on">
+                    <v-btn color="rgba(255, 255, 255, 0.2)" v-else class="mr-1" elevation="0" @click="setCompare()" fab small v-bind="attrs" v-on="on">
                       <v-icon color="rgba(255, 255, 255, 0.7)">mdi-file-compare</v-icon>
                     </v-btn>
                   </template>
@@ -112,7 +119,7 @@
                 </v-tooltip>
                 <v-tooltip bottom>
                   <template v-slot:activator="{ on, attrs }">
-                    <v-btn color="white" class="mr-2" elevation="1" :disabled="!isPristine || downLoading || activeProject.name === ''" @click="download" fab small v-bind="attrs" v-on="on">
+                    <v-btn color="white" class="mr-1" elevation="1" :disabled="!isPristine || downLoading || activeProject.name === ''" @click="download" fab small v-bind="attrs" v-on="on">
                       <v-icon color="primary" v-if="!downLoading">mdi-download</v-icon>
                       <div v-if="downLoading">
                         <v-progress-circular
@@ -147,6 +154,7 @@ import {validateJson, prettyPrint} from '../utils/PrettyPrint';
 import {UndoStack} from '../utils/UndoStack';
 import HeadBar from '../components/HeadBar.vue';
 import Snackbar from '../components/Snackbar.vue';
+import ProjectSettings from '../components/ProjectSettings.vue';
 import {Project} from '../models/Project';
 import {GeneratedFile} from '../models/GeneratedFile';
 import {CRC32} from 'crc_32_ts';
@@ -158,6 +166,7 @@ import {Compare}from '../utils/TextCompare'
 export default Vue.extend({
   components: {
     HeadBar,
+    ProjectSettings,
     Snackbar,
     CodeMirror,
     FileBrowser,
@@ -191,7 +200,8 @@ export default Vue.extend({
       backends: ['ASP.NET'],
       frontends: ['Vue 2 + JS', 'Vue 2 + TS', 'Vue 3', 'React'],
       backend: 'ASP.NET',
-      frontend: 'Vue 2 + JS'
+      frontend: 'Vue 2 + JS',
+      prjectSettings: false,
     };
   },
   created: async function(){
@@ -242,6 +252,17 @@ export default Vue.extend({
     }
   },
   methods: {
+    saveProjectSettings: function(backend: string, frontend: string, name: string){
+      this.$gtag?.event('save-project-settings');
+      this.activeProject.backend = backend;
+      this.activeProject.frontend = frontend;
+      this.activeProject.name = name;
+      this.prjectSettings = false;
+    },
+    cancelProjectSettings: function(){
+      this.$gtag?.event('cancel-project-settings');
+      this.prjectSettings = false;
+    },
     delay: function(ms: number): Promise<void> {
       return new Promise(resolve => setTimeout(resolve, ms));
     },
@@ -494,21 +515,11 @@ export default Vue.extend({
     position: relative;
     top: -30px;
   }
-  .headBar{
-    margin-left: 40px;
-    margin-top: 17px;
+  .head{
     z-index: 99;
   }
-  @media screen and (max-width: 960px) {
-    .headBar {
-      margin-left: 70px;
-    }
-  }
-  @media screen and (max-width: 600px) {
-    .headBar {
-      margin-top: 60px;
-      margin-left: unset;
-    }
+  .freamworkSettings{
+    display: none;
   }
   .pathElement{
     cursor: pointer!important;
@@ -518,5 +529,13 @@ export default Vue.extend({
   }
   .select{
     max-width: 220px;
+  }
+  @media screen and (max-width: 600px) {
+    .d-flex.select{
+      display: none!important;
+    }
+    .freamworkSettings{
+      display: flex;
+    }
   }
 </style>

@@ -49,7 +49,7 @@
       </div>
     </v-navigation-drawer>
     <div class="d-flex mr-5">
-      <v-app-bar app color="transparent" flat height="75" class="navPosition" :data-value="$route.name !== 'Editor'">
+      <v-app-bar app color="transparent" flat height="75" width="max-content" style="z-index:101;" :data-value="$route.name !== 'Editor'">
         <v-btn class="mr-3" @click="setNavDraver()" elevation="1" fab small>
           <v-icon v-if="drawer">mdi-dots-vertical</v-icon>
           <v-icon v-else>mdi-view-quilt</v-icon>
@@ -59,7 +59,7 @@
       <v-spacer></v-spacer>
       <v-switch
         v-if="$route.name !== 'Editor'"
-        style="z-index:999;"
+        style="z-index:99;"
         v-model="darkTheme"
         label="Dark Mode"
       ></v-switch>
@@ -189,9 +189,6 @@ export default {
   }
   main{
     padding-top: unset!important;
-  }
-  .navPosition{
-    position: absolute!important;
   }
   .navCookie{
     color: #eee;

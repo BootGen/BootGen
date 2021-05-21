@@ -1,12 +1,12 @@
 <template>
-  <v-container fluid>
-    <v-row>
+  <v-container fluid class="pa-0 ma-0">
+    <v-row class="headBar d-flex">
       <v-col cols="12" class="pa-0 d-flex align-center justify-space-between flex-wrap">
         <div class="d-flex align-center">
           <v-toolbar-title class="font-weight-light mr-2">Editor -</v-toolbar-title>
           <ValidationObserver>
             <ValidationProvider v-slot="{ errors }" name="Project name" rules="required">
-              <v-text-field v-model="activeProjectName" placeholder="Name your project" type="text" :error-messages="errors" required @input="changeName"></v-text-field>
+              <v-text-field v-model="projectName" placeholder="Name your project" type="text" :error-messages="errors" required @input="changeName"></v-text-field>
             </ValidationProvider>
           </ValidationObserver>
           <v-btn class="mr-0 ml-3" color="primary" small @click="dialog = true" v-if="$store.state.auth.jwt">New project</v-btn>
@@ -20,36 +20,7 @@
         </div>
       </v-col>
     </v-row>
-    <v-dialog v-model="dialog" width="400" persistent>
-      <v-card class="pa-0 ma-0">
-        <v-card-title>
-          <span class="headline">Create new project</span>
-        </v-card-title>
-        <ValidationObserver v-slot="{ invalid }">
-          <v-card-text class="pb-0">
-            <ValidationProvider v-slot="{ errors }" name="Project name" rules="required">
-              <v-text-field v-model="projectName" placeholder="Name your project" type="text" :error-messages="errors" required></v-text-field>
-            </ValidationProvider>
-            <v-select
-              v-model="backend"
-              :items="backends"
-              label="Backend"              
-            ></v-select>
-            <v-select
-              v-model="frontend"
-              :items="frontends"
-              label="Frontend"             
-            ></v-select>
-            <v-alert class="text-left" type="error" v-if="errorMsg">This name is already in use, please enter another name!</v-alert>
-          </v-card-text>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn class="mr-0 ml-3" color="primary" @click="dialog = false">Cancel</v-btn>
-            <v-btn class="mr-0 ml-3" color="primary" @click="newProject" :disabled="invalid">Save</v-btn>
-          </v-card-actions>
-        </ValidationObserver>
-      </v-card>
-    </v-dialog>
+    <project-settings v-if="dialog" @save="newProject" title="Create new project" :backends="backends" :frontends="frontends"></project-settings>
   </v-container>
 </template>
 
@@ -57,6 +28,7 @@
 import Vue from 'vue';
 import { required } from 'vee-validate/dist/rules';
 import { extend, ValidationObserver, ValidationProvider } from 'vee-validate';
+import ProjectSettings from '../components/ProjectSettings.vue';
 
 extend('required', {
   ...required,
@@ -67,6 +39,7 @@ export default Vue.extend({
   components: {
     ValidationProvider,
     ValidationObserver,
+    ProjectSettings,
   },
   props: {
     activeProjectName: String,
@@ -89,6 +62,9 @@ export default Vue.extend({
       this.$gtag?.event('change-theme');
       localStorage.darkTheme = dark;
       this.$vuetify.theme.dark = dark;
+    },
+    activeProjectName(name){
+      this.projectName = name;
     }
   },
   data: function () {
@@ -96,19 +72,13 @@ export default Vue.extend({
       errorMsg: false,
       dialog: false,
       projectName: 'My Project',
-      backend: 'ASP.NET',
-      frontend: 'Vue 2 + JS',
       darkTheme: false
     };
   },
   methods: {
-    newProject: function(){
-      if(this.existsProjectName()){
-        this.errorMsg = true;
-      }else{
-        this.$emit('new-project', this.projectName, this.backend, this.frontend);
-        this.dialog = false;
-      }
+    newProject: function(backend: string, frontend: string, name: string){
+      this.$emit('new-project', name, backend, frontend);
+      this.dialog = false;
     },
     changeName: function(name: string){
       this.$emit('change-project-name', name);
@@ -116,14 +86,28 @@ export default Vue.extend({
     toLogin: function(){
       this.$gtag?.event('editor-to-login');
     },
-    existsProjectName: function(): boolean{
-      for(const i in this.$store.state.projects.items){
-        if(this.projectName === this.$store.state.projects.items[i].name){
-          return true;
-        }
-      }
-      return false;
-    },
   }
 });
 </script>
+
+<style lang="css">
+  .headBar{
+    margin-left: 0px;
+    margin-top: 32px;
+  }
+    .headBar {
+      margin-left: 70px;
+    }
+  @media screen and (max-width: 960px) {
+    .headBar {
+      margin-left: 85px;
+    }
+  }
+  @media screen and (max-width: 600px) {
+    .headBar {
+      margin: unset;
+      margin-top: 80px;
+      padding: 10px;
+    }
+  }
+</style>
