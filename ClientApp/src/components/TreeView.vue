@@ -1,11 +1,10 @@
 <template>
   <v-treeview
-    dark
-    active-class="activeFile"
     :items="tree.children"
     :active.sync="activeNodes"
     :open.sync="tree.open"
     @update:active="selectFile"
+    color="primary"
     return-object
     activatable
     hoverable
@@ -25,18 +24,13 @@
     </template>
     <template v-slot:append="{ item }">
       <p class="primary--text pa-0 ma-0 mr-1" v-if="item.change == ChangeType.Folder"><v-icon color="textOrange">mdi-circle-medium</v-icon></p>
-      <p class="primary--text pa-0 ma-0 mr-2" v-if="item.change == ChangeType.Edited && activeNodes[0] == item">M</p>
       <p class="textOrange--text pa-0 ma-0 mr-2" v-else-if="item.change == ChangeType.Edited">M</p>
-      <p class="primary--text pa-0 ma-0 mr-2" v-if="item.change == ChangeType.Created  && activeNodes[0] == item">A</p>
       <p class="textGreen--text pa-0 ma-0 mr-2" v-else-if="item.change == ChangeType.Created">A</p>
     </template>
     <template v-slot:label="{ item }">
       <p class="textOrange--text pa-0 ma-0" v-if="item.change == ChangeType.Folder">{{item.name}}</p>
-      <p class="primary--text pa-0 ma-0" v-if="item.change == ChangeType.Edited && activeNodes[0] == item">{{item.name}}</p>
       <p class="textOrange--text pa-0 ma-0" v-else-if="item.change == ChangeType.Edited">{{item.name}}</p>
-      <p class="primary--text pa-0 ma-0" v-if="item.change == ChangeType.Created && activeNodes[0] == item">{{item.name}}</p>
       <p class="textGreen--text pa-0 ma-0" v-else-if="item.change == ChangeType.Created">{{item.name}}</p>
-      <p class="primary--text pa-0 ma-0" v-if="item.change == ChangeType.Unchanged && activeNodes[0] == item">{{item.name}}</p>
       <p class="pa-0 ma-0" v-else-if="item.change == ChangeType.Unchanged">{{item.name}}</p>
     </template>
   </v-treeview>
@@ -265,9 +259,6 @@ export default Vue.extend({
 </script>
 
 <style>
-  .activeFile .v-treeview-node__content{
-    font-weight: 900;
-  }
   button.v-icon.notranslate {
     display: none;
   }
