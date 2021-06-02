@@ -198,7 +198,7 @@ export default Vue.extend({
       isCompare: true,
       showChanges: true,
       backends: ['ASP.NET'],
-      frontends: ['Vue 2 + JS', 'Vue 2 + TS', 'Vue 3', 'React'],
+      frontends: ['Vue 2 + JS', 'Vue 2 + TS'],
       backend: 'ASP.NET',
       frontend: 'Vue 2 + JS',
       prjectSettings: false,
