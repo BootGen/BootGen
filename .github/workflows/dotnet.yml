@@ -1,0 +1,29 @@
+name: Test
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 5.0.x
+        lfs: true
+    - name: Use Node.js 15.x
+      uses: actions/setup-node@v2
+      with:
+        node-version: 15.x
+    - name: Checkout LFS objects
+      run: git lfs pull
+    - name: Install dependencies (nuget)
+      run: dotnet restore
+    - name: Test
+      run: npm test:unit
+      working-directory: ./ClientApp
