@@ -25,5 +25,5 @@ jobs:
     - name: Install dependencies (nuget)
       run: dotnet restore
     - name: Test
-      run: npm test:unit
+      run: npm run test:unit
       working-directory: ./ClientApp
