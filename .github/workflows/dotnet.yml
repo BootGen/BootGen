@@ -24,6 +24,9 @@ jobs:
       run: git lfs pull
     - name: Install dependencies (nuget)
       run: dotnet restore
+    - name: Install dependencies (npm)
+      run: npm ci
+      working-directory: ./ClientApp
     - name: Test
       run: npm run test:unit
       working-directory: ./ClientApp
