@@ -42,5 +42,3 @@ jobs:
     steps:
     - name: Trigger webhook
       run: curl -s http://bootgen.com:9000/hooks/update?token=${{ secrets.WEBHOOK_TOKEN }}
-    - name: Check version
-      run: curl -s https://api.github.com/repos/BootGen/Editor/actions/artifacts?per_page=1
