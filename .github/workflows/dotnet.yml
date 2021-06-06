@@ -37,6 +37,7 @@ jobs:
         path: bin/Release/net5.0/publish
 
   deploy:
+    needs: build
     runs-on: ubuntu-latest
     steps:
     - name: Trigger webhook
