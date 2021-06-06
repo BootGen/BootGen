@@ -6,9 +6,7 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v2
     - name: Setup .NET
@@ -37,3 +35,9 @@ jobs:
       with:
         name: editor
         path: bin/Release/net5.0/publish
+
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Trigger webhook
+      run: curl http://bootgen.com:9000/hooks/update?token=${{ secrets.WEBHOOK_TOKEN }}
