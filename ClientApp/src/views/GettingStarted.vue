@@ -13,7 +13,7 @@
         Online project generator for ASP.Net 5 with Vue.js
       </h2>
       <p>
-        BootGen generates for you an ASP.Net 5 project with Vue.js based on the sample JSON data you provide. From this sample data it infers the types you need, and creates entity classes, data services, controllers and Vuex state management that fits your use case.
+        BootGen generates an ASP.Net 5 project with Vue.js based on the sample JSON data you provide. From this sample data it infers the types you need, and creates entity classes, data services, controllers and Vuex state management that fits your use case.
       </p>
       <div class="slogan">
         <v-btn to="/editor" color="primary"> Try Online </v-btn>
