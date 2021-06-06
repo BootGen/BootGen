@@ -7,11 +7,10 @@
         alt="BootGen logo"
       ></v-img>
       <h1 class="slogan">
-        Rapidly prototype yor next ASP.Net 5 - Vue.js application!
+        Don’t start from scratch!
       </h1>
       <h2 class="slogan">
-        Turns JSON sample data into working web application with best practices
-        applied.
+        Online project generator for ASP.Net 5 with Vue.js
       </h2>
       <div class="slogan">
         <v-btn to="/editor" color="primary"> Try Online </v-btn>
