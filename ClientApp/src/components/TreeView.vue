@@ -262,7 +262,4 @@ export default Vue.extend({
   button.v-icon.notranslate {
     display: none;
   }
-  .v-treeview {
-    font-family: 'Inconsolata';
-  }
 </style>
