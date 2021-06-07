@@ -84,7 +84,7 @@ export default {
     snackbar: {
       dismissible: false,
       visible: true,
-      type: 'third',
+      type: 'primary',
       icon: 'mdi-cookie-alert',
       text: 'We use cookies to improve your experience on our website.',
       timeout: -1,
@@ -194,11 +194,11 @@ export default {
     color: #eee;
   }
   a.repositoryLink{
-    color: #00A170!important;
+    color: #006FC5!important;
     text-decoration: none;
   }
   a.repositoryLink:hover{
-    color: #656867 !important;
+    color: #209EF0 !important;
   }
   footer {
     text-align: center;

@@ -171,7 +171,7 @@ export default Vue.extend({
     color: #3C4C72;
   }
   .cm-s-material .CodeMirror-cursor {
-    border-left: 1px solid #656867;
+    border-left: 1px solid #209EF0;
   }
   .cm-s-material .cm-keyword {
     color: #904bbb;

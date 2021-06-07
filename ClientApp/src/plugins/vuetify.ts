@@ -5,20 +5,18 @@ import '@/sass/overrides.sass'
 Vue.use(Vuetify)
 
 const lightTheme = {
-  primary: '#00A170',
-  secondary: '#656867',
-  third: '#00A170',
-  accent: '#656867',
+  primary: '#006FC5',
+  secondary: '#209EF0',
+  accent: '#209EF0',
   info: '#00CAE3',
   textOrange: '#fc825d',
   textGreen: '#29af56',
 }
 
 const darkTheme = {
-  primary: '#00A170',
-  secondary: '#656867',
-  third: '#00A170',
-  accent: '#656867',
+  primary: '#006FC5',
+  secondary: '#209EF0',
+  accent: '#209EF0',
   info: '#00CAE3',
   white: '#eee',
   textOrange: '#F78C6C',
