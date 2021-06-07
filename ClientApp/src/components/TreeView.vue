@@ -15,7 +15,7 @@
       <v-icon :color="$vuetify.theme.dark ? '#eee' : '#3C4C72'" v-if="item.type == 'folder'">
         {{ open ? 'mdi-chevron-down ' : 'mdi-chevron-right' }}
       </v-icon>
-      <v-icon :color="darkColors[item.type]" v-else-if="$vuetify.theme.dark">
+      <v-icon :color="colors[item.type]" v-else-if="$vuetify.theme.dark">
         {{ icons[item.type] }}
       </v-icon>
       <v-icon :color="colors[item.type]" v-else>
@@ -93,18 +93,11 @@ export default Vue.extend({
       filesById: Array<GeneratedFile>(),
       id: 0,
       colors: {
-        cs: '#457cf3',
-        vue: '#29af56',
-        ts: '#457cf3',
-        yml: '#dd4850',
-        js: '#d8b60d',
-      },
-      darkColors: {
-        cs: '#82AAFF',
-        vue: '#C3E88D',
-        ts: '#82AAFF',
-        yml: '#F07178',
-        js: '#DECB6B',
+        cs: '#0277BD',
+        vue: '#41B883',
+        ts: '#0288D1',
+        yml: '#F44336',
+        js: '#FFCA28',
       },
       icons: {
         cs: 'mdi-language-csharp',

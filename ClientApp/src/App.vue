@@ -32,7 +32,7 @@
         </div>
       </v-list>
       <div class="ma-4">
-        <div class="container-fluid d-flex flex-column navCookie" v-if="!cookieConsentAnswered">
+        <div class="container-fluid d-flex flex-column" v-if="!cookieConsentAnswered">
           <div class="container pl-0 align-center">
             <v-icon class="pr-2" color="primary" large>{{ snackbar.icon }}</v-icon>
             <span class="secondary--text">{{ snackbar.text }}</span>
@@ -50,7 +50,7 @@
     </v-navigation-drawer>
     <div class="d-flex mr-5">
       <v-app-bar app color="transparent" flat height="75" width="max-content" style="z-index:101;" :data-value="$route.name !== 'Editor'">
-        <v-btn class="mr-3" @click="setNavDraver()" elevation="1" fab small>
+        <v-btn class="mr-3" :color="this.$vuetify.theme.dark ? '#1E1E1E' : 'FFFFFF'" @click="setNavDraver()" elevation="1" fab small>
           <v-icon v-if="drawer">mdi-dots-vertical</v-icon>
           <v-icon v-else>mdi-view-quilt</v-icon>
         </v-btn>
@@ -75,7 +75,6 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
 import Snackbar from './components/Snackbar.vue';
 
 export default {
@@ -174,10 +173,10 @@ export default {
 
 <style lang="css">
   .theme--light .v-application--wrap{
-    background-color: #eee;
+    background-color: #F3F3F3;
   }
   .theme--dark .v-application--wrap{
-    background-color: #363636;
+    background-color: #252526;
   }
   .v-application--wrap nav{
     z-index: 999;
@@ -189,9 +188,6 @@ export default {
   }
   main{
     padding-top: unset!important;
-  }
-  .navCookie{
-    color: #eee;
   }
   a.repositoryLink{
     color: #006FC5!important;

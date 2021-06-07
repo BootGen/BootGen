@@ -331,7 +331,7 @@ export default Vue.extend({
               const compare = new Compare(this.activeFile.content.split('\n'), this.previousFiles[i].content.split('\n'));
               const changes = compare.getChanges();
               changes.forEach(v =>{
-                this.highlightedDifferences.push({ line : v, color:'rgba(0, 161, 112, 0.3)' })
+                this.highlightedDifferences.push({ line : v, color:'rgba(0, 111, 197, 0.3)' })
               })
               break;
             }
