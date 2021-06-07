@@ -93,18 +93,18 @@ export default Vue.extend({
       filesById: Array<GeneratedFile>(),
       id: 0,
       colors: {
-        cs: '#457cf3',
-        vue: '#29af56',
-        ts: '#457cf3',
-        yml: '#dd4850',
-        js: '#d8b60d',
+        cs: '#267F99',
+        vue: '#008000',
+        ts: '#267F99',
+        yml: '#FF0000',
+        js: '#dbc021',
       },
       darkColors: {
-        cs: '#82AAFF',
-        vue: '#C3E88D',
-        ts: '#82AAFF',
-        yml: '#F07178',
-        js: '#DECB6B',
+        cs: '#569CD6',
+        vue: '#6A9955',
+        ts: '#569CD6',
+        yml: '#D16969',
+        js: '#DCDC8B',
       },
       icons: {
         cs: 'mdi-language-csharp',
@@ -262,7 +262,7 @@ export default Vue.extend({
   button.v-icon.notranslate {
     display: none;
   }
-  .theme--light .v-treeview {
-    color: #3C4C72!important;
+  .v-treeview {
+    font-family: 'Inconsolata';
   }
 </style>
