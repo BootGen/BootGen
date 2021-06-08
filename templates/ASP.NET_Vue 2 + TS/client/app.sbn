@@ -55,12 +55,13 @@ export default {
             link: '/change-password',
             icon: 'mdi-form-textbox-password',
           },
-          { title: 'Logout', link: '/logout', icon: 'mdi-account-arrow-right-outline' }{{ for class in classes }},
+          { title: 'Logout', link: '/logout', icon: 'mdi-account-arrow-right-outline' },
+          {{~ for class in classes ~}}
           {
             title: '{{ class.name.plural }}',
             link: '/{{ camel_case class.name.plural }}',
             icon: 'mdi-format-list-text',
-          }
+          }{{if !for.last}},{{end}}
           {{~ end ~}}
         ];
       } else {
@@ -70,7 +71,7 @@ export default {
             title: 'Sign Up',
             link: 'sign-up',
             icon: 'mdi-account-plus-outline',
-          },
+          }
         ];
       }
     },

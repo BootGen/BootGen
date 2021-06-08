@@ -1,17 +1,17 @@
-import Vue from 'vue'
-import VueRouter, {NavigationGuardNext, Route, RouteConfig} from 'vue-router'
-import Login from '../views/Login.vue'
-import Logout from '../views/Logout.vue'
-import SignUp from '../views/SignUp.vue'
-import Profile from '../views/Profile.vue'
-import ChangePassword from '../views/ChangePassword.vue'
-import EditProfile from '../views/EditProfile.vue'
-import store from '../store'
+import Vue from 'vue';
+import VueRouter, {NavigationGuardNext, Route, RouteConfig} from 'vue-router';
+import Login from '../views/Login.vue';
+import Logout from '../views/Logout.vue';
+import SignUp from '../views/SignUp.vue';
+import Profile from '../views/Profile.vue';
+import ChangePassword from '../views/ChangePassword.vue';
+import EditProfile from '../views/EditProfile.vue';
+import store from '../store';
 {{~ for class in classes ~}}
-import {{ class.name }}List from '../views/{{ class.name }}List.vue'
+import {{ class.name }}List from '../views/{{ class.name }}List.vue';
 {{~ end ~}}
 
-Vue.use(VueRouter)
+Vue.use(VueRouter);
 
 const loggedInGuard = (to: Route, from: Route, next: NavigationGuardNext) => {
   if(store.state.auth.jwt){
@@ -64,13 +64,14 @@ const loggedOutGuard = (to: Route, from: Route, next: NavigationGuardNext) => {
     name: 'Logout',
     beforeEnter: loggedInGuard,
     component: Logout
-  }{{ for class in classes }},
+  },
+  {{~ for class in classes ~}}
   {
     path: '/{{ camel_case class.name.plural }}',
     name: '{{ class.name.plural }}',
     beforeEnter: loggedInGuard,
     component: {{ class.name }}List
-  }
+  }{{if !for.last}},{{end}}
   {{~ end ~}}
 ]
 
@@ -80,4 +81,4 @@ const router = new VueRouter({
   routes
 })
 
-export default router
+export default router;
