@@ -16,18 +16,17 @@ function transformResponse(response) {
 }
 
 function config(jwt) {
-  return {headers: {'Authorization': 'Bearer ' + jwt}, transformResponse: transformResponse };
+  return {headers: {'Authorization': `Bearer ${jwt}`}, transformResponse: transformResponse };
 }
 
 {{~ for resource in resources ~}}
 function {{ camel_case resource.class.name }}ToDto({{ camel_case resource.class.name }}) {
   return {
     {{~ for property in resource.class.common_properties~}}
-    {{ camel_case property.name }}: {{ camel_case resource.class.name }}.{{ camel_case property.name }},
+    {{ camel_case property.name }}: {{ camel_case resource.class.name }}.{{ camel_case property.name }}{{if !for.last}},{{end}}
     {{~ end ~}}
   };
 }
-
 {{~ end ~}}
 
 const api = {
