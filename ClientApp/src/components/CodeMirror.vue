@@ -65,6 +65,9 @@ export default Vue.extend({
           this.focus();
         }
       }
+    },
+    readOnly: function(readOnly: boolean){
+      this.cmOptions.readOnly = readOnly;
     }
   },
   updated: function() {

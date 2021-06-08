@@ -2,8 +2,8 @@
   <v-container fluid class="editor">
     <v-row class="d-flex">
       <v-col cols="12" class="head pa-0">
-        <head-bar v-if="$store.state.auth.jwt" :activeProjectName="activeProject.name" :backends="backends" :frontends="frontends" @new-project="createNewProject" @change-project-name="changeProjectName"></head-bar>
-        <head-bar v-else :activeProjectName="activeProject.name" @new-project="createNewProject" @change-project-name="changeProjectName"></head-bar>
+        <head-bar v-if="$store.state.auth.jwt" :activeProjectName="activeProject.name" :backends="backends" :frontends="frontends" :disabled="generateLoading" @new-project="createNewProject" @change-project-name="changeProjectName"></head-bar>
+        <head-bar v-else :activeProjectName="activeProject.name" :disabled="generateLoading" @new-project="createNewProject" @change-project-name="changeProjectName"></head-bar>
       </v-col>
     </v-row>
     <v-row class="d-flex align-center">
@@ -16,7 +16,7 @@
                 <v-icon class="mr-1">mdi-arrow-right</v-icon>
                 <v-tooltip bottom>
                   <template v-slot:activator="{ on, attrs }">
-                    <v-btn class="mr-1 freamworkSettings" color="white" elevation="1" @click="prjectSettings = true" fab small v-bind="attrs" v-on="on">
+                    <v-btn class="mr-1 freamworkSettings" color="white" elevation="1" @click="prjectSettings = true" fab small v-bind="attrs" v-on="on" :disabled="generateLoading">
                       <v-icon color="primary">mdi-cog</v-icon>
                     </v-btn>
                   </template>
@@ -29,21 +29,23 @@
                     :items="backends"
                     @change="change('backend')"
                     dense
-                    hide-details              
+                    hide-details
+                    :disabled="generateLoading"
                   ></v-select>
                   <v-select
                     v-model="activeProject.frontend"
                     :items="frontends"
                     @change="change('frontend')"
                     dense
-                    hide-details                
+                    hide-details
+                    :disabled="generateLoading"
                   ></v-select>
                 </div>
               </div>
               <div>
                 <v-tooltip bottom>
                   <template v-slot:activator="{ on, attrs }">
-                    <v-btn class="mr-1" color="white" elevation="1" fab small @click="undo" v-bind="attrs" v-on="on" :disabled="undoStack.length() < 2 && isJsonPristine">
+                    <v-btn class="mr-1" color="white" elevation="1" fab small @click="undo" v-bind="attrs" v-on="on" :disabled="(undoStack.length() < 2 && isJsonPristine) || generateLoading">
                       <v-icon color="primary">mdi-undo</v-icon>
                     </v-btn>
                   </template>
@@ -51,7 +53,7 @@
                 </v-tooltip>
                 <v-tooltip bottom v-if="$store.state.auth.jwt">
                   <template v-slot:activator="{ on, attrs }">
-                    <v-btn class="mr-1" color="white" elevation="1" fab small @click="save" v-bind="attrs" v-on="on" :disabled="saveDisabled">
+                    <v-btn class="mr-1" color="white" elevation="1" fab small @click="save" v-bind="attrs" v-on="on" :disabled="saveDisabled || generateLoading">
                       <v-icon color="primary">mdi-floppy</v-icon>
                     </v-btn>
                     </template>
@@ -59,7 +61,7 @@
                 </v-tooltip>
                 <v-tooltip bottom>
                   <template v-slot:activator="{ on, attrs }">
-                    <v-btn class="mr-1" color="white" elevation="1" fab small :disabled="activeProject.json === ''" @click="onPrettyPrintClicked" v-bind="attrs" v-on="on">
+                    <v-btn class="mr-1" color="white" elevation="1" fab small :disabled="activeProject.json === '' || generateLoading" @click="onPrettyPrintClicked" v-bind="attrs" v-on="on">
                       <v-icon color="primary">mdi-format-align-left</v-icon>
                     </v-btn>
                   </template>
@@ -84,7 +86,7 @@
               </div>
             </div>
           </template>
-          <code-mirror cmId="cm0" v-model="activeProject.json" mode="json" :readOnly="false" :linesToColor="jsonErrors" @change-json="removeErrors"></code-mirror>
+          <code-mirror cmId="cm0" v-model="activeProject.json" mode="json" :readOnly="generateLoading" :linesToColor="jsonErrors" @change-json="removeErrors"></code-mirror>
         </base-material-generator-card>
       </v-col>
       <v-col xl="5" lg="5" md="8" sm="8" class="pr-0 pl-0">

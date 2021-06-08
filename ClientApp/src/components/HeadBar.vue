@@ -6,10 +6,10 @@
           <v-toolbar-title class="font-weight-light mr-2">Editor -</v-toolbar-title>
           <ValidationObserver>
             <ValidationProvider v-slot="{ errors }" name="Project name" rules="required">
-              <v-text-field v-model="projectName" placeholder="Name your project" type="text" :error-messages="errors" required @input="changeName"></v-text-field>
+              <v-text-field v-model="projectName" placeholder="Name your project" type="text" :error-messages="errors" required @input="changeName" :disabled="disabled"></v-text-field>
             </ValidationProvider>
           </ValidationObserver>
-          <v-btn class="mr-0 ml-3" color="primary" small @click="dialog = true" v-if="$store.state.auth.jwt">New project</v-btn>
+          <v-btn class="mr-0 ml-3" color="primary" small @click="dialog = true" v-if="$store.state.auth.jwt" :disabled="disabled">New project</v-btn>
         </div>
         <div class="d-flex align-center mr-5">
           <span class="mr-5" v-if="!$store.state.auth.jwt">for save<router-link class="pl-2" to="/login" @click="toLogin()">sign in</router-link></span>
@@ -49,6 +49,7 @@ export default Vue.extend({
     frontends: {
       type: Array as () => Array<string>
     },
+    disabled: Boolean
   },
   mounted(){
     if(localStorage.darkTheme === 'true'){
