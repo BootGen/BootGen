@@ -96,14 +96,14 @@ export default Vue.extend({
         cs: '#267F99',
         vue: '#008000',
         ts: '#267F99',
-        yml: '#FF0000',
+        yml: '#AF00DB',
         js: '#dbc021',
       },
       darkColors: {
         cs: '#569CD6',
         vue: '#6A9955',
         ts: '#569CD6',
-        yml: '#D16969',
+        yml: '#AF00DB',
         js: '#DCDC8B',
       },
       icons: {
@@ -111,7 +111,7 @@ export default Vue.extend({
         vue: 'mdi-vuejs',
         ts: 'mdi-language-typescript',
         js: 'mdi-language-javascript',
-        yml: 'mdi-api',
+        yml: 'mdi-exclamation-thick ',
       },
       ChangeType: ChangeType,
     };
