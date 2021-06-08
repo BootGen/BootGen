@@ -308,7 +308,9 @@ export default Vue.extend({
         }
         this.backend = this.activeProject.backend;
         this.frontend = this.activeProject.frontend;
-        this.undoStack.push(this.activeProject.json);
+        if(this.undoStack.top()?.content !== this.activeProject.json){
+          this.undoStack.push(this.activeProject.json);
+        }
         this.setActiveFile();
         this.generateLoading = false;
       }
@@ -374,7 +376,6 @@ export default Vue.extend({
         this.setSnackbar('orange darken-2', result.message, -1);
       }
       this.activeProject.json = prettyPrint(this.activeProject.json);
-      this.hideSnackbar();
     },
     createNewProject: async function(name: string, backend: string, frontend: string){
       this.$gtag?.event('create-new-project');
@@ -396,7 +397,6 @@ export default Vue.extend({
       this.jsonErrors = [];
       const result = validateJson(this.activeProject.json);
       if(!result.error) {
-        this.hideSnackbar();
         this.callPrettyPrint();
         const jsonLength = this.getJsonLength(this.activeProject.json);
         if(jsonLength > 2000) {
@@ -417,7 +417,9 @@ export default Vue.extend({
       this.snackbar.visible = true;
     },
     hideSnackbar: function(){
-      this.snackbar.visible = false;
+      if(this.snackbar.type === 'error'){
+        this.snackbar.visible = false;
+      }
     },
     getProjectByName: function(projectName: string): Project | null{
       for(const i in this.$store.state.projects.items){
