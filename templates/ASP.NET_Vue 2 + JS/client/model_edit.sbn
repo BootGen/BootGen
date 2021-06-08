@@ -26,7 +26,7 @@
         {{~ else ~}}
           {{~ if (get_type property) == "number" ~}}
           <v-text-field type="number" v-model="edited{{ class.name }}.{{ camel_case property.name }}" dense></v-text-field>
-          {{~ else if (get_type property) == "Boolean" ~}}
+          {{~ else if (get_type property) == "boolean" ~}}
           <v-checkbox v-model="edited{{ class.name }}.{{ camel_case property.name }}"></v-checkbox>
           {{~ else ~}}
           <v-text-field v-model="edited{{ class.name }}.{{ camel_case property.name }}" dense></v-text-field>
