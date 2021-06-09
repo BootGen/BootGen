@@ -7,23 +7,15 @@
         alt="BootGen logo"
       ></v-img>
       <h1 class="slogan">
-        Don’t start from scratch!
+        Getting Started
       </h1>
-      <h2 class="slogan">
-        Online project generator for ASP.Net 5 with Vue.js
-      </h2>
-      <p>
-        BootGen generates an ASP.Net 5 project with Vue.js based on the sample JSON data you provide. From this sample data it infers the types you need, and creates entity classes, data services, controllers and Vuex state management that fits your use case.
-      </p>
-      <div class="slogan">
-        <v-btn to="/editor" color="primary"> Try Online </v-btn>
-      </div>
-      <h2>Getting Started</h2>
       <p>To start using BootGen all you need to do, is to create a sample dataset for your next application in JSON. You do not need to install anything, and you do not need to register. Just go to the editor, and enjoy the head start for your project!</p>
-
-      <h3>An Example JSON Input</h3>
+      <div class="slogan">
+        <v-btn class="ma-2" to="/editor" color="primary"> Try Online </v-btn>
+      </div>
+      <h2>An Example JSON Input</h2>
       <codemirror :value="example" :options="cmOptions" />
-      <h3>Conventions</h3>
+      <h2>Conventions</h2>
       <ul>
         <li>
           Property and class names should be camelCase. Casing will be set in
@@ -37,7 +29,7 @@
           form of names will be used.
         </li>
       </ul>
-      <h3>Hinting</h3>
+      <h2>Hinting</h2>
 
       You can give hints in the form of comments for the generator. Hints can be
       placed at the beginning of arrays. Possible hints:
@@ -126,15 +118,7 @@ export default Vue.extend({
 .CodeMirror {
   height: auto;
 }
-.theme--light .code{
-  font-family: 'Inconsolata';
-  background-color: #eee;
-}
-.theme--dark .code{
-  font-family: 'Inconsolata';
-  background-color: #666;
-}
-h3, h2 {
+h2 {
   margin-top: 30px;
   margin-bottom: 30px;
 }
