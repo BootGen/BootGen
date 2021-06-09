@@ -102,17 +102,17 @@ export default {
   mounted(){
     if(localStorage.cookieConsentAnswered) this.cookieConsentAnswered = localStorage.cookieConsentAnswered;
     if(localStorage.cookiesAccepted) this.cookiesAccepted = localStorage.cookiesAccepted;
-    if(localStorage.darkTheme === 'true'){
-      this.darkTheme = true;
-    }else{
+    if(localStorage.darkTheme === 'false'){
       this.darkTheme = false;
+    }else{
+      this.darkTheme = true;
     }
   },
   updated: function(){
-    if(localStorage.darkTheme === 'true'){
-      this.darkTheme = true;
-    }else{
+    if(localStorage.darkTheme === 'false'){
       this.darkTheme = false;
+    }else{
+      this.darkTheme = true;
     }
   },
   watch:{
