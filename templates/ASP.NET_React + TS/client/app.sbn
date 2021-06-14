@@ -1,0 +1,27 @@
+import * as React from 'react';
+import './custom.css';
+import { Route, Switch } from 'react-router';
+import Layout from './components/Layout';
+import Home from './components/Home';
+import Login from './components/Login';
+import ChangePassword from './components/ChangePassword';
+import SignUp from './components/SignUp';
+import Profile from './components/Profile';
+import Logout from './components/Logout';
+import EditProfile from './components/EditProfile';
+import TaskList from './components/TaskList';
+
+export default () => (
+    <Layout>
+        <Switch>
+            <Route exact path='/' component={Home} />
+            <Route exact path='/login' component={Login} />
+            <Route exact path='/sign-up' component={SignUp} />
+            <Route exact path='/profile' component={Profile} />
+            <Route exact path='/logout' component={Logout} />
+            <Route exact path='/change-password' component={ChangePassword} />
+            <Route exact path='/edit-profile' component={EditProfile} />
+            <Route exact path='/tasks' component={TaskList} />
+        </Switch>
+    </Layout>
+);
