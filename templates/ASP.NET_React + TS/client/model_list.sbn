@@ -1,0 +1,131 @@
+import * as React from 'react';
+import { connect } from 'react-redux';
+import { ApplicationState } from '../store';
+import * as {{ class.name }}Module from '../store/{{ class.name }}Module';
+import { RouteComponentProps } from 'react-router';
+import { Box, Button, Card, CardContent, Checkbox, Grid, TextField, Typography } from '@material-ui/core';
+import EditIcon from '@material-ui/icons/Edit';
+import CloseIcon from '@material-ui/icons/Close';
+import SaveIcon from '@material-ui/icons/Save';
+import { {{ class.name }} } from '../models/{{ class.name }}';
+
+interface {{ class.name }}ListState {
+  {{ camel_case class.name.plural }}: Array<{{ class.name }}>,
+  edited{{ class.name }}: {{ class.name }} | null,
+}
+
+type {{ class.name }}ListProps =
+  {{ class.name }}Module.{{ class.name }}State &
+  typeof {{ class.name }}Module.actionCreators &
+  RouteComponentProps<{}>;
+
+class {{ class.name }}List extends React.PureComponent<{{ class.name }}ListProps, {{ class.name }}ListState> {
+  constructor(props: any) {
+    super(props);
+    this.state = {
+      {{ camel_case class.name.plural }}: [],
+      edited{{ class.name }}: null,
+    };
+  }
+  public async componentDidMount() {
+    const {{ camel_case class.name.plural }} = await this.props.get{{ class.name }}sAsync();
+    this.setState({ {{ camel_case class.name.plural }}: {{ camel_case class.name.plural }} });
+  }
+  public filterDate(date: Date) {
+    return `${date.toLocaleDateString('en-US')}, ${date.toLocaleTimeString('en-US')}`;
+  }
+  public async save{{ class.name }}({{ camel_case class.name }}: {{ class.name }}){
+    await this.props.update{{ class.name }}Async({{ camel_case class.name }});
+    this.setState({edited{{ class.name }}: null});
+  }
+  public async cancelEdit{{ class.name }}(){
+    const {{ camel_case class.name.plural }} = await this.props.get{{ class.name }}sAsync();
+    this.setState({ {{ camel_case class.name.plural }}: {{ camel_case class.name.plural }} });
+    this.setState({edited{{ class.name }}: null});
+  }
+  public print{{ class.name.plural }}(){
+    return this.state.{{ camel_case class.name.plural }}.map(({{ camel_case class.name }}: {{ class.name }}) => 
+      <Grid item sm={12} md={6} lg={4} key={ {{ camel_case class.name }}.id}>
+        <Card>
+          <CardContent>
+            <Box display="flex" justifyContent="flex-end" pb={2}>
+              <Button variant="contained" color="primary" onClick={() => this.setState({edited{{ class.name }}: {{ camel_case class.name }} })}><EditIcon /></Button>
+            </Box>
+            <Typography component="div">
+              {{~ for property in class.common_properties ~}}
+              <Box display="flex" pb={2}>
+                <Box width={1/2}>{{ camel_case property.name }}:</Box>
+                {{~ if (get_type property) == "Date" ~}}
+                <Box width={1/2}>{this.filterDate({{ camel_case class.name }}.{{ camel_case property.name }})}</Box>
+                {{~ else ~}}
+                <Box width={1/2}>{ {{ camel_case class.name }}.{{ camel_case property.name }} }</Box>
+                {{~ end ~}}
+              </Box>
+              {{~ end ~}}
+            </Typography>
+          </CardContent>
+        </Card>
+      </Grid>
+    )
+  }
+  public printEdited{{ class.name }}({{ camel_case class.name }}: {{ class.name }}){
+    return <Grid item sm={12} md={6} lg={4} key={ {{ camel_case class.name }}.id}>
+      <Card>
+        <CardContent>
+          <Box display="flex" justifyContent="flex-end" pb={2}>
+            <Button variant="contained" color="primary" onClick={() => this.save{{ class.name }}({{ camel_case class.name }})}><SaveIcon /></Button>
+            <Button variant="contained" color="primary" onClick={() => this.cancelEdit{{ class.name }}()}><CloseIcon /></Button>
+          </Box>
+          <Typography component="div">
+            {{~ for property in class.common_properties ~}}
+            {{~ if (camel_case property.name) != "userId" ~}}
+            <Box display="flex" pb={2}>
+              <Box width={1/2}>{{ camel_case property.name }}:</Box>
+              {{~ if property.name == "Created" || property.name == "Updated" ~}}
+              <Box width={1/2}>{this.filterDate({{ camel_case class.name }}.{{ camel_case property.name }})}</Box>
+              {{~ else if property.name == "Id" ~}}
+              <Box width={1/2}>{ {{ camel_case class.name }}.{{ camel_case property.name }} }</Box>
+              {{~ else if (get_type property) == "Date" ~}}
+              <TextField type="datetime-local" defaultValue={ {{ camel_case class.name }}.{{ camel_case property.name }} } onChange={e => {{ camel_case class.name }}.{{ camel_case property.name }} = new Date(e.target.value)}></TextField>
+              {{~ else if (get_type property) == "number" ~}}             
+              <TextField type="number" defaultValue={ {{ camel_case class.name }}.{{ camel_case property.name }} } onChange={e => {{ camel_case class.name }}.{{ camel_case property.name }} = parseFloat(e.target.value)}></TextField>
+              {{~ else if (get_type property) == "boolean" ~}}              
+              <Checkbox
+                defaultChecked={ {{ camel_case class.name }}.{{ camel_case property.name }} }
+                onChange={e => {{ camel_case class.name }}.{{ camel_case property.name }} = e.target.checked}
+                color="primary"
+              />
+              {{~ else ~}}
+              <TextField defaultValue={ {{ camel_case class.name }}.{{ camel_case property.name }} } onChange={e => {{ camel_case class.name }}.{{ camel_case property.name }} = e.target.value}></TextField>
+              {{~ end ~}}
+            </Box>
+            {{~ end ~}}
+            {{~ end ~}}
+          </Typography>
+        </CardContent>
+      </Card>
+    </Grid>
+  }
+  public render() {
+    let content;
+    if(this.state.edited{{ class.name }}){
+      content = this.printEdited{{ class.name }}(this.state.edited{{ class.name }});
+    }else{
+      content = this.print{{ class.name.plural }}();
+    }
+    return (
+      <React.Fragment>
+        <Box display="flex" flexDirection="column">
+          <Grid container spacing={3}>
+            {content}
+          </Grid>
+        </Box>
+      </React.Fragment>
+    );
+  }
+};
+
+export default connect(
+  (state: ApplicationState) => state.auth,
+  {{ class.name }}Module.actionCreators
+)({{ class.name }}List);
