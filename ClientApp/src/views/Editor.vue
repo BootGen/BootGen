@@ -212,7 +212,7 @@ export default Vue.extend({
     if(this.$store.state.projects.lastProject.json){
       this.viewModel.activeProject = this.$store.state.projects.lastProject;
       this.viewModel.generatedFiles = [...this.$store.state.projects.lastGeneratedFiles];
-      this.backend = this.$store.state.projects.lastProject.backend;
+      this.viewModel.backend = this.$store.state.projects.lastProject.backend;
       this.frontend = this.$store.state.projects.lastProject.frontend;
       this.callPrettyPrint();
       this.viewModel.undoStack.push(this.viewModel.activeProject.json);
@@ -230,7 +230,7 @@ export default Vue.extend({
       if(top){
         if((top.crc32 === CRC32.str(this.viewModel.activeProject.json)) &&
           (this.viewModel.crc32ProjectName === CRC32.str(this.viewModel.activeProject.name)) &&
-          (this.backend === this.viewModel.activeProject.backend) &&
+          (this.viewModel.backend === this.viewModel.activeProject.backend) &&
           (this.frontend === this.viewModel.activeProject.frontend)
         ){
           return true;
@@ -301,13 +301,13 @@ export default Vue.extend({
         this.$store.commit('projects/setLastProject', this.viewModel.activeProject);
         this.$store.commit('projects/setLastGeneratedFiles', this.viewModel.generatedFiles);
         this.viewModel.crc32ProjectName = CRC32.str(this.viewModel.activeProject.name);
-        if(this.viewModel.activeProject.backend === this.backend && this.viewModel.activeProject.frontend === this.frontend){
+        if(this.viewModel.activeProject.backend === this.viewModel.backend && this.viewModel.activeProject.frontend === this.frontend){
           this.showChanges = true;
           this.highlightedDifferences = [];
         }else{1
           this.showChanges = false;
         }
-        this.backend = this.viewModel.activeProject.backend;
+        this.viewModel.backend = this.viewModel.activeProject.backend;
         this.frontend = this.viewModel.activeProject.frontend;
         if(this.viewModel.undoStack.top()?.content !== this.viewModel.activeProject.json){
           this.viewModel.undoStack.push(this.viewModel.activeProject.json);

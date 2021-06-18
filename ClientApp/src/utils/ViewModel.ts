@@ -12,5 +12,20 @@ export class ViewModel {
     activeProject: Project = {id: -1, ownerId: -1, name: 'My Project', json: '', backend: 'ASP.NET', frontend: 'Vue 2 + JS'};
     activeFile: GeneratedFile = {name: '', path: '', content: ''};
     jsonErrors = Array<{line: number; color: string}>();
+    backend = 'ASP.NET';
+    frontend = 'Vue 2 + JS';
+    public get isPristine(): boolean {
+        const top = this.undoStack.top();
+        if(top){
+            if((top.crc32 === CRC32.str(this.activeProject.json)) &&
+                (this.crc32ProjectName === CRC32.str(this.activeProject.name)) &&
+                (this.backend === this.activeProject.backend) &&
+                (this.frontend === this.activeProject.frontend)
+            ){
+                return true;
+            }
+        }
+        return false;
+    }
     setSnackbar: (type: string, text: string, timeout: number) => void = function (type: string, text: string, timeout: number) {console.log('setSnackbar')};
 }
