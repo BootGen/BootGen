@@ -141,7 +141,14 @@
         </base-material-generator-card>
       </v-col>
       <v-col xl="2" lg="2" md="4" sm="4" class="pr-0 pl-0">
-        <file-browser :generatedFiles="generatedFiles" :previousFiles="previousFiles" :openPath="openPath" :isCompare="showChanges" @select-file="selectFile"></file-browser>
+        <base-material-generator-card>
+          <template v-slot:heading>
+            <div class="d-flex align-center justify-space-between pa-2">
+              <div class="display-1 font-weight-light pa-2">Generated Files</div>
+            </div>
+          </template>
+          <file-browser :files="generatedFiles" :previousFiles="previousFiles" :openPath="openPath" :isCompare="showChanges" @select-file="selectFile"></file-browser>
+        </base-material-generator-card>
       </v-col>
     </v-row>
     <snackbar v-if="snackbar.visible" :snackbar="snackbar"></snackbar>
