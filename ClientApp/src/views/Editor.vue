@@ -2,8 +2,8 @@
   <v-container fluid class="editor">
     <v-row class="d-flex">
       <v-col cols="12" class="head pa-0">
-        <head-bar v-if="$store.state.auth.jwt" :activeProjectName="activeProject.name" :backends="backends" :frontends="frontends" :disabled="generateLoading" @new-project="createNewProject" @change-project-name="changeProjectName"></head-bar>
-        <head-bar v-else :activeProjectName="activeProject.name" :disabled="generateLoading" @new-project="createNewProject" @change-project-name="changeProjectName"></head-bar>
+        <head-bar v-if="$store.state.auth.jwt" :activeProjectName="viewModel.activeProject.name" :backends="backends" :frontends="frontends" :disabled="generateLoading" @new-project="createNewProject" @change-project-name="changeProjectName"></head-bar>
+        <head-bar v-else :activeProjectName="viewModel.activeProject.name" :disabled="generateLoading" @new-project="createNewProject" @change-project-name="changeProjectName"></head-bar>
       </v-col>
     </v-row>
     <v-row class="d-flex align-center">
@@ -25,7 +25,7 @@
                 <project-settings v-if="prjectSettings" @save="saveProjectSettings" @cancel="cancelProjectSettings" title="Project Settings" :activeProject="activeProject" :backends="backends" :frontends="frontends"></project-settings>
                 <div class="d-flex select">
                   <v-select
-                    v-model="activeProject.backend"
+                    v-model="viewModel.activeProject.backend"
                     :items="backends"
                     @change="change('backend')"
                     dense
@@ -33,7 +33,7 @@
                     :disabled="generateLoading"
                   ></v-select>
                   <v-select
-                    v-model="activeProject.frontend"
+                    v-model="viewModel.activeProject.frontend"
                     :items="frontends"
                     @change="change('frontend')"
                     dense
@@ -45,7 +45,7 @@
               <div>
                 <v-tooltip bottom>
                   <template v-slot:activator="{ on, attrs }">
-                    <v-btn class="mr-1" color="white" elevation="1" fab small @click="undo" v-bind="attrs" v-on="on" :disabled="(undoStack.length() < 2 && isJsonPristine) || generateLoading">
+                    <v-btn class="mr-1" color="white" elevation="1" fab small @click="undo" v-bind="attrs" v-on="on" :disabled="(viewModel.undoStack.length() < 2 && isJsonPristine) || generateLoading">
                       <v-icon color="primary">mdi-undo</v-icon>
                     </v-btn>
                   </template>
@@ -61,7 +61,7 @@
                 </v-tooltip>
                 <v-tooltip bottom>
                   <template v-slot:activator="{ on, attrs }">
-                    <v-btn class="mr-1" color="white" elevation="1" fab small :disabled="activeProject.json === '' || generateLoading" @click="onPrettyPrintClicked" v-bind="attrs" v-on="on">
+                    <v-btn class="mr-1" color="white" elevation="1" fab small :disabled="viewModel.activeProject.json === '' || generateLoading" @click="onPrettyPrintClicked" v-bind="attrs" v-on="on">
                       <v-icon color="primary">mdi-format-align-left</v-icon>
                     </v-btn>
                   </template>
@@ -70,7 +70,7 @@
 
                 <v-tooltip bottom>
                   <template v-slot:activator="{ on, attrs }">
-                    <v-btn class="mr-1" color="white" elevation="1" fab small :disabled="isPristine || generateLoading || activeProject.name === ''" @click="onGenerateClicked" v-bind="attrs" v-on="on">
+                    <v-btn class="mr-1" color="white" elevation="1" fab small :disabled="isPristine || generateLoading || viewModel.activeProject.name === ''" @click="onGenerateClicked" v-bind="attrs" v-on="on">
                       <v-icon color="primary" v-if="!generateLoading">mdi-arrow-right-bold</v-icon>
                       <div v-if="generateLoading">
                         <v-progress-circular
@@ -86,24 +86,24 @@
               </div>
             </div>
           </template>
-          <code-mirror cmId="cm0" v-model="activeProject.json" mode="json" :readOnly="generateLoading" :linesToColor="jsonErrors" @change-json="removeErrors"></code-mirror>
+          <code-mirror cmId="cm0" v-model="viewModel.activeProject.json" mode="json" :readOnly="generateLoading" :linesToColor="viewModel.jsonErrors" @change-json="removeErrors"></code-mirror>
         </base-material-generator-card>
       </v-col>
       <v-col xl="5" lg="5" md="8" sm="8" class="pr-0 pl-0">
         <base-material-generator-card>
           <template v-slot:heading>
             <div class="d-flex display-1 font-weight-light align-center justify-space-between pa-2">
-              <div class="text-break" v-if="activeFile.path && activeFile.path !== ''">
-                <span class="pathElement" v-for="(part, i) in activeFile.path.split('/')" :key="i" @click="openFolder(i+1)">
+              <div class="text-break" v-if="viewModel.activeFile.path && viewModel.activeFile.path !== ''">
+                <span class="pathElement" v-for="(part, i) in viewModel.activeFile.path.split('/')" :key="i" @click="openFolder(i+1)">
                   {{ part }} /
                 </span>
-                <span class="pathElement" @click="openFolder(activeFile.path.split('/').length)">
-                  {{ activeFile.name }}
+                <span class="pathElement" @click="openFolder(viewModel.activeFile.path.split('/').length)">
+                  {{ viewModel.activeFile.name }}
                 </span>
               </div>
               <div v-else>
                 <span class="pathElement" @click="openFolder(0)">
-                  {{ activeFile.name }}
+                  {{ viewModel.activeFile.name }}
                 </span>
               </div>
               <div class="d-flex">
@@ -121,7 +121,7 @@
                 </v-tooltip>
                 <v-tooltip bottom>
                   <template v-slot:activator="{ on, attrs }">
-                    <v-btn color="white" class="mr-1" elevation="1" :disabled="!isPristine || downLoading || activeProject.name === ''" @click="download" fab small v-bind="attrs" v-on="on">
+                    <v-btn color="white" class="mr-1" elevation="1" :disabled="!isPristine || downLoading || viewModel.activeProject.name === ''" @click="download" fab small v-bind="attrs" v-on="on">
                       <v-icon color="primary" v-if="!downLoading">mdi-download</v-icon>
                       <div v-if="downLoading">
                         <v-progress-circular
@@ -137,7 +137,7 @@
               </div>
             </div>
           </template>
-          <code-mirror cmId="cm1" :value="activeFile.content" :mode="getMode()" :readOnly="true" :linesToColor="highlightedDifferences"></code-mirror>
+          <code-mirror cmId="cm1" :value="viewModel.activeFile.content" :mode="getMode()" :readOnly="true" :linesToColor="highlightedDifferences"></code-mirror>
         </base-material-generator-card>
       </v-col>
       <v-col xl="2" lg="2" md="4" sm="4" class="pr-0 pl-0">
@@ -147,7 +147,7 @@
               <div class="display-1 font-weight-light pa-2">Generated Files</div>
             </div>
           </template>
-          <file-browser :files="generatedFiles" :previousFiles="previousFiles" :openPath="openPath" :isCompare="showChanges" @select-file="selectFile"></file-browser>
+          <file-browser :files="viewModel.generatedFiles" :previousFiles="viewModel.previousFiles" :openPath="openPath" :isCompare="showChanges" @select-file="selectFile"></file-browser>
         </base-material-generator-card>
       </v-col>
     </v-row>
@@ -160,7 +160,6 @@ import Vue from 'vue';
 import CodeMirror from '../components/CodeMirror.vue';
 import FileBrowser from '../components/FileBrowser.vue';
 import {validateJson, prettyPrint} from '../utils/PrettyPrint';
-import {UndoStack} from '../utils/UndoStack';
 import HeadBar from '../components/HeadBar.vue';
 import Snackbar from '../components/Snackbar.vue';
 import ProjectSettings from '../components/ProjectSettings.vue';
@@ -171,6 +170,7 @@ import axios from 'axios';
 import api from '../api'
 import {GenerateResponse} from '../models/GenerateResponse';
 import {Compare}from '../utils/TextCompare'
+import {ViewModel}from '../utils/ViewModel'
 
 export default Vue.extend({
   components: {
@@ -182,14 +182,8 @@ export default Vue.extend({
   },
   data: function () {
     return {
-      generatedFiles: Array<GeneratedFile>(),
-      previousFiles: Array<GeneratedFile>(),
-      undoStack: new UndoStack(),
-      crc32ProjectName: CRC32.str('My Project'),
-      crc32Saved: 0,
-      activeProject: {id: -1, ownerId: -1, name: 'My Project', json: '', backend: 'ASP.NET', frontend: 'Vue 2 + JS'},
+      viewModel: new ViewModel(),
       newProject: {id: -1, ownerId: -1, name: 'My Project', json: '', backend: 'ASP.NET', frontend: 'Vue 2 + JS'},
-      activeFile: {} as GeneratedFile,
       snackbar: {
         dismissible: true,
         visible: false,
@@ -198,7 +192,6 @@ export default Vue.extend({
         text: '',
         timeout: 5000,
       },
-      jsonErrors: Array<{line: number; color: string}>(),
       highlightedDifferences: Array<{line: number; color: string}>(),
       drawer: false,
       openPath: '',
@@ -214,30 +207,31 @@ export default Vue.extend({
     };
   },
   created: async function(){
+    this.viewModel.setSnackbar = this.setSnackbar;
     this.newProject.json = JSON.stringify((await axios.get(`${this.$root.$data.baseUrl}/new_project_input.json`, {responseType: 'json'})).data);
     if(this.$store.state.projects.lastProject.json){
-      this.activeProject = this.$store.state.projects.lastProject;
-      this.generatedFiles = [...this.$store.state.projects.lastGeneratedFiles];
+      this.viewModel.activeProject = this.$store.state.projects.lastProject;
+      this.viewModel.generatedFiles = [...this.$store.state.projects.lastGeneratedFiles];
       this.backend = this.$store.state.projects.lastProject.backend;
       this.frontend = this.$store.state.projects.lastProject.frontend;
       this.callPrettyPrint();
-      this.undoStack.push(this.activeProject.json);
+      this.viewModel.undoStack.push(this.viewModel.activeProject.json);
       this.setActiveFile();
-      this.crc32Saved = this.crc32ForSaving;
-      this.crc32ProjectName = CRC32.str(this.activeProject.name);
+      this.viewModel.crc32Saved = this.crc32ForSaving;
+      this.viewModel.crc32ProjectName = CRC32.str(this.viewModel.activeProject.name);
     }else{
-      this.activeProject.json = (await axios.get(`${this.$root.$data.baseUrl}/example_input.json`, {responseType: 'text'})).data;
+      this.viewModel.activeProject.json = (await axios.get(`${this.$root.$data.baseUrl}/example_input.json`, {responseType: 'text'})).data;
       await this.validateAndGenerate();
     }
   },
   computed: {
     isPristine: function(): boolean {
-      const top = this.undoStack.top();
+      const top = this.viewModel.undoStack.top();
       if(top){
-        if((top.crc32 === CRC32.str(this.activeProject.json)) &&
-          (this.crc32ProjectName === CRC32.str(this.activeProject.name)) &&
-          (this.backend === this.activeProject.backend) &&
-          (this.frontend === this.activeProject.frontend)
+        if((top.crc32 === CRC32.str(this.viewModel.activeProject.json)) &&
+          (this.viewModel.crc32ProjectName === CRC32.str(this.viewModel.activeProject.name)) &&
+          (this.backend === this.viewModel.activeProject.backend) &&
+          (this.frontend === this.viewModel.activeProject.frontend)
         ){
           return true;
         }
@@ -245,27 +239,27 @@ export default Vue.extend({
       return false;
     },
     isJsonPristine: function(): boolean {
-      const top = this.undoStack.top();
+      const top = this.viewModel.undoStack.top();
       if(top){
-        if(top.crc32 === CRC32.str(this.activeProject.json)){
+        if(top.crc32 === CRC32.str(this.viewModel.activeProject.json)){
           return true;
         }
       }
       return false;
     },
     crc32ForSaving: function(): number {
-      return CRC32.str(this.activeProject.name + this.activeProject.json);
+      return CRC32.str(this.viewModel.activeProject.name + this.viewModel.activeProject.json);
     },
     saveDisabled: function(): boolean {
-      return this.crc32Saved === this.crc32ForSaving;
+      return this.viewModel.crc32Saved === this.crc32ForSaving;
     }
   },
   methods: {
     saveProjectSettings: function(backend: string, frontend: string, name: string){
       this.$gtag?.event('save-project-settings');
-      this.activeProject.backend = backend;
-      this.activeProject.frontend = frontend;
-      this.activeProject.name = name;
+      this.viewModel.activeProject.backend = backend;
+      this.viewModel.activeProject.frontend = frontend;
+      this.viewModel.activeProject.name = name;
       this.prjectSettings = false;
     },
     cancelProjectSettings: function(){
@@ -276,47 +270,47 @@ export default Vue.extend({
       return new Promise(resolve => setTimeout(resolve, ms));
     },
     getMode: function(): string {
-      if(this.activeFile.name){
-        return this.activeFile.name.split('.')[1];
+      if(this.viewModel.activeFile.name){
+        return this.viewModel.activeFile.name.split('.')[1];
       }
       return '';
     },
     removeErrors: function(){
-      this.jsonErrors = [];
+      this.viewModel.jsonErrors = [];
       this.hideSnackbar();
     },
     generate: async function(){
       if(!this.generateLoading){
         this.generateLoading = true;
         const generateResult: GenerateResponse = await api.generate({
-          data: this.activeProject.json,
-          nameSpace: this.toCamelCase(this.activeProject.name),
-          backend: this.activeProject.backend,
-          frontend: this.activeProject.frontend
+          data: this.viewModel.activeProject.json,
+          nameSpace: this.toCamelCase(this.viewModel.activeProject.name),
+          backend: this.viewModel.activeProject.backend,
+          frontend: this.viewModel.activeProject.frontend
         });
         if(generateResult.errorMessage){
           this.setSnackbar('orange darken-2', generateResult.errorMessage, -1);
           if(generateResult.errorLine !== null){
-            this.jsonErrors.push({line: generateResult.errorLine-1, color: 'rgba(255, 0, 0, 0.3)'});
+            this.viewModel.jsonErrors.push({line: generateResult.errorLine-1, color: 'rgba(255, 0, 0, 0.3)'});
           }
           this.generateLoading = false;
           return;
         }
-        this.previousFiles = [...this.generatedFiles];
-        this.generatedFiles = generateResult.generatedFiles;
-        this.$store.commit('projects/setLastProject', this.activeProject);
-        this.$store.commit('projects/setLastGeneratedFiles', this.generatedFiles);
-        this.crc32ProjectName = CRC32.str(this.activeProject.name);
-        if(this.activeProject.backend === this.backend && this.activeProject.frontend === this.frontend){
+        this.viewModel.previousFiles = [...this.viewModel.generatedFiles];
+        this.viewModel.generatedFiles = generateResult.generatedFiles;
+        this.$store.commit('projects/setLastProject', this.viewModel.activeProject);
+        this.$store.commit('projects/setLastGeneratedFiles', this.viewModel.generatedFiles);
+        this.viewModel.crc32ProjectName = CRC32.str(this.viewModel.activeProject.name);
+        if(this.viewModel.activeProject.backend === this.backend && this.viewModel.activeProject.frontend === this.frontend){
           this.showChanges = true;
           this.highlightedDifferences = [];
         }else{1
           this.showChanges = false;
         }
-        this.backend = this.activeProject.backend;
-        this.frontend = this.activeProject.frontend;
-        if(this.undoStack.top()?.content !== this.activeProject.json){
-          this.undoStack.push(this.activeProject.json);
+        this.backend = this.viewModel.activeProject.backend;
+        this.frontend = this.viewModel.activeProject.frontend;
+        if(this.viewModel.undoStack.top()?.content !== this.viewModel.activeProject.json){
+          this.viewModel.undoStack.push(this.viewModel.activeProject.json);
         }
         this.setActiveFile();
         this.generateLoading = false;
@@ -334,12 +328,12 @@ export default Vue.extend({
       }
     },
     setHighlightedDifferences: function(){
-      if(this.previousFiles.length > 0 && this.isCompare){
+      if(this.viewModel.previousFiles.length > 0 && this.isCompare){
         this.highlightedDifferences = [];
         if(this.showChanges){
-          for(let i = 0; i < this.previousFiles.length; i++){
-            if(this.previousFiles[i].name === this.activeFile.name && this.previousFiles[i].path === this.activeFile.path){
-              const compare = new Compare(this.activeFile.content.split('\n'), this.previousFiles[i].content.split('\n'));
+          for(let i = 0; i < this.viewModel.previousFiles.length; i++){
+            if(this.viewModel.previousFiles[i].name === this.viewModel.activeFile.name && this.viewModel.previousFiles[i].path === this.viewModel.activeFile.path){
+              const compare = new Compare(this.viewModel.activeFile.content.split('\n'), this.viewModel.previousFiles[i].content.split('\n'));
               const changes = compare.getChanges();
               changes.forEach(v =>{
                 this.highlightedDifferences.push({ line : v, color:'rgba(0, 111, 197, 0.3)' })
@@ -357,18 +351,18 @@ export default Vue.extend({
       return json.length;
     },
     setSelectedFile: function (fileName: string, filePath: string) {
-      for (let i = 0; i < this.generatedFiles.length; i++) {
-        if (this.generatedFiles[i].name === fileName && this.generatedFiles[i].path === filePath) {
-          this.activeFile = this.generatedFiles[i];
+      for (let i = 0; i < this.viewModel.generatedFiles.length; i++) {
+        if (this.viewModel.generatedFiles[i].name === fileName && this.viewModel.generatedFiles[i].path === filePath) {
+          this.viewModel.activeFile = this.viewModel.generatedFiles[i];
           break;
         }
       }
     },
     setActiveFile: function(){
-      if(!this.activeFile.name){
+      if(!this.viewModel.activeFile.name){
         this.setSelectedFile('restapi.yml', '');
       }else{
-        this.setSelectedFile(this.activeFile.name, this.activeFile.path);
+        this.setSelectedFile(this.viewModel.activeFile.name, this.viewModel.activeFile.path);
       }
       this.setHighlightedDifferences();
     },
@@ -377,22 +371,22 @@ export default Vue.extend({
       this.callPrettyPrint();
     },
     callPrettyPrint: function(){
-      const result = validateJson(this.activeProject.json);
+      const result = validateJson(this.viewModel.activeProject.json);
       if (result.error) {
-        this.jsonErrors.push({line: result.line, color: 'rgba(255, 0, 0, 0.3)'});
+        this.viewModel.jsonErrors.push({line: result.line, color: 'rgba(255, 0, 0, 0.3)'});
         this.setSnackbar('orange darken-2', result.message, -1);
       }
-      this.activeProject.json = prettyPrint(this.activeProject.json);
+      this.viewModel.activeProject.json = prettyPrint(this.viewModel.activeProject.json);
     },
     createNewProject: async function(name: string, backend: string, frontend: string){
       this.$gtag?.event('create-new-project');
       this.newProject.name = name;
       this.newProject.backend = backend;
       this.newProject.frontend = frontend;
-      this.activeProject = {...this.newProject};
+      this.viewModel.activeProject = {...this.newProject};
       this.callPrettyPrint();
       this.save();
-      this.undoStack.clear();
+      this.viewModel.undoStack.clear();
       await this.generate();
       this.highlightedDifferences = [];
     },
@@ -401,18 +395,18 @@ export default Vue.extend({
       this.validateAndGenerate();
     },
     validateAndGenerate: async function() {
-      this.jsonErrors = [];
-      const result = validateJson(this.activeProject.json);
+      this.viewModel.jsonErrors = [];
+      const result = validateJson(this.viewModel.activeProject.json);
       if(!result.error) {
         this.callPrettyPrint();
-        const jsonLength = this.getJsonLength(this.activeProject.json);
+        const jsonLength = this.getJsonLength(this.viewModel.activeProject.json);
         if(jsonLength > 2000) {
           this.setSnackbar('orange darken-2', `Exceeded character limit: ${jsonLength} / 2000`, -1);
           return;
         }
         await this.generate();
       } else {
-        this.jsonErrors.push({line: result.line, color: 'rgba(255, 0, 0, 0.3)'});
+        this.viewModel.jsonErrors.push({line: result.line, color: 'rgba(255, 0, 0, 0.3)'});
         this.setSnackbar('orange darken-2', result.message, -1);
       }
     },
@@ -440,20 +434,20 @@ export default Vue.extend({
       if (!this.$store.state.auth.jwt)
         return;
       this.$gtag?.event('save-project');
-      if(this.activeProject.name){
-        const project = this.getProjectByName(this.activeProject.name);
-        if (!project && this.activeProject.id === -1) {
+      if(this.viewModel.activeProject.name){
+        const project = this.getProjectByName(this.viewModel.activeProject.name);
+        if (!project && this.viewModel.activeProject.id === -1) {
           this.setSnackbar('success', 'The new project was successfully created!', 5000);
-          this.crc32Saved = this.crc32ForSaving;
-          this.activeProject.id = 0;
-          this.activeProject.ownerId = this.$store.state.auth.user.id;
-          this.activeProject = await this.$store.dispatch('projects/addProject', this.activeProject);
-        } else if(project && project.id !== this.activeProject.id) {
+          this.viewModel.crc32Saved = this.crc32ForSaving;
+          this.viewModel.activeProject.id = 0;
+          this.viewModel.activeProject.ownerId = this.$store.state.auth.user.id;
+          this.viewModel.activeProject = await this.$store.dispatch('projects/addProject', this.viewModel.activeProject);
+        } else if(project && project.id !== this.viewModel.activeProject.id) {
           this.setSnackbar('error', 'This name is already in use, please enter another name!', 5000);
         } else {
-          this.crc32Saved = this.crc32ForSaving;
+          this.viewModel.crc32Saved = this.crc32ForSaving;
           this.setSnackbar('success', 'Project updated successfully!', 5000);
-          await this.$store.dispatch('projects/updateProject', this.activeProject);
+          await this.$store.dispatch('projects/updateProject', this.viewModel.activeProject);
           this.setSnackbar('success', 'Project updated successfully!', 5000);
         }
       }else{
@@ -463,11 +457,11 @@ export default Vue.extend({
     undo: async function () {
       this.$gtag?.event('undo');
       if (this.isPristine) {
-        this.undoStack.pop();
+        this.viewModel.undoStack.pop();
       }
-      const top = this.undoStack.top();
+      const top = this.viewModel.undoStack.top();
       if(top) {
-        this.activeProject.json = top.content;
+        this.viewModel.activeProject.json = top.content;
       }
       this.setSnackbar('info', 'Everything restored to its previous generated state', 5000);
     },
@@ -476,7 +470,7 @@ export default Vue.extend({
     },
     changeProjectName: function(name: string){
       this.$gtag?.event('change-project-name');
-      this.activeProject.name = name.trim();
+      this.viewModel.activeProject.name = name.trim();
     },
     download: async function() {
       if(!this.downLoading){
@@ -485,10 +479,10 @@ export default Vue.extend({
         await Promise.all([
           this.delay(3000),
           api.download({
-            data: this.activeProject.json,
-            nameSpace: this.toCamelCase(this.activeProject.name),
-            backend: this.activeProject.backend,
-            frontend: this.activeProject.frontend
+            data: this.viewModel.activeProject.json,
+            nameSpace: this.toCamelCase(this.viewModel.activeProject.name),
+            backend: this.viewModel.activeProject.backend,
+            frontend: this.viewModel.activeProject.frontend
           })
         ]);
         this.downLoading = false;
@@ -498,15 +492,15 @@ export default Vue.extend({
       this.$gtag?.event('click-on-path-element');
       this.openPath = '';
       for(let i = 0; i < idx; i++){
-        if(this.activeFile.path.split('/')[i]){
-          this.openPath += `${this.activeFile.path.split('/')[i]}/`;
+        if(this.viewModel.activeFile.path.split('/')[i]){
+          this.openPath += `${this.viewModel.activeFile.path.split('/')[i]}/`;
         }
       }
       this.openPath = this.openPath.slice(0, -1);
       this.drawer = true;
     },
     selectFile: function(data: GeneratedFile){
-      this.activeFile = data;
+      this.viewModel.activeFile = data;
       this.setHighlightedDifferences();
     },
     toCamelCase: function(str: string): string {
