@@ -90,9 +90,7 @@ export class CompareCommand implements Command {
         }
         return 'Show Changes: Off';
     }
-    public get disabled(): boolean {
-        return this.viewModel.isPristine || this.viewModel.generateLoading || this.viewModel.activeProject.name === '';
-    }
+    disabled = false;
     progress = false;
     constructor(viewModel: ViewModel) {
         this.viewModel = viewModel;
