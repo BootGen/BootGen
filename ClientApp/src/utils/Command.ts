@@ -79,3 +79,34 @@ export class GenerateCommand implements Command {
 
     }
 }
+
+export class CompareCommand implements Command {
+    name = 'set-compare';
+    viewModel: ViewModel;
+    icon = 'mdi-file-compare';
+    public get hoverText(): string {
+        if(this.viewModel.isCompare){
+            return 'Show Changes: On';
+        }
+        return 'Show Changes: Off';
+    }
+    public get disabled(): boolean {
+        return this.viewModel.isPristine || this.viewModel.generateLoading || this.viewModel.activeProject.name === '';
+    }
+    progress = false;
+    constructor(viewModel: ViewModel) {
+        this.viewModel = viewModel;
+    }
+    
+    action() {
+        if(this.viewModel.isCompare){
+            this.viewModel.isCompare = false;
+            this.viewModel.showChanges = false;
+            this.viewModel.highlightedDifferences = [];
+        }else{
+            this.viewModel.isCompare = true;
+            this.viewModel.showChanges = true;
+            this.viewModel.setHighlightedDifferences();
+        }
+    }
+}

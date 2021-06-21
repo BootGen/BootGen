@@ -109,14 +109,14 @@
               <div class="d-flex">
                 <v-tooltip bottom>
                   <template v-slot:activator="{ on, attrs }">
-                    <v-btn color="white" v-if="isCompare" class="mr-1" elevation="1" @click="setCompare()" fab small v-bind="attrs" v-on="on">
+                    <v-btn color="white" v-if="viewModel.isCompare" class="mr-1" elevation="1" @click="setCompare()" fab small v-bind="attrs" v-on="on">
                       <v-icon color="primary">mdi-file-compare</v-icon>
                     </v-btn>
                     <v-btn color="rgba(255, 255, 255, 0.2)" v-else class="mr-1" elevation="0" @click="setCompare()" fab small v-bind="attrs" v-on="on">
                       <v-icon color="rgba(255, 255, 255, 0.7)">mdi-file-compare</v-icon>
                     </v-btn>
                   </template>
-                  <span v-if="isCompare">Show Changes: On</span>
+                  <span v-if="viewModel.isCompare">Show Changes: On</span>
                   <span v-else>Show Changes: Off</span>
                 </v-tooltip>
                 <v-tooltip bottom>
@@ -137,7 +137,7 @@
               </div>
             </div>
           </template>
-          <code-mirror cmId="cm1" :value="viewModel.activeFile.content" :mode="getMode()" :readOnly="true" :linesToColor="highlightedDifferences"></code-mirror>
+          <code-mirror cmId="cm1" :value="viewModel.activeFile.content" :mode="getMode()" :readOnly="true" :linesToColor="viewModel.highlightedDifferences"></code-mirror>
         </base-material-generator-card>
       </v-col>
       <v-col xl="2" lg="2" md="4" sm="4" class="pr-0 pl-0">
@@ -147,7 +147,7 @@
               <div class="display-1 font-weight-light pa-2">Generated Files</div>
             </div>
           </template>
-          <file-browser :files="viewModel.generatedFiles" :previousFiles="viewModel.previousFiles" :openPath="openPath" :isCompare="showChanges" @select-file="selectFile"></file-browser>
+          <file-browser :files="viewModel.generatedFiles" :previousFiles="viewModel.previousFiles" :openPath="openPath" :isCompare="viewModel.showChanges" @select-file="selectFile"></file-browser>
         </base-material-generator-card>
       </v-col>
     </v-row>
@@ -192,12 +192,9 @@ export default Vue.extend({
         text: '',
         timeout: 5000,
       },
-      highlightedDifferences: Array<{line: number; color: string}>(),
       drawer: false,
       openPath: '',
       downLoading: false,
-      isCompare: true,
-      showChanges: true,
       backends: ['ASP.NET'],
       frontends: ['Vue 2 + JS', 'Vue 2 + TS'],
       prjectSettings: false,
@@ -205,6 +202,7 @@ export default Vue.extend({
   },
   created: async function(){
     this.viewModel.setSnackbar = this.setSnackbar;
+    this.viewModel.setHighlightedDifferences = this.setHighlightedDifferences;
     this.newProject.json = JSON.stringify((await axios.get(`${this.$root.$data.baseUrl}/new_project_input.json`, {responseType: 'json'})).data);
     if(this.$store.state.projects.lastProject.json){
       this.viewModel.activeProject = this.$store.state.projects.lastProject;
@@ -286,10 +284,10 @@ export default Vue.extend({
         this.$store.commit('projects/setLastGeneratedFiles', this.viewModel.generatedFiles);
         this.viewModel.crc32ProjectName = CRC32.str(this.viewModel.activeProject.name);
         if(this.viewModel.activeProject.backend === this.viewModel.backend && this.viewModel.activeProject.frontend === this.viewModel.frontend){
-          this.showChanges = true;
-          this.highlightedDifferences = [];
+          this.viewModel.showChanges = true;
+          this.viewModel.highlightedDifferences = [];
         }else{
-          this.showChanges = false;
+          this.viewModel.showChanges = false;
         }
         this.viewModel.backend = this.viewModel.activeProject.backend;
         this.viewModel.frontend = this.viewModel.activeProject.frontend;
@@ -301,26 +299,26 @@ export default Vue.extend({
       }
     },
     setCompare: function(){
-      if(this.isCompare){
-        this.isCompare = false;
-        this.showChanges = false;
-        this.highlightedDifferences = [];
+      if(this.viewModel.isCompare){
+        this.viewModel.isCompare = false;
+        this.viewModel.showChanges = false;
+        this.viewModel.highlightedDifferences = [];
       }else{
-        this.isCompare = true;
-        this.showChanges = true;
+        this.viewModel.isCompare = true;
+        this.viewModel.showChanges = true;
         this.setHighlightedDifferences();
       }
     },
     setHighlightedDifferences: function(){
-      if(this.viewModel.previousFiles.length > 0 && this.isCompare){
-        this.highlightedDifferences = [];
-        if(this.showChanges){
+      if(this.viewModel.previousFiles.length > 0 && this.viewModel.isCompare){
+        this.viewModel.highlightedDifferences = [];
+        if(this.viewModel.showChanges){
           for(let i = 0; i < this.viewModel.previousFiles.length; i++){
             if(this.viewModel.previousFiles[i].name === this.viewModel.activeFile.name && this.viewModel.previousFiles[i].path === this.viewModel.activeFile.path){
               const compare = new Compare(this.viewModel.activeFile.content.split('\n'), this.viewModel.previousFiles[i].content.split('\n'));
               const changes = compare.getChanges();
               changes.forEach(v =>{
-                this.highlightedDifferences.push({ line : v, color:'rgba(0, 111, 197, 0.3)' })
+                this.viewModel.highlightedDifferences.push({ line : v, color:'rgba(0, 111, 197, 0.3)' })
               })
               break;
             }
@@ -372,7 +370,7 @@ export default Vue.extend({
       this.save();
       this.viewModel.undoStack.clear();
       await this.generate();
-      this.highlightedDifferences = [];
+      this.viewModel.highlightedDifferences = [];
     },
     onGenerateClicked: function () {
       this.$gtag?.event('generate');

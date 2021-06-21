@@ -15,6 +15,9 @@ export class ViewModel {
     backend = 'ASP.NET';
     frontend = 'Vue 2 + JS';
     generateLoading = false;
+    isCompare = true;
+    showChanges = true;
+    highlightedDifferences: Array<{line: number; color: string}> = [];
     public get isPristine(): boolean {
         const top = this.undoStack.top();
         if(top){
@@ -29,4 +32,5 @@ export class ViewModel {
         return false;
     }
     setSnackbar: (type: string, text: string, timeout: number) => void = function (type: string, text: string, timeout: number) {console.log('setSnackbar')};
+    setHighlightedDifferences: () => void = function () {console.log('setHighlightedDifferences')}
 }
