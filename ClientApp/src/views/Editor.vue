@@ -201,8 +201,6 @@ export default Vue.extend({
       showChanges: true,
       backends: ['ASP.NET'],
       frontends: ['Vue 2 + JS', 'Vue 2 + TS'],
-      backend: 'ASP.NET',
-      frontend: 'Vue 2 + JS',
       prjectSettings: false,
     };
   },
@@ -213,7 +211,7 @@ export default Vue.extend({
       this.viewModel.activeProject = this.$store.state.projects.lastProject;
       this.viewModel.generatedFiles = [...this.$store.state.projects.lastGeneratedFiles];
       this.viewModel.backend = this.$store.state.projects.lastProject.backend;
-      this.frontend = this.$store.state.projects.lastProject.frontend;
+      this.viewModel.frontend = this.$store.state.projects.lastProject.frontend;
       this.callPrettyPrint();
       this.viewModel.undoStack.push(this.viewModel.activeProject.json);
       this.setActiveFile();
@@ -231,7 +229,7 @@ export default Vue.extend({
         if((top.crc32 === CRC32.str(this.viewModel.activeProject.json)) &&
           (this.viewModel.crc32ProjectName === CRC32.str(this.viewModel.activeProject.name)) &&
           (this.viewModel.backend === this.viewModel.activeProject.backend) &&
-          (this.frontend === this.viewModel.activeProject.frontend)
+          (this.viewModel.frontend === this.viewModel.activeProject.frontend)
         ){
           return true;
         }
@@ -301,14 +299,14 @@ export default Vue.extend({
         this.$store.commit('projects/setLastProject', this.viewModel.activeProject);
         this.$store.commit('projects/setLastGeneratedFiles', this.viewModel.generatedFiles);
         this.viewModel.crc32ProjectName = CRC32.str(this.viewModel.activeProject.name);
-        if(this.viewModel.activeProject.backend === this.viewModel.backend && this.viewModel.activeProject.frontend === this.frontend){
+        if(this.viewModel.activeProject.backend === this.viewModel.backend && this.viewModel.activeProject.frontend === this.viewModel.frontend){
           this.showChanges = true;
           this.highlightedDifferences = [];
         }else{1
           this.showChanges = false;
         }
         this.viewModel.backend = this.viewModel.activeProject.backend;
-        this.frontend = this.viewModel.activeProject.frontend;
+        this.viewModel.frontend = this.viewModel.activeProject.frontend;
         if(this.viewModel.undoStack.top()?.content !== this.viewModel.activeProject.json){
           this.viewModel.undoStack.push(this.viewModel.activeProject.json);
         }
