@@ -58,5 +58,24 @@ export class PrettyPrintCommand implements Command {
         }
         this.viewModel.activeProject.json = prettyPrint(this.viewModel.activeProject.json);
     }
+}
+
+export class GenerateCommand implements Command {
+    name = 'generate';
+    viewModel: ViewModel;
+    icon = 'mdi-arrow-right-bold';
+    hoverText = 'Generate';
+    public get disabled(): boolean {
+        return this.viewModel.isPristine || this.viewModel.generateLoading || this.viewModel.activeProject.name === '';
+    }
+    public get progress(): boolean {
+        return this.viewModel.generateLoading;
+    }
+    constructor(viewModel: ViewModel) {
+        this.viewModel = viewModel;
+    }
     
+    action() {
+
+    }
 }

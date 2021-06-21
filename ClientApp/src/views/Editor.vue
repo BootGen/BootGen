@@ -2,8 +2,8 @@
   <v-container fluid class="editor">
     <v-row class="d-flex">
       <v-col cols="12" class="head pa-0">
-        <head-bar v-if="$store.state.auth.jwt" :activeProjectName="viewModel.activeProject.name" :backends="backends" :frontends="frontends" :disabled="generateLoading" @new-project="createNewProject" @change-project-name="changeProjectName"></head-bar>
-        <head-bar v-else :activeProjectName="viewModel.activeProject.name" :disabled="generateLoading" @new-project="createNewProject" @change-project-name="changeProjectName"></head-bar>
+        <head-bar v-if="$store.state.auth.jwt" :activeProjectName="viewModel.activeProject.name" :backends="backends" :frontends="frontends" :disabled="viewModel.generateLoading" @new-project="createNewProject" @change-project-name="changeProjectName"></head-bar>
+        <head-bar v-else :activeProjectName="viewModel.activeProject.name" :disabled="viewModel.generateLoading" @new-project="createNewProject" @change-project-name="changeProjectName"></head-bar>
       </v-col>
     </v-row>
     <v-row class="d-flex align-center">
@@ -16,7 +16,7 @@
                 <v-icon class="mr-1">mdi-arrow-right</v-icon>
                 <v-tooltip bottom>
                   <template v-slot:activator="{ on, attrs }">
-                    <v-btn class="mr-1 freamworkSettings" color="white" elevation="1" @click="prjectSettings = true" fab small v-bind="attrs" v-on="on" :disabled="generateLoading">
+                    <v-btn class="mr-1 freamworkSettings" color="white" elevation="1" @click="prjectSettings = true" fab small v-bind="attrs" v-on="on" :disabled="viewModel.generateLoading">
                       <v-icon color="primary">mdi-cog</v-icon>
                     </v-btn>
                   </template>
@@ -30,7 +30,7 @@
                     @change="change('backend')"
                     dense
                     hide-details
-                    :disabled="generateLoading"
+                    :disabled="viewModel.generateLoading"
                   ></v-select>
                   <v-select
                     v-model="viewModel.activeProject.frontend"
@@ -38,14 +38,14 @@
                     @change="change('frontend')"
                     dense
                     hide-details
-                    :disabled="generateLoading"
+                    :disabled="viewModel.generateLoading"
                   ></v-select>
                 </div>
               </div>
               <div>
                 <v-tooltip bottom>
                   <template v-slot:activator="{ on, attrs }">
-                    <v-btn class="mr-1" color="white" elevation="1" fab small @click="undo" v-bind="attrs" v-on="on" :disabled="(viewModel.undoStack.length() < 2 && isJsonPristine) || generateLoading">
+                    <v-btn class="mr-1" color="white" elevation="1" fab small @click="undo" v-bind="attrs" v-on="on" :disabled="(viewModel.undoStack.length() < 2 && isJsonPristine) || viewModel.generateLoading">
                       <v-icon color="primary">mdi-undo</v-icon>
                     </v-btn>
                   </template>
@@ -53,7 +53,7 @@
                 </v-tooltip>
                 <v-tooltip bottom v-if="$store.state.auth.jwt">
                   <template v-slot:activator="{ on, attrs }">
-                    <v-btn class="mr-1" color="white" elevation="1" fab small @click="save" v-bind="attrs" v-on="on" :disabled="saveDisabled || generateLoading">
+                    <v-btn class="mr-1" color="white" elevation="1" fab small @click="save" v-bind="attrs" v-on="on" :disabled="saveDisabled || viewModel.generateLoading">
                       <v-icon color="primary">mdi-floppy</v-icon>
                     </v-btn>
                     </template>
@@ -61,7 +61,7 @@
                 </v-tooltip>
                 <v-tooltip bottom>
                   <template v-slot:activator="{ on, attrs }">
-                    <v-btn class="mr-1" color="white" elevation="1" fab small :disabled="viewModel.activeProject.json === '' || generateLoading" @click="onPrettyPrintClicked" v-bind="attrs" v-on="on">
+                    <v-btn class="mr-1" color="white" elevation="1" fab small :disabled="viewModel.activeProject.json === '' || viewModel.generateLoading" @click="onPrettyPrintClicked" v-bind="attrs" v-on="on">
                       <v-icon color="primary">mdi-format-align-left</v-icon>
                     </v-btn>
                   </template>
@@ -70,9 +70,9 @@
 
                 <v-tooltip bottom>
                   <template v-slot:activator="{ on, attrs }">
-                    <v-btn class="mr-1" color="white" elevation="1" fab small :disabled="viewModel.isPristine || generateLoading || viewModel.activeProject.name === ''" @click="onGenerateClicked" v-bind="attrs" v-on="on">
-                      <v-icon color="primary" v-if="!generateLoading">mdi-arrow-right-bold</v-icon>
-                      <div v-if="generateLoading">
+                    <v-btn class="mr-1" color="white" elevation="1" fab small :disabled="viewModel.isPristine || viewModel.generateLoading || viewModel.activeProject.name === ''" @click="onGenerateClicked" v-bind="attrs" v-on="on">
+                      <v-icon color="primary" v-if="!viewModel.generateLoading">mdi-arrow-right-bold</v-icon>
+                      <div v-if="viewModel.generateLoading">
                         <v-progress-circular
                           indeterminate
                           :size="25"
@@ -86,7 +86,7 @@
               </div>
             </div>
           </template>
-          <code-mirror cmId="cm0" v-model="viewModel.activeProject.json" mode="json" :readOnly="generateLoading" :linesToColor="viewModel.jsonErrors" @change-json="removeErrors"></code-mirror>
+          <code-mirror cmId="cm0" v-model="viewModel.activeProject.json" mode="json" :readOnly="viewModel.generateLoading" :linesToColor="viewModel.jsonErrors" @change-json="removeErrors"></code-mirror>
         </base-material-generator-card>
       </v-col>
       <v-col xl="5" lg="5" md="8" sm="8" class="pr-0 pl-0">
@@ -195,7 +195,6 @@ export default Vue.extend({
       highlightedDifferences: Array<{line: number; color: string}>(),
       drawer: false,
       openPath: '',
-      generateLoading: false,
       downLoading: false,
       isCompare: true,
       showChanges: true,
@@ -265,8 +264,8 @@ export default Vue.extend({
       this.hideSnackbar();
     },
     generate: async function(){
-      if(!this.generateLoading){
-        this.generateLoading = true;
+      if(!this.viewModel.generateLoading){
+        this.viewModel.generateLoading = true;
         const generateResult: GenerateResponse = await api.generate({
           data: this.viewModel.activeProject.json,
           nameSpace: this.toCamelCase(this.viewModel.activeProject.name),
@@ -278,7 +277,7 @@ export default Vue.extend({
           if(generateResult.errorLine !== null){
             this.viewModel.jsonErrors.push({line: generateResult.errorLine-1, color: 'rgba(255, 0, 0, 0.3)'});
           }
-          this.generateLoading = false;
+          this.viewModel.generateLoading = false;
           return;
         }
         this.viewModel.previousFiles = [...this.viewModel.generatedFiles];
@@ -289,7 +288,7 @@ export default Vue.extend({
         if(this.viewModel.activeProject.backend === this.viewModel.backend && this.viewModel.activeProject.frontend === this.viewModel.frontend){
           this.showChanges = true;
           this.highlightedDifferences = [];
-        }else{1
+        }else{
           this.showChanges = false;
         }
         this.viewModel.backend = this.viewModel.activeProject.backend;
@@ -298,7 +297,7 @@ export default Vue.extend({
           this.viewModel.undoStack.push(this.viewModel.activeProject.json);
         }
         this.setActiveFile();
-        this.generateLoading = false;
+        this.viewModel.generateLoading = false;
       }
     },
     setCompare: function(){

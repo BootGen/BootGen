@@ -14,6 +14,7 @@ export class ViewModel {
     jsonErrors = Array<{line: number; color: string}>();
     backend = 'ASP.NET';
     frontend = 'Vue 2 + JS';
+    generateLoading = false;
     public get isPristine(): boolean {
         const top = this.undoStack.top();
         if(top){
