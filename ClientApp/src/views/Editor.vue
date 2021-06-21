@@ -70,7 +70,7 @@
 
                 <v-tooltip bottom>
                   <template v-slot:activator="{ on, attrs }">
-                    <v-btn class="mr-1" color="white" elevation="1" fab small :disabled="isPristine || generateLoading || viewModel.activeProject.name === ''" @click="onGenerateClicked" v-bind="attrs" v-on="on">
+                    <v-btn class="mr-1" color="white" elevation="1" fab small :disabled="viewModel.isPristine || generateLoading || viewModel.activeProject.name === ''" @click="onGenerateClicked" v-bind="attrs" v-on="on">
                       <v-icon color="primary" v-if="!generateLoading">mdi-arrow-right-bold</v-icon>
                       <div v-if="generateLoading">
                         <v-progress-circular
@@ -121,7 +121,7 @@
                 </v-tooltip>
                 <v-tooltip bottom>
                   <template v-slot:activator="{ on, attrs }">
-                    <v-btn color="white" class="mr-1" elevation="1" :disabled="!isPristine || downLoading || viewModel.activeProject.name === ''" @click="download" fab small v-bind="attrs" v-on="on">
+                    <v-btn color="white" class="mr-1" elevation="1" :disabled="!viewModel.isPristine || downLoading || viewModel.activeProject.name === ''" @click="download" fab small v-bind="attrs" v-on="on">
                       <v-icon color="primary" v-if="!downLoading">mdi-download</v-icon>
                       <div v-if="downLoading">
                         <v-progress-circular
@@ -223,19 +223,6 @@ export default Vue.extend({
     }
   },
   computed: {
-    isPristine: function(): boolean {
-      const top = this.viewModel.undoStack.top();
-      if(top){
-        if((top.crc32 === CRC32.str(this.viewModel.activeProject.json)) &&
-          (this.viewModel.crc32ProjectName === CRC32.str(this.viewModel.activeProject.name)) &&
-          (this.viewModel.backend === this.viewModel.activeProject.backend) &&
-          (this.viewModel.frontend === this.viewModel.activeProject.frontend)
-        ){
-          return true;
-        }
-      }
-      return false;
-    },
     isJsonPristine: function(): boolean {
       const top = this.viewModel.undoStack.top();
       if(top){
@@ -454,7 +441,7 @@ export default Vue.extend({
     },
     undo: async function () {
       this.$gtag?.event('undo');
-      if (this.isPristine) {
+      if (this.viewModel.isPristine) {
         this.viewModel.undoStack.pop();
       }
       const top = this.viewModel.undoStack.top();
