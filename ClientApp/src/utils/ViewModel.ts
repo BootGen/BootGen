@@ -18,6 +18,7 @@ export class ViewModel {
     isCompare = true;
     showChanges = true;
     highlightedDifferences: Array<{line: number; color: string}> = [];
+    downLoading = false;
     public get isPristine(): boolean {
         const top = this.undoStack.top();
         if(top){

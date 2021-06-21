@@ -121,9 +121,9 @@
                 </v-tooltip>
                 <v-tooltip bottom>
                   <template v-slot:activator="{ on, attrs }">
-                    <v-btn color="white" class="mr-1" elevation="1" :disabled="!viewModel.isPristine || downLoading || viewModel.activeProject.name === ''" @click="download" fab small v-bind="attrs" v-on="on">
-                      <v-icon color="primary" v-if="!downLoading">mdi-download</v-icon>
-                      <div v-if="downLoading">
+                    <v-btn color="white" class="mr-1" elevation="1" :disabled="!viewModel.isPristine || viewModel.downLoading || viewModel.activeProject.name === ''" @click="download" fab small v-bind="attrs" v-on="on">
+                      <v-icon color="primary" v-if="!viewModel.downLoading">mdi-download</v-icon>
+                      <div v-if="viewModel.downLoading">
                         <v-progress-circular
                           indeterminate
                           :size="25"
@@ -194,7 +194,6 @@ export default Vue.extend({
       },
       drawer: false,
       openPath: '',
-      downLoading: false,
       backends: ['ASP.NET'],
       frontends: ['Vue 2 + JS', 'Vue 2 + TS'],
       prjectSettings: false,
@@ -455,8 +454,8 @@ export default Vue.extend({
       this.viewModel.activeProject.name = name.trim();
     },
     download: async function() {
-      if(!this.downLoading){
-        this.downLoading = true;
+      if(!this.viewModel.downLoading){
+        this.viewModel.downLoading = true;
         this.$gtag?.event('download');
         await Promise.all([
           this.delay(3000),
@@ -467,7 +466,7 @@ export default Vue.extend({
             frontend: this.viewModel.activeProject.frontend
           })
         ]);
-        this.downLoading = false;
+        this.viewModel.downLoading = false;
       }
     },
     openFolder: function(idx: number){

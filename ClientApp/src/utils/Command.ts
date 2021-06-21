@@ -1,4 +1,5 @@
-import { prettyPrint, validateJson } from "./PrettyPrint";
+import api from '@/api';
+import { prettyPrint, validateJson } from './PrettyPrint';
 import { ViewModel } from "./ViewModel";
 
 export interface Command {
@@ -106,5 +107,45 @@ export class CompareCommand implements Command {
             this.viewModel.showChanges = true;
             this.viewModel.setHighlightedDifferences();
         }
+    }
+}
+export class DownloadCommand implements Command {
+    name = 'download';
+    viewModel: ViewModel;
+    icon = 'mdi-download';
+    hoverText = 'Download';
+    public get disabled(): boolean {
+        return !this.viewModel.isPristine || this.viewModel.downLoading || this.viewModel.activeProject.name === '';
+    }
+    public get progress(): boolean {
+        return this.viewModel.downLoading;
+    }
+    constructor(viewModel: ViewModel) {
+        this.viewModel = viewModel;
+    }
+    
+    async action() {
+        if(!this.viewModel.downLoading){
+            this.viewModel.downLoading = true;
+            await Promise.all([
+            this.delay(3000),
+            api.download({
+                data: this.viewModel.activeProject.json,
+                nameSpace: this.toCamelCase(this.viewModel.activeProject.name),
+                backend: this.viewModel.activeProject.backend,
+                frontend: this.viewModel.activeProject.frontend
+            })
+        ]);
+        this.viewModel.downLoading = false;
+      }
+    }
+    delay(ms: number): Promise<void> {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+    toCamelCase(str: string): string {
+        const nameSpace = str.replace(/(?:^\w|[A-Z]|\b\w)/g, function(word, index) {
+            return index === 0 ? word.toLowerCase() : word.toUpperCase();
+        }).replace(/\s+/g, '');
+        return `${nameSpace.charAt(0).toUpperCase()}${nameSpace.slice(1)}`;
     }
 }
