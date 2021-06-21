@@ -16,13 +16,13 @@
                 <v-icon class="mr-1">mdi-arrow-right</v-icon>
                 <v-tooltip bottom>
                   <template v-slot:activator="{ on, attrs }">
-                    <v-btn class="mr-1 freamworkSettings" color="white" elevation="1" @click="prjectSettings = true" fab small v-bind="attrs" v-on="on" :disabled="viewModel.generateLoading">
+                    <v-btn class="mr-1 freamworkSettings" color="white" elevation="1" @click="viewModel.projectSettings = true" fab small v-bind="attrs" v-on="on" :disabled="viewModel.generateLoading">
                       <v-icon color="primary">mdi-cog</v-icon>
                     </v-btn>
                   </template>
                   <span>Project settings</span>
                 </v-tooltip>
-                <project-settings v-if="prjectSettings" @save="saveProjectSettings" @cancel="cancelProjectSettings" title="Project Settings" :activeProject="activeProject" :backends="backends" :frontends="frontends"></project-settings>
+                <project-settings v-if="viewModel.projectSettings" @save="saveProjectSettings" @cancel="cancelProjectSettings" title="Project Settings" :activeProject="viewModel.activeProject" :backends="backends" :frontends="frontends"></project-settings>
                 <div class="d-flex select">
                   <v-select
                     v-model="viewModel.activeProject.backend"
@@ -196,7 +196,6 @@ export default Vue.extend({
       openPath: '',
       backends: ['ASP.NET'],
       frontends: ['Vue 2 + JS', 'Vue 2 + TS'],
-      prjectSettings: false,
     };
   },
   created: async function(){
@@ -241,11 +240,11 @@ export default Vue.extend({
       this.viewModel.activeProject.backend = backend;
       this.viewModel.activeProject.frontend = frontend;
       this.viewModel.activeProject.name = name;
-      this.prjectSettings = false;
+      this.viewModel.projectSettings = false;
     },
     cancelProjectSettings: function(){
       this.$gtag?.event('cancel-project-settings');
-      this.prjectSettings = false;
+      this.viewModel.projectSettings = false;
     },
     delay: function(ms: number): Promise<void> {
       return new Promise(resolve => setTimeout(resolve, ms));

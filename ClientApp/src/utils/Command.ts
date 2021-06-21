@@ -12,6 +12,25 @@ export interface Command {
     action: () => void
 }
 
+export class ProjectSettingsCommand implements Command {
+    name = 'project-settings';
+    viewModel: ViewModel;
+    icon = 'mdi-cog';
+    hoverText = 'Project settings';
+    public get disabled() : boolean {
+        return this.viewModel.generateLoading;
+    }
+    progress = false;
+    constructor(viewModel: ViewModel) {
+        this.viewModel = viewModel;
+    }
+
+    action() {
+        this.viewModel.projectSettings = true;
+    }
+    
+}
+
 export class UndoCommand implements Command {
     name = 'undo';
     viewModel: ViewModel;
