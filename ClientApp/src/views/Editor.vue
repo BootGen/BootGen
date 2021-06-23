@@ -195,7 +195,7 @@ export default Vue.extend({
       drawer: false,
       openPath: '',
       backends: ['ASP.NET'],
-      frontends: ['Vue 2 + JS', 'Vue 2 + TS'],
+      frontends: ['Vue 2 + JS', 'Vue 2 + TS', 'React + TS'],
     };
   },
   created: async function(){

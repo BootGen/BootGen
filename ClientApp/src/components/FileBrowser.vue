@@ -85,6 +85,7 @@ export default Vue.extend({
         ts: '#267F99',
         yml: '#AF00DB',
         js: '#dbc021',
+        tsx: '#267F99',
       },
       darkColors: {
         cs: '#569CD6',
@@ -92,6 +93,7 @@ export default Vue.extend({
         ts: '#569CD6',
         yml: '#AF00DB',
         js: '#DCDC8B',
+        tsx: '#569CD6',
       },
       icons: {
         cs: 'mdi-language-csharp',
@@ -99,6 +101,7 @@ export default Vue.extend({
         ts: 'mdi-language-typescript',
         js: 'mdi-language-javascript',
         yml: 'mdi-exclamation-thick ',
+        tsx: 'mdi-react',
       },
       ChangeType: ChangeType,
     };
