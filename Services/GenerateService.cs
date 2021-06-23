@@ -166,8 +166,12 @@ namespace Editor.Services
             var seedStore = new SeedDataStore(collection);
             seedStore.Load(jObject);
             var clientExtension = "ts";
+            var clientComponentExtension = "vue";
             if(request.Frontend.Contains("JS")){
                 clientExtension = "js";
+            }
+            if(request.Frontend.Contains("React + TS")){
+                clientComponentExtension = "tsx";
             }
             var project = new BootGen.Project
             {
@@ -176,7 +180,7 @@ namespace Editor.Services
                 EntityFolder = "Entities",
                 ClientFolder = "ClientApp/src",
                 ClientExtension = clientExtension,
-                ClientComponentExtension = "vue",
+                ClientComponentExtension = clientComponentExtension,
                 Disk = disk,
                 ResourceCollection = collection,
                 SeedStore = seedStore,
