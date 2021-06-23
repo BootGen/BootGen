@@ -1,0 +1,19 @@
+{{~ for class in classes ~}}
+import * as {{class.name}} from './{{class.name}}Module';
+{{~ end ~}}
+
+export interface ApplicationState {
+  {{~ for class in classes ~}}
+  {{camel_case class.name.plural}}: {{class.name.plural}}State;
+  {{~ end ~}}
+}
+
+export const reducers = {
+  {{~ for class in classes ~}}
+  {{camel_case class.name.plural}}: {{class.name}}.reducer{{if !for.last}},{{end}}
+  {{~ end ~}}
+};
+
+export interface AppThunkAction<TAction> {
+    (dispatch: (action: TAction) => void, getState: () => ApplicationState): void;
+}
