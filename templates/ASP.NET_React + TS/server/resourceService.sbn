@@ -1,0 +1,139 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+
+namespace {{ name_space }}.Services
+{
+    public class {{ resource.name.plural }}Service : I{{ resource.name.plural }}Service
+    {
+        {{~ class = resource.class ~}}
+        private readonly ApplicationDbContext dbContext;
+
+        public {{ resource.name.plural }}Service(ApplicationDbContext dbContext)
+        {
+            this.dbContext = dbContext;
+        }
+
+        public List<{{ class.name }}> Get{{ class.name.plural }}()
+        {
+            return dbContext.{{ class.name.plural }}.ToList();
+        }
+
+        {{~ for property in class.properties ~}}
+        {{~ if property.is_parent_reference ~}}
+        public List<{{ class.name }}> Get{{ class.name.plural }}Of{{ property.name }}(int {{ camel_case property.class.name }}Id)
+        {
+            var query = dbContext.{{ class.name.plural }}
+                                 .Where(item => item.{{ property.name }}Id == {{ camel_case property.class.name }}Id);
+            return query.ToList();
+        }
+
+        {{~ end ~}}
+        {{~ if property.is_many_to_many ~}}
+        public List<{{ class.name }}> Get{{ class.name.plural }}Of{{ property.class.name }}(int {{ camel_case property.class.name }}Id)
+        {
+            var {{ camel_case property.class.name }} = dbContext.{{ property.class.name.plural }}.Include(i => i.{{ property.mirror_property.name }}).First();
+            return {{ camel_case property.class.name }}.{{ property.mirror_property.name }};
+        }
+
+        public bool Add{{ class.name }}To{{ property.class.name }}(int {{ camel_case class.name }}Id, int {{ camel_case property.class.name }}Id)
+        {
+            var {{ camel_case property.class.name }} = dbContext.{{ property.class.name.plural }}.Include(i => i.{{ property.mirror_property.name }}).FirstOrDefault();
+            if ({{ camel_case property.class.name }} == null)
+                return false;
+            var {{ camel_case class.name }} = dbContext.{{ class.name.plural }}.Single(item => item.Id == {{ camel_case class.name }}Id);
+            if ({{ camel_case class.name }} == null)
+                return false;
+            {{ camel_case property.class.name }}.{{ property.mirror_property.name }}.Add({{ camel_case class.name }});
+            dbContext.SaveChanges();
+            return true;
+        }
+
+        public bool Remove{{ class.name }}From{{ property.class.name }}(int {{ camel_case class.name }}Id, int {{ camel_case property.class.name }}Id)
+        {
+            var {{ camel_case property.class.name }} = dbContext.{{ property.class.name.plural }}.Include(i => i.{{ property.mirror_property.name }}).FirstOrDefault();
+            if ({{ camel_case property.class.name }}.{{ property.mirror_property.name }}.All(i => i.Id != {{ camel_case class.name }}Id))
+                return false;
+            {{ camel_case property.class.name }}.{{ property.mirror_property.name }}.RemoveAll(i => i.Id == {{ camel_case class.name }}Id);
+            dbContext.SaveChanges();
+            return true;
+        }
+
+        {{~ end ~}}
+        {{~ end ~}}
+        public {{ class.name }} Get{{ class.name }}(int {{ camel_case class.name }}Id)
+        {
+            return dbContext.{{ class.name.plural }}.Single(item => item.Id == {{ camel_case class.name }}Id);
+        }
+        {{~ if !resource.is_readonly ~}}
+
+        public {{ class.name }} Add{{ class.name }}({{ class.name }} {{ camel_case class.name }})
+        {
+            {{~ if resource.has_timestamps ~}}
+            {{ camel_case class.name }}.Created = DateTime.Now;
+            {{ camel_case class.name }}.Updated = DateTime.Now;
+            {{~ end ~}}
+            {{~
+            parent = resource.parent_resource
+            ~}}
+            {{~ if parent ~}}
+            {{ camel_case class.name }}.{{ parent_id_name resource }} = {{ camel_case parent.class.name }}Id;
+            {{~ end ~}}
+            try
+            {
+                var entityEntry = dbContext.{{ class.name.plural }}.Add({{ camel_case class.name }});
+                dbContext.SaveChanges();
+                return entityEntry.Entity;
+            } catch (DbUpdateException)
+            {
+                return null;
+            }
+        }
+
+        public {{ class.name }} Update{{ class.name }}(int {{ camel_case class.name }}Id, {{ class.name }} {{ camel_case class.name }})
+        {
+            try
+            {
+                var original = dbContext.{{ class.name.plural }}
+                                        .Where(item => item.Id == {{ camel_case class.name }}Id).FirstOrDefault();
+                dbContext.{{ class.name.plural }}.Update(original);
+                {{~ for property in class.common_properties ~}}
+                {{~ if !property.is_client_readonly ~}}
+                original.{{property.name}} = {{ camel_case class.name }}.{{property.name}};
+                {{~ end ~}}
+                {{~ end ~}}
+                {{~ if resource.has_timestamps ~}}
+                original.Updated = DateTime.Now;
+                {{~ end ~}}
+                dbContext.SaveChanges();
+                return original;
+            } catch (DbUpdateException)
+            {
+                return null;
+            }
+        }
+
+        public bool Delete{{ class.name }}(int {{ camel_case class.name }}Id)
+        {
+            try
+            {
+                var item = dbContext.{{ class.name.plural }}.Where(item => item.Id == {{ camel_case class.name }}Id).FirstOrDefault();
+                if (item == null)
+                    return false;
+                dbContext.{{ class.name.plural }}.Remove(item);
+                dbContext.SaveChanges();
+                return true;
+            } catch (DbUpdateException)
+            {
+                return false;
+            }
+        }
+        {{~ end ~}}
+    }
+}
