@@ -14,14 +14,7 @@
               <div class="d-flex">
                 <span class="display-1 font-weight-light pa-2">JSON</span>
                 <v-icon class="mr-1">mdi-arrow-right</v-icon>
-                <v-tooltip bottom>
-                  <template v-slot:activator="{ on, attrs }">
-                    <v-btn class="mr-1 freamworkSettings" color="white" elevation="1" @click="viewModel.projectSettings = true" fab small v-bind="attrs" v-on="on" :disabled="viewModel.generateLoading">
-                      <v-icon color="primary">mdi-cog</v-icon>
-                    </v-btn>
-                  </template>
-                  <span>Project settings</span>
-                </v-tooltip>
+                <tool-bar class="freamworkSettings" :buttons="[projectSettingsCommand]"></tool-bar>
                 <project-settings v-if="viewModel.projectSettings" @save="saveProjectSettings" @cancel="cancelProjectSettings" title="Project Settings" :activeProject="viewModel.activeProject" :backends="backends" :frontends="frontends"></project-settings>
                 <div class="d-flex select">
                   <v-select
@@ -174,7 +167,7 @@ import api from '../api'
 import {GenerateResponse} from '../models/GenerateResponse';
 import {Compare}from '../utils/TextCompare';
 import {ViewModel}from '../utils/ViewModel';
-import { Command, UndoCommand, SaveCommand, PrettyPrintCommand, GenerateCommand, CompareCommand, DownloadCommand } from '../utils/Command';
+import { Command, ProjectSettingsCommand, UndoCommand, SaveCommand, PrettyPrintCommand, GenerateCommand, CompareCommand, DownloadCommand } from '../utils/Command';
 
 export default Vue.extend({
   components: {
@@ -188,6 +181,7 @@ export default Vue.extend({
   data: function () {
     return {
       viewModel: new ViewModel(),
+      projectSettingsCommand: null as (Command | null),
       undoCommand: null as (Command | null),
       saveCommand: null as (Command | null),
       prettyPrintCommand: null as (Command | null),
@@ -210,6 +204,7 @@ export default Vue.extend({
     };
   },
   created: async function(){
+    this.projectSettingsCommand = new ProjectSettingsCommand(this.viewModel);
     this.undoCommand = new UndoCommand(this.viewModel);
     this.saveCommand = new SaveCommand(this.viewModel);
     this.prettyPrintCommand = new PrettyPrintCommand(this.viewModel);

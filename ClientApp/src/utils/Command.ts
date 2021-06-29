@@ -18,7 +18,7 @@ export class ProjectSettingsCommand implements Command {
     icon = 'mdi-cog';
     hoverText = 'Project settings';
     public get disabled(): boolean {
-        return this.viewModel.generateLoading;
+        return !this.viewModel.generateLoading;
     }
     progress = false;
     constructor(viewModel: ViewModel) {

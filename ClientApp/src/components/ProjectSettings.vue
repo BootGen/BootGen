@@ -25,7 +25,7 @@
           <v-card-actions>
             <v-spacer></v-spacer>
             <v-btn class="mr-0 ml-3" color="primary" @click="cancel">Cancel</v-btn>
-            <v-btn class="mr-0 ml-3" color="primary" @click="save" :disabled="invalid">Save</v-btn>
+            <v-btn class="mr-0 ml-3" color="primary" @click="save" :disabled="invalid">Ok</v-btn>
           </v-card-actions>
         </ValidationObserver>
       </v-card>
