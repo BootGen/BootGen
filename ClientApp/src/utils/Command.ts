@@ -54,7 +54,23 @@ export class UndoCommand implements Command {
         }
         this.viewModel.setSnackbar('info', 'Everything restored to its previous generated state', 5000);
     }
-    
+}
+export class SaveCommand implements Command {
+    name = 'save';
+    viewModel: ViewModel;
+    icon = 'mdi-floppy';
+    hoverText = 'Save';
+    public get disabled(): boolean {
+        return !(this.viewModel.saveDisabled || this.viewModel.generateLoading);
+    }
+    progress = false;
+    constructor(viewModel: ViewModel) {
+        this.viewModel = viewModel;
+    }
+
+    action() {
+       console.log('SaveCommand'); 
+    }
 }
 
 export class PrettyPrintCommand implements Command {

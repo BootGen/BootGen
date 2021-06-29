@@ -54,7 +54,7 @@
                 </v-tooltip>
                 <v-tooltip bottom v-if="$store.state.auth.jwt">
                   <template v-slot:activator="{ on, attrs }">
-                    <v-btn class="mr-1" color="white" elevation="1" fab small @click="save" v-bind="attrs" v-on="on" :disabled="saveDisabled || viewModel.generateLoading">
+                    <v-btn class="mr-1" color="white" elevation="1" fab small @click="save" v-bind="attrs" v-on="on" :disabled="viewModel.saveDisabled || viewModel.generateLoading">
                       <v-icon color="primary">mdi-floppy</v-icon>
                     </v-btn>
                     </template>
@@ -218,19 +218,11 @@ export default Vue.extend({
       this.callPrettyPrint();
       this.viewModel.undoStack.push(this.viewModel.activeProject.json);
       this.setActiveFile();
-      this.viewModel.crc32Saved = this.crc32ForSaving;
+      this.viewModel.crc32Saved = this.viewModel.crc32ForSaving;
       this.viewModel.crc32ProjectName = CRC32.str(this.viewModel.activeProject.name);
     }else{
       this.viewModel.activeProject.json = (await axios.get(`${this.$root.$data.baseUrl}/example_input.json`, {responseType: 'text'})).data;
       await this.validateAndGenerate();
-    }
-  },
-  computed: {
-    crc32ForSaving: function(): number {
-      return CRC32.str(this.viewModel.activeProject.name + this.viewModel.activeProject.json);
-    },
-    saveDisabled: function(): boolean {
-      return this.viewModel.crc32Saved === this.crc32ForSaving;
     }
   },
   methods: {
@@ -417,14 +409,14 @@ export default Vue.extend({
         const project = this.getProjectByName(this.viewModel.activeProject.name);
         if (!project && this.viewModel.activeProject.id === -1) {
           this.setSnackbar('success', 'The new project was successfully created!', 5000);
-          this.viewModel.crc32Saved = this.crc32ForSaving;
+          this.viewModel.crc32Saved = this.viewModel.crc32ForSaving;
           this.viewModel.activeProject.id = 0;
           this.viewModel.activeProject.ownerId = this.$store.state.auth.user.id;
           this.viewModel.activeProject = await this.$store.dispatch('projects/addProject', this.viewModel.activeProject);
         } else if(project && project.id !== this.viewModel.activeProject.id) {
           this.setSnackbar('error', 'This name is already in use, please enter another name!', 5000);
         } else {
-          this.viewModel.crc32Saved = this.crc32ForSaving;
+          this.viewModel.crc32Saved = this.viewModel.crc32ForSaving;
           this.setSnackbar('success', 'Project updated successfully!', 5000);
           await this.$store.dispatch('projects/updateProject', this.viewModel.activeProject);
           this.setSnackbar('success', 'Project updated successfully!', 5000);
