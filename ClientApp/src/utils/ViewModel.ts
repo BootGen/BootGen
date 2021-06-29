@@ -33,6 +33,15 @@ export class ViewModel {
         }
         return false;
     }
+    public get isJsonPristine(): boolean {
+        const top = this.undoStack.top();
+        if(top){
+            if(top.crc32 === CRC32.str(this.activeProject.json)){
+            return true;
+            }
+        }
+        return false;
+    }
     setSnackbar: (type: string, text: string, timeout: number) => void = function (type: string, text: string, timeout: number) {console.log('setSnackbar')};
     setHighlightedDifferences: () => void = function () {console.log('setHighlightedDifferences')}
 }

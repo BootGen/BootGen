@@ -1,6 +1,6 @@
 import api from '@/api';
 import { prettyPrint, validateJson } from './PrettyPrint';
-import { ViewModel } from "./ViewModel";
+import { ViewModel } from './ViewModel';
 
 export interface Command {
     name: string;
@@ -9,7 +9,7 @@ export interface Command {
 	hoverText: string;
 	disabled: boolean;
     progress: boolean;
-    action: () => void
+    action: () => void;
 }
 
 export class ProjectSettingsCommand implements Command {
@@ -17,7 +17,7 @@ export class ProjectSettingsCommand implements Command {
     viewModel: ViewModel;
     icon = 'mdi-cog';
     hoverText = 'Project settings';
-    public get disabled() : boolean {
+    public get disabled(): boolean {
         return this.viewModel.generateLoading;
     }
     progress = false;
@@ -36,8 +36,8 @@ export class UndoCommand implements Command {
     viewModel: ViewModel;
     icon = 'mdi-undo';
     hoverText = 'Rollback to the last generated state';
-    public get disabled() : boolean {
-        return this.viewModel.undoStack.length() < 2
+    public get disabled(): boolean {
+        return !((this.viewModel.undoStack.length() < 2 && this.viewModel.isJsonPristine) || this.viewModel.generateLoading);
     }
     progress = false;
     constructor(viewModel: ViewModel) {
@@ -62,7 +62,7 @@ export class PrettyPrintCommand implements Command {
     viewModel: ViewModel;
     icon = 'mdi-format-align-left';
     hoverText = 'Formatting';
-    public get disabled() : boolean {
+    public get disabled(): boolean {
         return this.viewModel.activeProject.json === ''
     }
     progress = false;
@@ -96,7 +96,7 @@ export class GenerateCommand implements Command {
     }
     
     action() {
-
+        console.log('generateCommand');
     }
 }
 
