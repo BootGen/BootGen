@@ -127,7 +127,7 @@ export class CompareCommand implements Command {
         }
         return 'Show Changes: Off';
     }
-    disabled = false;
+    disabled = true;
     progress = false;
     constructor(viewModel: ViewModel) {
         this.viewModel = viewModel;
