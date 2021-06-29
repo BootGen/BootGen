@@ -55,6 +55,7 @@ export class UndoCommand implements Command {
         this.viewModel.setSnackbar('info', 'Everything restored to its previous generated state', 5000);
     }
 }
+
 export class SaveCommand implements Command {
     name = 'save';
     viewModel: ViewModel;
