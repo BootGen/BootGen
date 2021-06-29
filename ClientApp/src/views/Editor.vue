@@ -102,33 +102,6 @@
               </div>
               <div class="d-flex">
                 <tool-bar :buttons="[compareCommand, downloadCommand]"></tool-bar>
-                <v-tooltip bottom>
-                  <template v-slot:activator="{ on, attrs }">
-                    <v-btn color="white" v-if="viewModel.isCompare" class="mr-1" elevation="1" @click="setCompare()" fab small v-bind="attrs" v-on="on">
-                      <v-icon color="primary">mdi-file-compare</v-icon>
-                    </v-btn>
-                    <v-btn color="rgba(255, 255, 255, 0.2)" v-else class="mr-1" elevation="0" @click="setCompare()" fab small v-bind="attrs" v-on="on">
-                      <v-icon color="rgba(255, 255, 255, 0.7)">mdi-file-compare</v-icon>
-                    </v-btn>
-                  </template>
-                  <span v-if="viewModel.isCompare">Show Changes: On</span>
-                  <span v-else>Show Changes: Off</span>
-                </v-tooltip>
-                <v-tooltip bottom>
-                  <template v-slot:activator="{ on, attrs }">
-                    <v-btn color="white" class="mr-1" elevation="1" :disabled="!viewModel.isPristine || viewModel.downLoading || viewModel.activeProject.name === ''" @click="download" fab small v-bind="attrs" v-on="on">
-                      <v-icon color="primary" v-if="!viewModel.downLoading">mdi-download</v-icon>
-                      <div v-if="viewModel.downLoading">
-                        <v-progress-circular
-                          indeterminate
-                          :size="25"
-                          color="primary"
-                        ></v-progress-circular>
-                      </div>
-                    </v-btn>
-                  </template>
-                  <span>Download</span>
-                </v-tooltip>
               </div>
             </div>
           </template>

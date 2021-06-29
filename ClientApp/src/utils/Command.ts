@@ -7,6 +7,7 @@ export interface Command {
     viewModel: ViewModel;
 	icon: string;
 	hoverText: string;
+	color?: string;
 	disabled: boolean;
     progress: boolean;
     action: () => void;
@@ -122,11 +123,18 @@ export class CompareCommand implements Command {
     viewModel: ViewModel;
     icon = 'mdi-file-compare';
     public get hoverText(): string {
-        if(this.viewModel.isCompare){
+        if(!this.viewModel.isCompare){
             return 'Show Changes: On';
         }
         return 'Show Changes: Off';
     }
+    public get color(): string {
+        if(!this.viewModel.isCompare){
+            return 'rgba(255, 255, 255, 0.2)';
+        }
+        return '#ffffff';
+    }
+    
     disabled = true;
     progress = false;
     constructor(viewModel: ViewModel) {

@@ -2,7 +2,7 @@
  <v-container fluid class="pa-0 ma-0">
     <v-tooltip bottom v-for="(button, idx) in buttons" :key="idx">
       <template v-slot:activator="{ on, attrs }">
-      <v-btn class="mr-1" color="white" elevation="1" fab small @click="button.action()" v-bind="attrs" v-on="on" :disabled="!button.disabled">
+      <v-btn class="mr-1" :color="button.color ? button.color : 'white'" elevation="1" fab small @click="button.action()" v-bind="attrs" v-on="on" :disabled="!button.disabled">
         <v-icon v-if="!button.progress" color="primary">{{ button.icon }}</v-icon>
         <div v-if="button.progress">
           <v-progress-circular
