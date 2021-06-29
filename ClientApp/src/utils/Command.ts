@@ -103,7 +103,7 @@ export class GenerateCommand implements Command {
     icon = 'mdi-arrow-right-bold';
     hoverText = 'Generate';
     public get disabled(): boolean {
-        return this.viewModel.isPristine || this.viewModel.generateLoading || this.viewModel.activeProject.name === '';
+        return !(this.viewModel.isPristine || this.viewModel.generateLoading || this.viewModel.activeProject.name === '');
     }
     public get progress(): boolean {
         return this.viewModel.generateLoading;
