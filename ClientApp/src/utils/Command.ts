@@ -151,7 +151,7 @@ export class DownloadCommand implements Command {
     icon = 'mdi-download';
     hoverText = 'Download';
     public get disabled(): boolean {
-        return !this.viewModel.isPristine || this.viewModel.downLoading || this.viewModel.activeProject.name === '';
+        return !(!this.viewModel.isPristine || this.viewModel.downLoading || this.viewModel.activeProject.name === '');
     }
     public get progress(): boolean {
         return this.viewModel.downLoading;

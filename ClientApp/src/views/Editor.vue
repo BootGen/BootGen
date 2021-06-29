@@ -108,7 +108,7 @@
                 </span>
               </div>
               <div class="d-flex">
-                <tool-bar :buttons="[compareCommand]"></tool-bar>
+                <tool-bar :buttons="[compareCommand, downloadCommand]"></tool-bar>
                 <v-tooltip bottom>
                   <template v-slot:activator="{ on, attrs }">
                     <v-btn color="white" v-if="viewModel.isCompare" class="mr-1" elevation="1" @click="setCompare()" fab small v-bind="attrs" v-on="on">
@@ -174,7 +174,7 @@ import api from '../api'
 import {GenerateResponse} from '../models/GenerateResponse';
 import {Compare}from '../utils/TextCompare';
 import {ViewModel}from '../utils/ViewModel';
-import { Command, UndoCommand, SaveCommand, PrettyPrintCommand, GenerateCommand, CompareCommand } from '../utils/Command';
+import { Command, UndoCommand, SaveCommand, PrettyPrintCommand, GenerateCommand, CompareCommand, DownloadCommand } from '../utils/Command';
 
 export default Vue.extend({
   components: {
@@ -193,6 +193,7 @@ export default Vue.extend({
       prettyPrintCommand: null as (Command | null),
       generateCommand: null as (Command | null),
       compareCommand: null as (Command | null),
+      downloadCommand: null as (Command | null),
       newProject: {id: -1, ownerId: -1, name: 'My Project', json: '', backend: 'ASP.NET', frontend: 'Vue 2 + JS'},
       snackbar: {
         dismissible: true,
@@ -214,6 +215,7 @@ export default Vue.extend({
     this.prettyPrintCommand = new PrettyPrintCommand(this.viewModel);
     this.generateCommand = new GenerateCommand(this.viewModel);
     this.compareCommand = new CompareCommand(this.viewModel);
+    this.downloadCommand = new DownloadCommand(this.viewModel);
     this.viewModel.setSnackbar = this.setSnackbar;
     this.viewModel.setHighlightedDifferences = this.setHighlightedDifferences;
     this.newProject.json = JSON.stringify((await axios.get(`${this.$root.$data.baseUrl}/new_project_input.json`, {responseType: 'json'})).data);
