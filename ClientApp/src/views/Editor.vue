@@ -43,7 +43,7 @@
                 </div>
               </div>
               <div>
-                <tool-bar v-if="undoCommand" :buttons="[undoCommand]"></tool-bar>
+                <tool-bar v-if="undoCommand" :buttons="[undoCommand, prettyPrintCommand]"></tool-bar>
                 <v-tooltip bottom>
                   <template v-slot:activator="{ on, attrs }">
                     <v-btn class="mr-1" color="white" elevation="1" fab small @click="undo" v-bind="attrs" v-on="on" :disabled="(viewModel.undoStack.length() < 2 && viewModel.isJsonPristine) || viewModel.generateLoading">
@@ -173,7 +173,7 @@ import api from '../api'
 import {GenerateResponse} from '../models/GenerateResponse';
 import {Compare}from '../utils/TextCompare';
 import {ViewModel}from '../utils/ViewModel';
-import { Command, UndoCommand } from '../utils/Command';
+import { Command, UndoCommand, PrettyPrintCommand } from '../utils/Command';
 
 export default Vue.extend({
   components: {
@@ -188,6 +188,7 @@ export default Vue.extend({
     return {
       viewModel: new ViewModel(),
       undoCommand: null as (Command | null),
+      prettyPrintCommand: null as (Command | null),
       newProject: {id: -1, ownerId: -1, name: 'My Project', json: '', backend: 'ASP.NET', frontend: 'Vue 2 + JS'},
       snackbar: {
         dismissible: true,
@@ -205,6 +206,7 @@ export default Vue.extend({
   },
   created: async function(){
     this.undoCommand = new UndoCommand(this.viewModel);
+    this.prettyPrintCommand = new PrettyPrintCommand(this.viewModel);
     this.viewModel.setSnackbar = this.setSnackbar;
     this.viewModel.setHighlightedDifferences = this.setHighlightedDifferences;
     this.newProject.json = JSON.stringify((await axios.get(`${this.$root.$data.baseUrl}/new_project_input.json`, {responseType: 'json'})).data);

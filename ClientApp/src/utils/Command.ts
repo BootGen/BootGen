@@ -63,7 +63,7 @@ export class PrettyPrintCommand implements Command {
     icon = 'mdi-format-align-left';
     hoverText = 'Formatting';
     public get disabled(): boolean {
-        return this.viewModel.activeProject.json === ''
+        return !(this.viewModel.activeProject.json === '' || this.viewModel.generateLoading);
     }
     progress = false;
     constructor(viewModel: ViewModel) {
