@@ -36,47 +36,8 @@
                 </div>
               </div>
               <div>
-                <tool-bar :buttons="[undoCommand, saveCommand, prettyPrintCommand, generateCommand]"></tool-bar>
-                <v-tooltip bottom>
-                  <template v-slot:activator="{ on, attrs }">
-                    <v-btn class="mr-1" color="white" elevation="1" fab small @click="undo" v-bind="attrs" v-on="on" :disabled="(viewModel.undoStack.length() < 2 && viewModel.isJsonPristine) || viewModel.generateLoading">
-                      <v-icon color="primary">mdi-undo</v-icon>
-                    </v-btn>
-                  </template>
-                  <span>Rollback to the last generated state</span>
-                </v-tooltip>
-                <v-tooltip bottom v-if="$store.state.auth.jwt">
-                  <template v-slot:activator="{ on, attrs }">
-                    <v-btn class="mr-1" color="white" elevation="1" fab small @click="save" v-bind="attrs" v-on="on" :disabled="viewModel.saveDisabled || viewModel.generateLoading">
-                      <v-icon color="primary">mdi-floppy</v-icon>
-                    </v-btn>
-                    </template>
-                  <span>Save</span>
-                </v-tooltip>
-                <v-tooltip bottom>
-                  <template v-slot:activator="{ on, attrs }">
-                    <v-btn class="mr-1" color="white" elevation="1" fab small :disabled="viewModel.activeProject.json === '' || viewModel.generateLoading" @click="onPrettyPrintClicked" v-bind="attrs" v-on="on">
-                      <v-icon color="primary">mdi-format-align-left</v-icon>
-                    </v-btn>
-                  </template>
-                  <span>Formatting</span>
-                </v-tooltip>
-
-                <v-tooltip bottom>
-                  <template v-slot:activator="{ on, attrs }">
-                    <v-btn class="mr-1" color="white" elevation="1" fab small :disabled="viewModel.isPristine || viewModel.generateLoading || viewModel.activeProject.name === ''" @click="onGenerateClicked" v-bind="attrs" v-on="on">
-                      <v-icon color="primary" v-if="!viewModel.generateLoading">mdi-arrow-right-bold</v-icon>
-                      <div v-if="viewModel.generateLoading">
-                        <v-progress-circular
-                          indeterminate
-                          :size="25"
-                          color="primary"
-                        ></v-progress-circular>
-                      </div>
-                    </v-btn>
-                    </template>
-                  <span>Generate</span>
-                </v-tooltip>
+                <tool-bar v-if="$store.state.auth.jwt" :buttons="[undoCommand, saveCommand, prettyPrintCommand, generateCommand]"></tool-bar>
+                <tool-bar v-else :buttons="[undoCommand, prettyPrintCommand, generateCommand]"></tool-bar>
               </div>
             </div>
           </template>
@@ -266,17 +227,6 @@ export default Vue.extend({
         this.viewModel.generateLoading = false;
       }
     },
-    setCompare: function(){
-      if(this.viewModel.isCompare){
-        this.viewModel.isCompare = false;
-        this.viewModel.showChanges = false;
-        this.viewModel.highlightedDifferences = [];
-      }else{
-        this.viewModel.isCompare = true;
-        this.viewModel.showChanges = true;
-        this.setHighlightedDifferences();
-      }
-    },
     setHighlightedDifferences: function(){
       if(this.viewModel.previousFiles.length > 0 && this.viewModel.isCompare){
         this.viewModel.highlightedDifferences = [];
@@ -381,8 +331,6 @@ export default Vue.extend({
       return null;
     },
     save: async function (){
-      if (!this.$store.state.auth.jwt)
-        return;
       this.$gtag?.event('save-project');
       if(this.viewModel.activeProject.name){
         const project = this.getProjectByName(this.viewModel.activeProject.name);
@@ -404,39 +352,12 @@ export default Vue.extend({
         this.setSnackbar('error', 'This name is incorrect!', 5000);
       }
     },
-    undo: async function () {
-      this.$gtag?.event('undo');
-      if (this.viewModel.isPristine) {
-        this.viewModel.undoStack.pop();
-      }
-      const top = this.viewModel.undoStack.top();
-      if(top) {
-        this.viewModel.activeProject.json = top.content;
-      }
-      this.setSnackbar('info', 'Everything restored to its previous generated state', 5000);
-    },
     change: function(page: string){
       this.$gtag?.event(`change-${page}`);
     },
     changeProjectName: function(name: string){
       this.$gtag?.event('change-project-name');
       this.viewModel.activeProject.name = name.trim();
-    },
-    download: async function() {
-      if(!this.viewModel.downLoading){
-        this.viewModel.downLoading = true;
-        this.$gtag?.event('download');
-        await Promise.all([
-          this.delay(3000),
-          api.download({
-            data: this.viewModel.activeProject.json,
-            nameSpace: this.toCamelCase(this.viewModel.activeProject.name),
-            backend: this.viewModel.activeProject.backend,
-            frontend: this.viewModel.activeProject.frontend
-          })
-        ]);
-        this.viewModel.downLoading = false;
-      }
     },
     openFolder: function(idx: number){
       this.$gtag?.event('click-on-path-element');
