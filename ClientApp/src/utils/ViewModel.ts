@@ -49,5 +49,7 @@ export class ViewModel {
         return this.crc32Saved === this.crc32ForSaving;
     }
     setSnackbar: (type: string, text: string, timeout: number) => void = function (type: string, text: string, timeout: number) {console.log('setSnackbar')};
-    setHighlightedDifferences: () => void = function () {console.log('setHighlightedDifferences')}
+    setHighlightedDifferences: () => void = function () {console.log('setHighlightedDifferences')};
+    save: () => void = function () {console.log('save')};
+    generate: () => void = function () {console.log('generate')};
 }

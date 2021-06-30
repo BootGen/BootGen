@@ -71,7 +71,7 @@ export class SaveCommand implements Command {
     }
 
     action() {
-       console.log('SaveCommand'); 
+        this.viewModel.save();
     }
 }
 
@@ -114,7 +114,7 @@ export class GenerateCommand implements Command {
     }
     
     action() {
-        console.log('generateCommand');
+        this.viewModel.generate();
     }
 }
 

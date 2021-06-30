@@ -186,6 +186,8 @@ export default Vue.extend({
     this.downloadCommand = new DownloadCommand(this.viewModel);
     this.viewModel.setSnackbar = this.setSnackbar;
     this.viewModel.setHighlightedDifferences = this.setHighlightedDifferences;
+    this.viewModel.save = this.save;
+    this.viewModel.generate = this.generate;
     this.newProject.json = JSON.stringify((await axios.get(`${this.$root.$data.baseUrl}/new_project_input.json`, {responseType: 'json'})).data);
     if(this.$store.state.projects.lastProject.json){
       this.viewModel.activeProject = this.$store.state.projects.lastProject;
