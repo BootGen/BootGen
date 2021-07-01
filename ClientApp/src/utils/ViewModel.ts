@@ -56,5 +56,4 @@ export class ViewModel {
     public get saveDisabled(): boolean {
         return this.crc32Saved === this.crc32ForSaving;
     }
-    setActiveFile: () => void = function () {console.log('setActiveFile')};
 }

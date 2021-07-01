@@ -97,7 +97,7 @@ import {CRC32} from 'crc_32_ts';
 import axios from 'axios';
 import {ViewModel}from '../utils/ViewModel';
 import { Command, ProjectSettingsCommand, UndoCommand, SaveCommand, PrettyPrintCommand, GenerateCommand, CompareCommand, DownloadCommand } from '../utils/Command';
-import { setSnackbar, setHighlightedDifferences } from '../utils/Command';
+import { setSnackbar, setHighlightedDifferences, setActiveFile } from '../utils/Command';
 
 export default Vue.extend({
   components: {
@@ -133,7 +133,6 @@ export default Vue.extend({
     this.generateCommand = new GenerateCommand(this.viewModel);
     this.compareCommand = new CompareCommand(this.viewModel);
     this.downloadCommand = new DownloadCommand(this.viewModel);
-    this.viewModel.setActiveFile = this.setActiveFile;
     this.newProject.json = JSON.stringify((await axios.get(`${this.$root.$data.baseUrl}/new_project_input.json`, {responseType: 'json'})).data);
     if(this.$store.state.projects.lastProject.json){
       this.viewModel.activeProject = this.$store.state.projects.lastProject;
@@ -142,7 +141,7 @@ export default Vue.extend({
       this.viewModel.frontend = this.$store.state.projects.lastProject.frontend;
       this.callPrettyPrint();
       this.viewModel.undoStack.push(this.viewModel.activeProject.json);
-      this.setActiveFile();
+      setActiveFile(this.viewModel);
       this.viewModel.crc32Saved = this.viewModel.crc32ForSaving;
       this.viewModel.crc32ProjectName = CRC32.str(this.viewModel.activeProject.name);
     }else{
@@ -177,22 +176,6 @@ export default Vue.extend({
       json = json.replace(/": /g, '":');
       json = json.replace(/[\n\t\r]/g, '');
       return json.length;
-    },
-    setSelectedFile: function (fileName: string, filePath: string) {
-      for (let i = 0; i < this.viewModel.generatedFiles.length; i++) {
-        if (this.viewModel.generatedFiles[i].name === fileName && this.viewModel.generatedFiles[i].path === filePath) {
-          this.viewModel.activeFile = this.viewModel.generatedFiles[i];
-          break;
-        }
-      }
-    },
-    setActiveFile: function(){
-      if(!this.viewModel.activeFile.name){
-        this.setSelectedFile('restapi.yml', '');
-      }else{
-        this.setSelectedFile(this.viewModel.activeFile.name, this.viewModel.activeFile.path);
-      }
-      setHighlightedDifferences(this.viewModel);
     },
     callPrettyPrint: function(){
       const result = validateJson(this.viewModel.activeProject.json);

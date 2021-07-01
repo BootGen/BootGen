@@ -38,21 +38,39 @@ export function setSnackbar(viewModel: ViewModel, type: string, text: string, ti
 
 export function setHighlightedDifferences(viewModel: ViewModel){
     if(viewModel.previousFiles.length > 0 && viewModel.isCompare){
-      viewModel.highlightedDifferences = [];
-      if(viewModel.showChanges){
-        for(let i = 0; i < viewModel.previousFiles.length; i++){
-          if(viewModel.previousFiles[i].name === viewModel.activeFile.name && viewModel.previousFiles[i].path === viewModel.activeFile.path){
-            const compare = new Compare(viewModel.activeFile.content.split('\n'), viewModel.previousFiles[i].content.split('\n'));
-            const changes = compare.getChanges();
-            changes.forEach(v =>{
-              viewModel.highlightedDifferences.push({ line : v, color:'rgba(0, 111, 197, 0.3)' })
-            })
-            break;
-          }
+        viewModel.highlightedDifferences = [];
+        if(viewModel.showChanges){
+            for(let i = 0; i < viewModel.previousFiles.length; i++){
+                if(viewModel.previousFiles[i].name === viewModel.activeFile.name && viewModel.previousFiles[i].path === viewModel.activeFile.path){
+                    const compare = new Compare(viewModel.activeFile.content.split('\n'), viewModel.previousFiles[i].content.split('\n'));
+                    const changes = compare.getChanges();
+                    changes.forEach(v =>{
+                    viewModel.highlightedDifferences.push({ line : v, color:'rgba(0, 111, 197, 0.3)' })
+                    })
+                    break;
+                }
+            }
         }
-      }
     }
-  }
+}
+  
+function setSelectedFile (viewModel: ViewModel, fileName: string, filePath: string) {
+    for (let i = 0; i < viewModel.generatedFiles.length; i++) {
+        if (viewModel.generatedFiles[i].name === fileName && viewModel.generatedFiles[i].path === filePath) {
+            viewModel.activeFile = viewModel.generatedFiles[i];
+            break;
+        }
+    }
+}
+
+export function setActiveFile (viewModel: ViewModel){
+    if(!viewModel.activeFile.name){
+      setSelectedFile(viewModel, 'restapi.yml', '');
+    }else{
+      setSelectedFile(viewModel, viewModel.activeFile.name, viewModel.activeFile.path);
+    }
+    setHighlightedDifferences(viewModel);
+}
 
 export class ProjectSettingsCommand implements Command {
     name = 'project-settings';
@@ -205,7 +223,7 @@ export class GenerateCommand implements Command {
       if(this.viewModel.undoStack.top()?.content !== this.viewModel.activeProject.json){
         this.viewModel.undoStack.push(this.viewModel.activeProject.json);
       }
-      this.viewModel.setActiveFile();
+      setActiveFile(this.viewModel);
       this.viewModel.generateLoading = false;
     }
 }
