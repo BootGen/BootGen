@@ -5,7 +5,7 @@ Online rapid prototyping tool for ASP.Net and Vue.js projects. Turn JSON into we
 
 ## How Does it Work?
 
-<img width="800px" height="450px" src="Images/diff_demo.gif">
+[<img width="800px" height="450px" src="Images/diff_demo.gif">](https://youtu.be/bdgWl8Ia7u8)
 
 Create sample JSON data, and generate your application. Edit the JSON, and regenerate until you are satisfied with the result. Changes will be highlighted in the generated files.
 
