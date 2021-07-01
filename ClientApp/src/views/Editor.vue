@@ -96,11 +96,8 @@ import {Project} from '../models/Project';
 import {GeneratedFile} from '../models/GeneratedFile';
 import {CRC32} from 'crc_32_ts';
 import axios from 'axios';
-import api from '../api';
-import {GenerateResponse} from '../models/GenerateResponse';
 import {Compare}from '../utils/TextCompare';
 import {ViewModel}from '../utils/ViewModel';
-import { toCamelCase } from '../utils/Helper';
 import { Command, ProjectSettingsCommand, UndoCommand, SaveCommand, PrettyPrintCommand, GenerateCommand, CompareCommand, DownloadCommand } from '../utils/Command';
 
 export default Vue.extend({
@@ -148,7 +145,7 @@ export default Vue.extend({
     this.viewModel.setSnackbar = this.setSnackbar;
     this.viewModel.setHighlightedDifferences = this.setHighlightedDifferences;
     this.viewModel.save = this.save;
-    this.viewModel.generate = this.generate;
+    this.viewModel.setActiveFile = this.setActiveFile;
     this.newProject.json = JSON.stringify((await axios.get(`${this.$root.$data.baseUrl}/new_project_input.json`, {responseType: 'json'})).data);
     if(this.$store.state.projects.lastProject.json){
       this.viewModel.activeProject = this.$store.state.projects.lastProject;
@@ -186,41 +183,6 @@ export default Vue.extend({
     removeErrors: function(){
       this.viewModel.jsonErrors = [];
       this.hideSnackbar();
-    },
-    generate: async function(){
-      this.viewModel.generateLoading = true;
-      const generateResult: GenerateResponse = await api.generate({
-        data: this.viewModel.activeProject.json,
-        nameSpace: toCamelCase(this.viewModel.activeProject.name),
-        backend: this.viewModel.activeProject.backend,
-        frontend: this.viewModel.activeProject.frontend
-      });
-      if(generateResult.errorMessage){
-        this.setSnackbar('orange darken-2', generateResult.errorMessage, -1);
-        if(generateResult.errorLine !== null){
-          this.viewModel.jsonErrors.push({line: generateResult.errorLine-1, color: 'rgba(255, 0, 0, 0.3)'});
-        }
-        this.viewModel.generateLoading = false;
-        return;
-      }
-      this.viewModel.previousFiles = [...this.viewModel.generatedFiles];
-      this.viewModel.generatedFiles = generateResult.generatedFiles;
-      this.$store.commit('projects/setLastProject', this.viewModel.activeProject);
-      this.$store.commit('projects/setLastGeneratedFiles', this.viewModel.generatedFiles);
-      this.viewModel.crc32ProjectName = CRC32.str(this.viewModel.activeProject.name);
-      if(this.viewModel.activeProject.backend === this.viewModel.backend && this.viewModel.activeProject.frontend === this.viewModel.frontend){
-        this.viewModel.showChanges = true;
-        this.viewModel.highlightedDifferences = [];
-      }else{
-        this.viewModel.showChanges = false;
-      }
-      this.viewModel.backend = this.viewModel.activeProject.backend;
-      this.viewModel.frontend = this.viewModel.activeProject.frontend;
-      if(this.viewModel.undoStack.top()?.content !== this.viewModel.activeProject.json){
-        this.viewModel.undoStack.push(this.viewModel.activeProject.json);
-      }
-      this.setActiveFile();
-      this.viewModel.generateLoading = false;
     },
     setHighlightedDifferences: function(){
       if(this.viewModel.previousFiles.length > 0 && this.viewModel.isCompare){
@@ -278,7 +240,9 @@ export default Vue.extend({
       this.callPrettyPrint();
       this.save();
       this.viewModel.undoStack.clear();
-      await this.generate();
+      if(this.generateCommand){
+        await this.generateCommand.action();
+      }
       this.viewModel.highlightedDifferences = [];
     },
     validateAndGenerate: async function() {
@@ -291,7 +255,9 @@ export default Vue.extend({
           this.setSnackbar('orange darken-2', `Exceeded character limit: ${jsonLength} / 2000`, -1);
           return;
         }
-        await this.generate();
+        if(this.generateCommand){
+          await this.generateCommand.action();
+        }
       } else {
         this.viewModel.jsonErrors.push({line: result.line, color: 'rgba(255, 0, 0, 0.3)'});
         this.setSnackbar('orange darken-2', result.message, -1);

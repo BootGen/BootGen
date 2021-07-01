@@ -51,5 +51,6 @@ export class ViewModel {
     setSnackbar: (type: string, text: string, timeout: number) => void = function (type: string, text: string, timeout: number) {console.log('setSnackbar')};
     setHighlightedDifferences: () => void = function () {console.log('setHighlightedDifferences')};
     save: () => void = function () {console.log('save')};
-    generate: () => void = function () {console.log('generate')};
+    setActiveFile: () => void = function () {console.log('setActiveFile')};
+    
 }

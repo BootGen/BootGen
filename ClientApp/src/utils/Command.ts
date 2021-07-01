@@ -2,6 +2,9 @@ import api from '@/api';
 import { prettyPrint, validateJson } from './PrettyPrint';
 import { delay, toCamelCase } from './Helper';
 import { ViewModel } from './ViewModel';
+import store from '../store/index';
+import { GenerateResponse } from '@/models/GenerateResponse';
+import { CRC32 } from 'crc_32_ts';
 
 export interface Command {
     name: string;
@@ -114,8 +117,40 @@ export class GenerateCommand implements Command {
         this.viewModel = viewModel;
     }
     
-    action() {
-        this.viewModel.generate();
+    async action() {
+      this.viewModel.generateLoading = true;
+      const generateResult: GenerateResponse = await api.generate({
+        data: this.viewModel.activeProject.json,
+        nameSpace: toCamelCase(this.viewModel.activeProject.name),
+        backend: this.viewModel.activeProject.backend,
+        frontend: this.viewModel.activeProject.frontend
+      });
+      if(generateResult.errorMessage){
+        this.viewModel.setSnackbar('orange darken-2', generateResult.errorMessage, -1);
+        if(generateResult.errorLine !== null){
+          this.viewModel.jsonErrors.push({line: generateResult.errorLine-1, color: 'rgba(255, 0, 0, 0.3)'});
+        }
+        this.viewModel.generateLoading = false;
+        return;
+      }
+      this.viewModel.previousFiles = [...this.viewModel.generatedFiles];
+      this.viewModel.generatedFiles = generateResult.generatedFiles;
+      store.commit('projects/setLastProject', this.viewModel.activeProject);
+      store.commit('projects/setLastGeneratedFiles', this.viewModel.generatedFiles);
+      this.viewModel.crc32ProjectName = CRC32.str(this.viewModel.activeProject.name);
+      if(this.viewModel.activeProject.backend === this.viewModel.backend && this.viewModel.activeProject.frontend === this.viewModel.frontend){
+        this.viewModel.showChanges = true;
+        this.viewModel.highlightedDifferences = [];
+      }else{
+        this.viewModel.showChanges = false;
+      }
+      this.viewModel.backend = this.viewModel.activeProject.backend;
+      this.viewModel.frontend = this.viewModel.activeProject.frontend;
+      if(this.viewModel.undoStack.top()?.content !== this.viewModel.activeProject.json){
+        this.viewModel.undoStack.push(this.viewModel.activeProject.json);
+      }
+      this.viewModel.setActiveFile();
+      this.viewModel.generateLoading = false;
     }
 }
 
