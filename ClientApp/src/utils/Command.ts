@@ -6,6 +6,7 @@ import store from '../store/index';
 import { GenerateResponse } from '@/models/GenerateResponse';
 import { CRC32 } from 'crc_32_ts';
 import { Project } from '@/models/Project';
+import { Compare } from './TextCompare';
 
 export interface Command {
     name: string;
@@ -27,15 +28,31 @@ function getProjectByName(projectName: string): Project | null{
     return null;
 }
 
-
 export function setSnackbar(viewModel: ViewModel, type: string, text: string, timeout: number){
-    console.log(text);
     viewModel.snackbar.dismissible = true;
     viewModel.snackbar.timeout = timeout;
     viewModel.snackbar.type = type;
     viewModel.snackbar.text = text;
     viewModel.snackbar.visible = true;
 }
+
+export function setHighlightedDifferences(viewModel: ViewModel){
+    if(viewModel.previousFiles.length > 0 && viewModel.isCompare){
+      viewModel.highlightedDifferences = [];
+      if(viewModel.showChanges){
+        for(let i = 0; i < viewModel.previousFiles.length; i++){
+          if(viewModel.previousFiles[i].name === viewModel.activeFile.name && viewModel.previousFiles[i].path === viewModel.activeFile.path){
+            const compare = new Compare(viewModel.activeFile.content.split('\n'), viewModel.previousFiles[i].content.split('\n'));
+            const changes = compare.getChanges();
+            changes.forEach(v =>{
+              viewModel.highlightedDifferences.push({ line : v, color:'rgba(0, 111, 197, 0.3)' })
+            })
+            break;
+          }
+        }
+      }
+    }
+  }
 
 export class ProjectSettingsCommand implements Command {
     name = 'project-settings';
@@ -53,7 +70,6 @@ export class ProjectSettingsCommand implements Command {
     action() {
         this.viewModel.projectSettings = true;
     }
-    
 }
 
 export class UndoCommand implements Command {
@@ -225,7 +241,7 @@ export class CompareCommand implements Command {
         }else{
             this.viewModel.isCompare = true;
             this.viewModel.showChanges = true;
-            this.viewModel.setHighlightedDifferences();
+            setHighlightedDifferences(this.viewModel);
         }
     }
 }

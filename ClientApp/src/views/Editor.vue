@@ -92,14 +92,12 @@ import HeadBar from '../components/HeadBar.vue';
 import Snackbar from '../components/Snackbar.vue';
 import ProjectSettings from '../components/ProjectSettings.vue';
 import ToolBar from '../components/ToolBar.vue';
-import {Project} from '../models/Project';
 import {GeneratedFile} from '../models/GeneratedFile';
 import {CRC32} from 'crc_32_ts';
 import axios from 'axios';
-import {Compare}from '../utils/TextCompare';
 import {ViewModel}from '../utils/ViewModel';
 import { Command, ProjectSettingsCommand, UndoCommand, SaveCommand, PrettyPrintCommand, GenerateCommand, CompareCommand, DownloadCommand } from '../utils/Command';
-import { setSnackbar } from '../utils/Command';
+import { setSnackbar, setHighlightedDifferences } from '../utils/Command';
 
 export default Vue.extend({
   components: {
@@ -135,7 +133,6 @@ export default Vue.extend({
     this.generateCommand = new GenerateCommand(this.viewModel);
     this.compareCommand = new CompareCommand(this.viewModel);
     this.downloadCommand = new DownloadCommand(this.viewModel);
-    this.viewModel.setHighlightedDifferences = this.setHighlightedDifferences;
     this.viewModel.setActiveFile = this.setActiveFile;
     this.newProject.json = JSON.stringify((await axios.get(`${this.$root.$data.baseUrl}/new_project_input.json`, {responseType: 'json'})).data);
     if(this.$store.state.projects.lastProject.json){
@@ -175,23 +172,6 @@ export default Vue.extend({
       this.viewModel.jsonErrors = [];
       this.hideSnackbar();
     },
-    setHighlightedDifferences: function(){
-      if(this.viewModel.previousFiles.length > 0 && this.viewModel.isCompare){
-        this.viewModel.highlightedDifferences = [];
-        if(this.viewModel.showChanges){
-          for(let i = 0; i < this.viewModel.previousFiles.length; i++){
-            if(this.viewModel.previousFiles[i].name === this.viewModel.activeFile.name && this.viewModel.previousFiles[i].path === this.viewModel.activeFile.path){
-              const compare = new Compare(this.viewModel.activeFile.content.split('\n'), this.viewModel.previousFiles[i].content.split('\n'));
-              const changes = compare.getChanges();
-              changes.forEach(v =>{
-                this.viewModel.highlightedDifferences.push({ line : v, color:'rgba(0, 111, 197, 0.3)' })
-              })
-              break;
-            }
-          }
-        }
-      }
-    },
     getJsonLength: function(json: string): number{
       json = json.replace(/ {2}/g, '');
       json = json.replace(/": /g, '":');
@@ -212,7 +192,7 @@ export default Vue.extend({
       }else{
         this.setSelectedFile(this.viewModel.activeFile.name, this.viewModel.activeFile.path);
       }
-      this.setHighlightedDifferences();
+      setHighlightedDifferences(this.viewModel);
     },
     callPrettyPrint: function(){
       const result = validateJson(this.viewModel.activeProject.json);
@@ -281,7 +261,7 @@ export default Vue.extend({
     },
     selectFile: function(data: GeneratedFile){
       this.viewModel.activeFile = data;
-      this.setHighlightedDifferences();
+      setHighlightedDifferences(this.viewModel);
     },
   },
 });

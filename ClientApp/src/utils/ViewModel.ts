@@ -56,6 +56,5 @@ export class ViewModel {
     public get saveDisabled(): boolean {
         return this.crc32Saved === this.crc32ForSaving;
     }
-    setHighlightedDifferences: () => void = function () {console.log('setHighlightedDifferences')};
     setActiveFile: () => void = function () {console.log('setActiveFile')};
 }
