@@ -97,10 +97,11 @@ import {Project} from '../models/Project';
 import {GeneratedFile} from '../models/GeneratedFile';
 import {CRC32} from 'crc_32_ts';
 import axios from 'axios';
-import api from '../api'
+import api from '../api';
 import {GenerateResponse} from '../models/GenerateResponse';
 import {Compare}from '../utils/TextCompare';
 import {ViewModel}from '../utils/ViewModel';
+import { toCamelCase } from '../utils/Helper';
 import { Command, ProjectSettingsCommand, UndoCommand, SaveCommand, PrettyPrintCommand, GenerateCommand, CompareCommand, DownloadCommand } from '../utils/Command';
 
 export default Vue.extend({
@@ -177,9 +178,6 @@ export default Vue.extend({
       this.$gtag?.event('cancel-project-settings');
       this.viewModel.projectSettings = false;
     },
-    delay: function(ms: number): Promise<void> {
-      return new Promise(resolve => setTimeout(resolve, ms));
-    },
     getMode: function(): string {
       if(this.viewModel.activeFile.name){
         return this.viewModel.activeFile.name.split('.')[1];
@@ -195,7 +193,7 @@ export default Vue.extend({
         this.viewModel.generateLoading = true;
         const generateResult: GenerateResponse = await api.generate({
           data: this.viewModel.activeProject.json,
-          nameSpace: this.toCamelCase(this.viewModel.activeProject.name),
+          nameSpace: toCamelCase(this.viewModel.activeProject.name),
           backend: this.viewModel.activeProject.backend,
           frontend: this.viewModel.activeProject.frontend
         });
@@ -374,12 +372,6 @@ export default Vue.extend({
       this.viewModel.activeFile = data;
       this.setHighlightedDifferences();
     },
-    toCamelCase: function(str: string): string {
-      const nameSpace = str.replace(/(?:^\w|[A-Z]|\b\w)/g, function(word, index) {
-        return index === 0 ? word.toLowerCase() : word.toUpperCase();
-      }).replace(/\s+/g, '');
-      return `${nameSpace.charAt(0).toUpperCase()}${nameSpace.slice(1)}`;
-    }
   },
 });
 </script>
