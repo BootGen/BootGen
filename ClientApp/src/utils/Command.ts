@@ -27,9 +27,8 @@ function getProjectByName(projectName: string): Project | null{
     return null;
 }
 
-const viewModel = new ViewModel ();
 
-export function setSnackbar(this: any, type: string, text: string, timeout: number){
+export function setSnackbar(viewModel: ViewModel, type: string, text: string, timeout: number){
     console.log(text);
     viewModel.snackbar.dismissible = true;
     viewModel.snackbar.timeout = timeout;
@@ -78,7 +77,7 @@ export class UndoCommand implements Command {
         if(top) {
           this.viewModel.activeProject.json = top.content;
         }
-        setSnackbar('info', 'Everything restored to its previous generated state', 5000);
+        setSnackbar(this.viewModel, 'info', 'Everything restored to its previous generated state', 5000);
     }
 }
 
@@ -99,7 +98,7 @@ export class SaveCommand implements Command {
         if(this.viewModel.activeProject.name){
           const project = getProjectByName(this.viewModel.activeProject.name);
           if (!project && this.viewModel.activeProject.id === -1) {
-            setSnackbar('success', 'The new project was successfully created!', 5000);
+            setSnackbar(this.viewModel, 'success', 'The new project was successfully created!', 5000);
             this.viewModel.crc32Saved = this.viewModel.crc32ForSaving;
             this.viewModel.activeProject.id = 0;
             if(store.state.auth.user){
@@ -107,15 +106,15 @@ export class SaveCommand implements Command {
             }
             this.viewModel.activeProject = await store.dispatch('projects/addProject', this.viewModel.activeProject);
           } else if(project && project.id !== this.viewModel.activeProject.id) {
-            setSnackbar('error', 'This name is already in use, please enter another name!', 5000);
+            setSnackbar(this.viewModel, 'error', 'This name is already in use, please enter another name!', 5000);
           } else {
             this.viewModel.crc32Saved = this.viewModel.crc32ForSaving;
-            setSnackbar('success', 'Project updated successfully!', 5000);
+            setSnackbar(this.viewModel, 'success', 'Project updated successfully!', 5000);
             await store.dispatch('projects/updateProject', this.viewModel.activeProject);
-            setSnackbar('success', 'Project updated successfully!', 5000);
+            setSnackbar(this.viewModel, 'success', 'Project updated successfully!', 5000);
           }
         }else{
-          setSnackbar('error', 'This name is incorrect!', 5000);
+          setSnackbar(this.viewModel, 'error', 'This name is incorrect!', 5000);
         }
     }
 }
@@ -137,7 +136,7 @@ export class PrettyPrintCommand implements Command {
         const result = validateJson(this.viewModel.activeProject.json);
         if (result.error) {
           this.viewModel.jsonErrors.push({line: result.line, color: 'rgba(255, 0, 0, 0.3)'});
-          setSnackbar('orange darken-2', result.message, -1);
+          setSnackbar(this.viewModel, 'orange darken-2', result.message, -1);
         }
         this.viewModel.activeProject.json = prettyPrint(this.viewModel.activeProject.json);
     }
@@ -167,7 +166,7 @@ export class GenerateCommand implements Command {
         frontend: this.viewModel.activeProject.frontend
       });
       if(generateResult.errorMessage){
-        setSnackbar('orange darken-2', generateResult.errorMessage, -1);
+        setSnackbar(this.viewModel, 'orange darken-2', generateResult.errorMessage, -1);
         if(generateResult.errorLine !== null){
           this.viewModel.jsonErrors.push({line: generateResult.errorLine-1, color: 'rgba(255, 0, 0, 0.3)'});
         }

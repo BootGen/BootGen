@@ -218,7 +218,7 @@ export default Vue.extend({
       const result = validateJson(this.viewModel.activeProject.json);
       if (result.error) {
         this.viewModel.jsonErrors.push({line: result.line, color: 'rgba(255, 0, 0, 0.3)'});
-        setSnackbar('orange darken-2', result.message, -1);
+        setSnackbar(this.viewModel, 'orange darken-2', result.message, -1);
       }
       this.viewModel.activeProject.json = prettyPrint(this.viewModel.activeProject.json);
     },
@@ -245,7 +245,7 @@ export default Vue.extend({
         this.callPrettyPrint();
         const jsonLength = this.getJsonLength(this.viewModel.activeProject.json);
         if(jsonLength > 2000) {
-          setSnackbar('orange darken-2', `Exceeded character limit: ${jsonLength} / 2000`, -1);
+          setSnackbar(this.viewModel, 'orange darken-2', `Exceeded character limit: ${jsonLength} / 2000`, -1);
           return;
         }
         if(this.generateCommand){
@@ -253,7 +253,7 @@ export default Vue.extend({
         }
       } else {
         this.viewModel.jsonErrors.push({line: result.line, color: 'rgba(255, 0, 0, 0.3)'});
-        setSnackbar('orange darken-2', result.message, -1);
+        setSnackbar(this.viewModel, 'orange darken-2', result.message, -1);
       }
     },
     hideSnackbar: function(){
