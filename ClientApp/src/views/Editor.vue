@@ -2,8 +2,7 @@
   <v-container fluid class="editor">
     <v-row class="d-flex">
       <v-col cols="12" class="head pa-0">
-        <head-bar v-if="$store.state.auth.jwt" :activeProjectName="viewModel.activeProject.name" :backends="backends" :frontends="frontends" :disabled="viewModel.generateLoading" @new-project="createNewProject" @change-project-name="changeProjectName"></head-bar>
-        <head-bar v-else :activeProjectName="viewModel.activeProject.name" :disabled="viewModel.generateLoading" @new-project="createNewProject" @change-project-name="changeProjectName"></head-bar>
+        <head-bar :activeProjectName="viewModel.activeProject.name" :backends="backends" :frontends="frontends" :disabled="viewModel.generateLoading" @new-project="createNewProject" @change-project-name="changeProjectName"></head-bar>
       </v-col>
     </v-row>
     <v-row class="d-flex align-center">
@@ -189,41 +188,39 @@ export default Vue.extend({
       this.hideSnackbar();
     },
     generate: async function(){
-      if(!this.viewModel.generateLoading){
-        this.viewModel.generateLoading = true;
-        const generateResult: GenerateResponse = await api.generate({
-          data: this.viewModel.activeProject.json,
-          nameSpace: toCamelCase(this.viewModel.activeProject.name),
-          backend: this.viewModel.activeProject.backend,
-          frontend: this.viewModel.activeProject.frontend
-        });
-        if(generateResult.errorMessage){
-          this.setSnackbar('orange darken-2', generateResult.errorMessage, -1);
-          if(generateResult.errorLine !== null){
-            this.viewModel.jsonErrors.push({line: generateResult.errorLine-1, color: 'rgba(255, 0, 0, 0.3)'});
-          }
-          this.viewModel.generateLoading = false;
-          return;
+      this.viewModel.generateLoading = true;
+      const generateResult: GenerateResponse = await api.generate({
+        data: this.viewModel.activeProject.json,
+        nameSpace: toCamelCase(this.viewModel.activeProject.name),
+        backend: this.viewModel.activeProject.backend,
+        frontend: this.viewModel.activeProject.frontend
+      });
+      if(generateResult.errorMessage){
+        this.setSnackbar('orange darken-2', generateResult.errorMessage, -1);
+        if(generateResult.errorLine !== null){
+          this.viewModel.jsonErrors.push({line: generateResult.errorLine-1, color: 'rgba(255, 0, 0, 0.3)'});
         }
-        this.viewModel.previousFiles = [...this.viewModel.generatedFiles];
-        this.viewModel.generatedFiles = generateResult.generatedFiles;
-        this.$store.commit('projects/setLastProject', this.viewModel.activeProject);
-        this.$store.commit('projects/setLastGeneratedFiles', this.viewModel.generatedFiles);
-        this.viewModel.crc32ProjectName = CRC32.str(this.viewModel.activeProject.name);
-        if(this.viewModel.activeProject.backend === this.viewModel.backend && this.viewModel.activeProject.frontend === this.viewModel.frontend){
-          this.viewModel.showChanges = true;
-          this.viewModel.highlightedDifferences = [];
-        }else{
-          this.viewModel.showChanges = false;
-        }
-        this.viewModel.backend = this.viewModel.activeProject.backend;
-        this.viewModel.frontend = this.viewModel.activeProject.frontend;
-        if(this.viewModel.undoStack.top()?.content !== this.viewModel.activeProject.json){
-          this.viewModel.undoStack.push(this.viewModel.activeProject.json);
-        }
-        this.setActiveFile();
         this.viewModel.generateLoading = false;
+        return;
       }
+      this.viewModel.previousFiles = [...this.viewModel.generatedFiles];
+      this.viewModel.generatedFiles = generateResult.generatedFiles;
+      this.$store.commit('projects/setLastProject', this.viewModel.activeProject);
+      this.$store.commit('projects/setLastGeneratedFiles', this.viewModel.generatedFiles);
+      this.viewModel.crc32ProjectName = CRC32.str(this.viewModel.activeProject.name);
+      if(this.viewModel.activeProject.backend === this.viewModel.backend && this.viewModel.activeProject.frontend === this.viewModel.frontend){
+        this.viewModel.showChanges = true;
+        this.viewModel.highlightedDifferences = [];
+      }else{
+        this.viewModel.showChanges = false;
+      }
+      this.viewModel.backend = this.viewModel.activeProject.backend;
+      this.viewModel.frontend = this.viewModel.activeProject.frontend;
+      if(this.viewModel.undoStack.top()?.content !== this.viewModel.activeProject.json){
+        this.viewModel.undoStack.push(this.viewModel.activeProject.json);
+      }
+      this.setActiveFile();
+      this.viewModel.generateLoading = false;
     },
     setHighlightedDifferences: function(){
       if(this.viewModel.previousFiles.length > 0 && this.viewModel.isCompare){
@@ -264,10 +261,6 @@ export default Vue.extend({
       }
       this.setHighlightedDifferences();
     },
-    onPrettyPrintClicked: function(){
-      this.$gtag?.event('pretty-print');
-      this.callPrettyPrint();
-    },
     callPrettyPrint: function(){
       const result = validateJson(this.viewModel.activeProject.json);
       if (result.error) {
@@ -287,10 +280,6 @@ export default Vue.extend({
       this.viewModel.undoStack.clear();
       await this.generate();
       this.viewModel.highlightedDifferences = [];
-    },
-    onGenerateClicked: function () {
-      this.$gtag?.event('generate');
-      this.validateAndGenerate();
     },
     validateAndGenerate: async function() {
       this.viewModel.jsonErrors = [];
