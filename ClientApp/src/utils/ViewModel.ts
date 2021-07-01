@@ -42,7 +42,7 @@ export class ViewModel {
         }
         return false;
     }
-    public get  crc32ForSaving(): number {
+    public get crc32ForSaving(): number {
       return CRC32.str(this.activeProject.name + this.activeProject.json);
     }
     public get saveDisabled(): boolean {
@@ -50,7 +50,5 @@ export class ViewModel {
     }
     setSnackbar: (type: string, text: string, timeout: number) => void = function (type: string, text: string, timeout: number) {console.log('setSnackbar')};
     setHighlightedDifferences: () => void = function () {console.log('setHighlightedDifferences')};
-    save: () => void = function () {console.log('save')};
     setActiveFile: () => void = function () {console.log('setActiveFile')};
-    
 }

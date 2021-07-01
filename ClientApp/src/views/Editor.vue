@@ -144,7 +144,6 @@ export default Vue.extend({
     this.downloadCommand = new DownloadCommand(this.viewModel);
     this.viewModel.setSnackbar = this.setSnackbar;
     this.viewModel.setHighlightedDifferences = this.setHighlightedDifferences;
-    this.viewModel.save = this.save;
     this.viewModel.setActiveFile = this.setActiveFile;
     this.newProject.json = JSON.stringify((await axios.get(`${this.$root.$data.baseUrl}/new_project_input.json`, {responseType: 'json'})).data);
     if(this.$store.state.projects.lastProject.json){
@@ -238,7 +237,9 @@ export default Vue.extend({
       this.newProject.frontend = frontend;
       this.viewModel.activeProject = {...this.newProject};
       this.callPrettyPrint();
-      this.save();
+      if(this.saveCommand){
+        await this.saveCommand.action();
+      }
       this.viewModel.undoStack.clear();
       if(this.generateCommand){
         await this.generateCommand.action();
@@ -273,36 +274,6 @@ export default Vue.extend({
     hideSnackbar: function(){
       if(this.snackbar.type === 'error'){
         this.snackbar.visible = false;
-      }
-    },
-    getProjectByName: function(projectName: string): Project | null{
-      for(const i in this.$store.state.projects.items){
-        if(projectName === this.$store.state.projects.items[i].name){
-          return this.$store.state.projects.items[i];
-        }
-      }
-      return null;
-    },
-    save: async function (){
-      this.$gtag?.event('save-project');
-      if(this.viewModel.activeProject.name){
-        const project = this.getProjectByName(this.viewModel.activeProject.name);
-        if (!project && this.viewModel.activeProject.id === -1) {
-          this.setSnackbar('success', 'The new project was successfully created!', 5000);
-          this.viewModel.crc32Saved = this.viewModel.crc32ForSaving;
-          this.viewModel.activeProject.id = 0;
-          this.viewModel.activeProject.ownerId = this.$store.state.auth.user.id;
-          this.viewModel.activeProject = await this.$store.dispatch('projects/addProject', this.viewModel.activeProject);
-        } else if(project && project.id !== this.viewModel.activeProject.id) {
-          this.setSnackbar('error', 'This name is already in use, please enter another name!', 5000);
-        } else {
-          this.viewModel.crc32Saved = this.viewModel.crc32ForSaving;
-          this.setSnackbar('success', 'Project updated successfully!', 5000);
-          await this.$store.dispatch('projects/updateProject', this.viewModel.activeProject);
-          this.setSnackbar('success', 'Project updated successfully!', 5000);
-        }
-      }else{
-        this.setSnackbar('error', 'This name is incorrect!', 5000);
       }
     },
     change: function(page: string){

@@ -5,6 +5,7 @@ import { ViewModel } from './ViewModel';
 import store from '../store/index';
 import { GenerateResponse } from '@/models/GenerateResponse';
 import { CRC32 } from 'crc_32_ts';
+import { Project } from '@/models/Project';
 
 export interface Command {
     name: string;
@@ -15,6 +16,15 @@ export interface Command {
 	disabled: boolean;
     progress: boolean;
     action: () => void;
+}
+
+function getProjectByName(projectName: string): Project | null{
+    for(const i in store.state.projects.items){
+        if(projectName === store.state.projects.items[i].name){
+            return store.state.projects.items[i];
+        }
+    }
+    return null;
 }
 
 export class ProjectSettingsCommand implements Command {
@@ -74,8 +84,29 @@ export class SaveCommand implements Command {
         this.viewModel = viewModel;
     }
 
-    action() {
-        this.viewModel.save();
+    async action() {
+        if(this.viewModel.activeProject.name){
+          const project = getProjectByName(this.viewModel.activeProject.name);
+          console.log(project);
+          if (!project && this.viewModel.activeProject.id === -1) {
+            this.viewModel.setSnackbar('success', 'The new project was successfully created!', 5000);
+            this.viewModel.crc32Saved = this.viewModel.crc32ForSaving;
+            this.viewModel.activeProject.id = 0;
+            if(store.state.auth.user){
+                this.viewModel.activeProject.ownerId = store.state.auth.user.id;
+            }
+            this.viewModel.activeProject = await store.dispatch('projects/addProject', this.viewModel.activeProject);
+          } else if(project && project.id !== this.viewModel.activeProject.id) {
+            this.viewModel.setSnackbar('error', 'This name is already in use, please enter another name!', 5000);
+          } else {
+            this.viewModel.crc32Saved = this.viewModel.crc32ForSaving;
+            this.viewModel.setSnackbar('success', 'Project updated successfully!', 5000);
+            await store.dispatch('projects/updateProject', this.viewModel.activeProject);
+            this.viewModel.setSnackbar('success', 'Project updated successfully!', 5000);
+          }
+        }else{
+          this.viewModel.setSnackbar('error', 'This name is incorrect!', 5000);
+        }
     }
 }
 
