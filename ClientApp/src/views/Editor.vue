@@ -79,7 +79,7 @@
         </base-material-generator-card>
       </v-col>
     </v-row>
-    <snackbar v-if="snackbar.visible" :snackbar="snackbar"></snackbar>
+    <snackbar v-if="viewModel.snackbar.visible" :snackbar="viewModel.snackbar"></snackbar>
   </v-container>
 </template>
 
@@ -99,6 +99,7 @@ import axios from 'axios';
 import {Compare}from '../utils/TextCompare';
 import {ViewModel}from '../utils/ViewModel';
 import { Command, ProjectSettingsCommand, UndoCommand, SaveCommand, PrettyPrintCommand, GenerateCommand, CompareCommand, DownloadCommand } from '../utils/Command';
+import { setSnackbar } from '../utils/Command';
 
 export default Vue.extend({
   components: {
@@ -120,14 +121,6 @@ export default Vue.extend({
       compareCommand: null as (Command | null),
       downloadCommand: null as (Command | null),
       newProject: {id: -1, ownerId: -1, name: 'My Project', json: '', backend: 'ASP.NET', frontend: 'Vue 2 + JS'},
-      snackbar: {
-        dismissible: true,
-        visible: false,
-        type: '',
-        icon: 'mdi-alert-circle',
-        text: '',
-        timeout: 5000,
-      },
       drawer: false,
       openPath: '',
       backends: ['ASP.NET'],
@@ -142,7 +135,6 @@ export default Vue.extend({
     this.generateCommand = new GenerateCommand(this.viewModel);
     this.compareCommand = new CompareCommand(this.viewModel);
     this.downloadCommand = new DownloadCommand(this.viewModel);
-    this.viewModel.setSnackbar = this.setSnackbar;
     this.viewModel.setHighlightedDifferences = this.setHighlightedDifferences;
     this.viewModel.setActiveFile = this.setActiveFile;
     this.newProject.json = JSON.stringify((await axios.get(`${this.$root.$data.baseUrl}/new_project_input.json`, {responseType: 'json'})).data);
@@ -226,7 +218,7 @@ export default Vue.extend({
       const result = validateJson(this.viewModel.activeProject.json);
       if (result.error) {
         this.viewModel.jsonErrors.push({line: result.line, color: 'rgba(255, 0, 0, 0.3)'});
-        this.setSnackbar('orange darken-2', result.message, -1);
+        setSnackbar('orange darken-2', result.message, -1);
       }
       this.viewModel.activeProject.json = prettyPrint(this.viewModel.activeProject.json);
     },
@@ -253,7 +245,7 @@ export default Vue.extend({
         this.callPrettyPrint();
         const jsonLength = this.getJsonLength(this.viewModel.activeProject.json);
         if(jsonLength > 2000) {
-          this.setSnackbar('orange darken-2', `Exceeded character limit: ${jsonLength} / 2000`, -1);
+          setSnackbar('orange darken-2', `Exceeded character limit: ${jsonLength} / 2000`, -1);
           return;
         }
         if(this.generateCommand){
@@ -261,19 +253,12 @@ export default Vue.extend({
         }
       } else {
         this.viewModel.jsonErrors.push({line: result.line, color: 'rgba(255, 0, 0, 0.3)'});
-        this.setSnackbar('orange darken-2', result.message, -1);
+        setSnackbar('orange darken-2', result.message, -1);
       }
     },
-    setSnackbar: function(type: string, text: string, timeout: number){
-      this.snackbar.dismissible = true;
-      this.snackbar.timeout = timeout;
-      this.snackbar.type = type;
-      this.snackbar.text = text;
-      this.snackbar.visible = true;
-    },
     hideSnackbar: function(){
-      if(this.snackbar.type === 'error'){
-        this.snackbar.visible = false;
+      if(this.viewModel.snackbar.type === 'error'){
+        this.viewModel.snackbar.visible = false;
       }
     },
     change: function(page: string){

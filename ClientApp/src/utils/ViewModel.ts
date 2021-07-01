@@ -20,6 +20,14 @@ export class ViewModel {
     highlightedDifferences: Array<{line: number; color: string}> = [];
     downLoading = false;
     projectSettings = false;
+    snackbar = {
+        dismissible: true,
+        visible: false,
+        type: '',
+        icon: 'mdi-alert-circle',
+        text: '',
+        timeout: 5000,
+    }
     public get isPristine(): boolean {
         const top = this.undoStack.top();
         if(top){
@@ -48,7 +56,6 @@ export class ViewModel {
     public get saveDisabled(): boolean {
         return this.crc32Saved === this.crc32ForSaving;
     }
-    setSnackbar: (type: string, text: string, timeout: number) => void = function (type: string, text: string, timeout: number) {console.log('setSnackbar')};
     setHighlightedDifferences: () => void = function () {console.log('setHighlightedDifferences')};
     setActiveFile: () => void = function () {console.log('setActiveFile')};
 }
