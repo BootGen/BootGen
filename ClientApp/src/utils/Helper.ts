@@ -8,3 +8,10 @@ export function toCamelCase(str: string): string {
     }).replace(/\s+/g, '');
     return `${nameSpace.charAt(0).toUpperCase()}${nameSpace.slice(1)}`;
 }
+
+export function getJsonLength (json: string): number{
+    json = json.replace(/ {2}/g, '');
+    json = json.replace(/": /g, '":');
+    json = json.replace(/[\n\t\r]/g, '');
+    return json.length;
+}

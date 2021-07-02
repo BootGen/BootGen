@@ -19,7 +19,7 @@
                   <v-select
                     v-model="viewModel.activeProject.backend"
                     :items="backends"
-                    @change="change('backend')"
+                    @change="changeFramework('backend')"
                     dense
                     hide-details
                     :disabled="viewModel.generateLoading"
@@ -27,7 +27,7 @@
                   <v-select
                     v-model="viewModel.activeProject.frontend"
                     :items="frontends"
-                    @change="change('frontend')"
+                    @change="changeFramework('frontend')"
                     dense
                     hide-details
                     :disabled="viewModel.generateLoading"
@@ -97,7 +97,7 @@ import {CRC32} from 'crc_32_ts';
 import axios from 'axios';
 import {ViewModel}from '../utils/ViewModel';
 import { Command, ProjectSettingsCommand, UndoCommand, SaveCommand, PrettyPrintCommand, GenerateCommand, CompareCommand, DownloadCommand } from '../utils/Command';
-import { setSnackbar, setHighlightedDifferences, setActiveFile } from '../utils/Command';
+import { setSnackbar, setHighlightedDifferences, setActiveFile, validateAndGenerate, hideSnackbar } from '../utils/Command';
 
 export default Vue.extend({
   components: {
@@ -146,7 +146,7 @@ export default Vue.extend({
       this.viewModel.crc32ProjectName = CRC32.str(this.viewModel.activeProject.name);
     }else{
       this.viewModel.activeProject.json = (await axios.get(`${this.$root.$data.baseUrl}/example_input.json`, {responseType: 'text'})).data;
-      await this.validateAndGenerate();
+      validateAndGenerate(this.viewModel);
     }
   },
   methods: {
@@ -169,13 +169,7 @@ export default Vue.extend({
     },
     removeErrors: function(){
       this.viewModel.jsonErrors = [];
-      this.hideSnackbar();
-    },
-    getJsonLength: function(json: string): number{
-      json = json.replace(/ {2}/g, '');
-      json = json.replace(/": /g, '":');
-      json = json.replace(/[\n\t\r]/g, '');
-      return json.length;
+      hideSnackbar(this.viewModel);
     },
     callPrettyPrint: function(){
       const result = validateJson(this.viewModel.activeProject.json);
@@ -201,30 +195,7 @@ export default Vue.extend({
       }
       this.viewModel.highlightedDifferences = [];
     },
-    validateAndGenerate: async function() {
-      this.viewModel.jsonErrors = [];
-      const result = validateJson(this.viewModel.activeProject.json);
-      if(!result.error) {
-        this.callPrettyPrint();
-        const jsonLength = this.getJsonLength(this.viewModel.activeProject.json);
-        if(jsonLength > 2000) {
-          setSnackbar(this.viewModel, 'orange darken-2', `Exceeded character limit: ${jsonLength} / 2000`, -1);
-          return;
-        }
-        if(this.generateCommand){
-          await this.generateCommand.action();
-        }
-      } else {
-        this.viewModel.jsonErrors.push({line: result.line, color: 'rgba(255, 0, 0, 0.3)'});
-        setSnackbar(this.viewModel, 'orange darken-2', result.message, -1);
-      }
-    },
-    hideSnackbar: function(){
-      if(this.viewModel.snackbar.type === 'error'){
-        this.viewModel.snackbar.visible = false;
-      }
-    },
-    change: function(page: string){
+    changeFramework: function(page: string){
       this.$gtag?.event(`change-${page}`);
     },
     changeProjectName: function(name: string){
