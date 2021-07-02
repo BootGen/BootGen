@@ -2,7 +2,7 @@
   <v-container fluid class="editor">
     <v-row class="d-flex">
       <v-col cols="12" class="head pa-0">
-        <head-bar :activeProjectName="viewModel.activeProject.name" :backends="backends" :frontends="frontends" :disabled="viewModel.generateLoading" @new-project="createNewProject" @change-project-name="changeProjectName"></head-bar>
+        <head-bar :viewModel="viewModel" :activeProjectName="viewModel.activeProject.name" :backends="backends" :frontends="frontends" :disabled="viewModel.generateLoading" @new-project="createNewProject" @change-project-name="changeProjectName"></head-bar>
       </v-col>
     </v-row>
     <v-row class="d-flex align-center">
@@ -146,7 +146,7 @@ export default Vue.extend({
       this.viewModel.crc32ProjectName = CRC32.str(this.viewModel.activeProject.name);
     }else{
       this.viewModel.activeProject.json = (await axios.get(`${this.$root.$data.baseUrl}/example_input.json`, {responseType: 'text'})).data;
-      validateAndGenerate(this.viewModel);
+      validateAndGenerate(this.viewModel, this.generateCommand);
     }
   },
   methods: {

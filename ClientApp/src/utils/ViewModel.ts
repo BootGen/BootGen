@@ -10,6 +10,7 @@ export class ViewModel {
     crc32ProjectName = CRC32.str('My Project');
     crc32Saved = 0;
     activeProject: Project = {id: -1, ownerId: -1, name: 'My Project', json: '', backend: 'ASP.NET', frontend: 'Vue 2 + JS'};
+    newProjectDialog = false;
     activeFile: GeneratedFile = {name: '', path: '', content: ''};
     jsonErrors = Array<{line: number; color: string}>();
     backend = 'ASP.NET';

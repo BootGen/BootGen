@@ -12,7 +12,8 @@ export interface Command {
     name: string;
     viewModel: ViewModel;
 	icon: string;
-	hoverText: string;
+	text: string;
+    isCircleShape: boolean;
 	color?: string;
 	disabled: boolean;
     progress: boolean;
@@ -80,9 +81,10 @@ export class ProjectSettingsCommand implements Command {
     name = 'project-settings';
     viewModel: ViewModel;
     icon = 'mdi-cog';
-    hoverText = 'Project settings';
+    text = 'Project settings';
+    isCircleShape = true;
     public get disabled(): boolean {
-        return !this.viewModel.generateLoading;
+        return this.viewModel.generateLoading;
     }
     progress = false;
     constructor(viewModel: ViewModel) {
@@ -98,9 +100,10 @@ export class UndoCommand implements Command {
     name = 'undo';
     viewModel: ViewModel;
     icon = 'mdi-undo';
-    hoverText = 'Rollback to the last generated state';
+    text = 'Rollback to the last generated state';
+    isCircleShape = true;
     public get disabled(): boolean {
-        return !((this.viewModel.undoStack.length() < 2 && this.viewModel.isJsonPristine) || this.viewModel.generateLoading);
+        return (this.viewModel.undoStack.length() < 2 && this.viewModel.isJsonPristine) || this.viewModel.generateLoading;
     }
     progress = false;
     constructor(viewModel: ViewModel) {
@@ -123,9 +126,10 @@ export class SaveCommand implements Command {
     name = 'save';
     viewModel: ViewModel;
     icon = 'mdi-floppy';
-    hoverText = 'Save';
+    text = 'Save';
+    isCircleShape = true;
     public get disabled(): boolean {
-        return !(this.viewModel.saveDisabled || this.viewModel.generateLoading);
+        return this.viewModel.saveDisabled || this.viewModel.generateLoading;
     }
     progress = false;
     constructor(viewModel: ViewModel) {
@@ -161,9 +165,10 @@ export class PrettyPrintCommand implements Command {
     name = 'pretty-print';
     viewModel: ViewModel;
     icon = 'mdi-format-align-left';
-    hoverText = 'Formatting';
+    text = 'Formatting';
+    isCircleShape = true;
     public get disabled(): boolean {
-        return !(this.viewModel.activeProject.json === '' || this.viewModel.generateLoading);
+        return this.viewModel.activeProject.json === '' || this.viewModel.generateLoading;
     }
     progress = false;
     constructor(viewModel: ViewModel) {
@@ -184,9 +189,10 @@ export class GenerateCommand implements Command {
     name = 'generate';
     viewModel: ViewModel;
     icon = 'mdi-arrow-right-bold';
-    hoverText = 'Generate';
+    text = 'Generate';
+    isCircleShape = true;
     public get disabled(): boolean {
-        return !(this.viewModel.isPristine || this.viewModel.generateLoading || this.viewModel.activeProject.name === '');
+        return this.viewModel.isPristine || this.viewModel.generateLoading || this.viewModel.activeProject.name === '';
     }
     public get progress(): boolean {
         return this.viewModel.generateLoading;
@@ -251,12 +257,13 @@ export class CompareCommand implements Command {
     name = 'set-compare';
     viewModel: ViewModel;
     icon = 'mdi-file-compare';
-    public get hoverText(): string {
+    public get text(): string {
         if(!this.viewModel.isCompare){
             return 'Show Changes: On';
         }
         return 'Show Changes: Off';
     }
+    isCircleShape = true;
     public get color(): string {
         if(!this.viewModel.isCompare){
             return 'rgba(255, 255, 255, 0.2)';
@@ -286,9 +293,10 @@ export class DownloadCommand implements Command {
     name = 'download';
     viewModel: ViewModel;
     icon = 'mdi-download';
-    hoverText = 'Download';
+    text = 'Download';
+    isCircleShape = true;
     public get disabled(): boolean {
-        return !(!this.viewModel.isPristine || this.viewModel.downLoading || this.viewModel.activeProject.name === '');
+        return !this.viewModel.isPristine || this.viewModel.downLoading || this.viewModel.activeProject.name === '';
     }
     public get progress(): boolean {
         return this.viewModel.downLoading;
@@ -314,7 +322,26 @@ export class DownloadCommand implements Command {
     }
 }
 
-export function validateAndGenerate (viewModel: ViewModel) {
+export class NewProjectCommand implements Command {
+    name = 'new-project';
+    viewModel: ViewModel;
+    icon = 'mdi-plus';
+    text = 'New project';
+    isCircleShape = false;
+    public get disabled(): boolean {
+        return this.viewModel.generateLoading;
+    }
+    progress = false;
+    constructor(viewModel: ViewModel) {
+        this.viewModel = viewModel;
+    }
+
+    action() {
+        this.viewModel.newProjectDialog = true;
+    }
+}
+
+export function validateAndGenerate (viewModel: ViewModel, generateCommand: Command) {
     viewModel.jsonErrors = [];
     const result = validateJson(viewModel.activeProject.json);
     if(!result.error) {
@@ -324,8 +351,7 @@ export function validateAndGenerate (viewModel: ViewModel) {
             setSnackbar(viewModel, 'orange darken-2', `Exceeded character limit: ${jsonLength} / 2000`, -1);
             return;
         }
-        const generateCommand = new GenerateCommand(viewModel);
-        if(generateCommand){
+        if(generateCommand.action){
             generateCommand.action();
         }
     } else {
