@@ -248,7 +248,7 @@ export default Vue.extend({
     opacity: 0.6;
   }
   .select{
-    max-width: 220px;
+    max-width: 300px;
   }
   @media screen and (max-width: 600px) {
     .d-flex.select{
