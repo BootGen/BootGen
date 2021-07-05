@@ -8,7 +8,6 @@ export class DownloadCommand implements Command {
     viewModel: ViewModel;
     icon = 'mdi-download';
     text = 'Download';
-    isCircleShape = true;
     public get disabled(): boolean {
         return !this.viewModel.isPristine || this.viewModel.downLoading || this.viewModel.activeProject.name === '';
     }

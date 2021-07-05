@@ -13,7 +13,6 @@ export class GenerateCommand implements Command {
     viewModel: ViewModel;
     icon = 'mdi-arrow-right-bold';
     text = 'Generate';
-    isCircleShape = true;
     public get disabled(): boolean {
         return this.viewModel.isPristine || this.viewModel.generateLoading || this.viewModel.activeProject.name === '';
     }

@@ -11,7 +11,6 @@ export class CompareCommand implements Command {
         }
         return 'Show Changes: Off';
     }
-    isCircleShape = true;
     public get color(): string {
         if(!this.viewModel.isCompare){
             return 'rgba(255, 255, 255, 0.2)';

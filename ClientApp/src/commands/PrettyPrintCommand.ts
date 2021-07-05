@@ -7,7 +7,6 @@ export class PrettyPrintCommand implements Command {
     viewModel: ViewModel;
     icon = 'mdi-format-align-left';
     text = 'Formatting';
-    isCircleShape = true;
     public get disabled(): boolean {
         return this.viewModel.activeProject.json === '' || this.viewModel.generateLoading;
     }

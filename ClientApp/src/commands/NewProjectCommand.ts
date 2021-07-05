@@ -7,7 +7,6 @@ export class NewProjectCommand implements Command {
     viewModel: ViewModel;
     icon = 'mdi-plus';
     text = 'New project';
-    isCircleShape = false;
     public get disabled(): boolean {
         return this.viewModel.generateLoading;
     }

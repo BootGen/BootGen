@@ -6,7 +6,6 @@ export class UndoCommand implements Command {
     viewModel: ViewModel;
     icon = 'mdi-undo';
     text = 'Rollback to the last generated state';
-    isCircleShape = true;
     public get disabled(): boolean {
         return (this.viewModel.undoStack.length() < 2 && this.viewModel.isJsonPristine) || this.viewModel.generateLoading;
     }

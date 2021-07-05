@@ -6,7 +6,6 @@ export class ProjectSettingsCommand implements Command {
     viewModel: ViewModel;
     icon = 'mdi-cog';
     text = 'Project settings';
-    isCircleShape = true;
     public get disabled(): boolean {
         return this.viewModel.generateLoading;
     }

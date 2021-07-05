@@ -17,7 +17,6 @@ export class SaveCommand implements Command {
     viewModel: ViewModel;
     icon = 'mdi-floppy';
     text = 'Save';
-    isCircleShape = true;
     public get disabled(): boolean {
         return this.viewModel.saveDisabled || this.viewModel.generateLoading;
     }

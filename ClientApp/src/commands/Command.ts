@@ -5,7 +5,6 @@ export interface Command {
     viewModel: ViewModel;
 	icon: string;
 	text: string;
-    isCircleShape: boolean;
 	color?: string;
 	disabled: boolean;
     progress: boolean;

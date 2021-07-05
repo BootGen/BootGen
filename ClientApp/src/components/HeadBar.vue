@@ -9,7 +9,7 @@
               <v-text-field v-model="projectName" placeholder="Name your project" type="text" :error-messages="errors" required @input="changeName" :disabled="disabled"></v-text-field>
             </ValidationProvider>
           </ValidationObserver>
-          <tool-bar v-if="$store.state.auth.jwt" :buttons="[newProjectCommand]"></tool-bar>
+          <v-btn class="mr-0 ml-3" color="primary" small @click="newProjectCommand.action()" v-if="$store.state.auth.jwt" :disabled="newProjectCommand.disabled">{{ newProjectCommand.text }}</v-btn>
         </div>
         <div class="d-flex align-center mr-5">
           <span class="mr-5" v-if="!$store.state.auth.jwt">for save<router-link class="pl-2" to="/login" @click="toLogin()">sign in</router-link></span>
@@ -29,7 +29,6 @@ import Vue from 'vue';
 import { required } from 'vee-validate/dist/rules';
 import { extend, ValidationObserver, ValidationProvider } from 'vee-validate';
 import ProjectSettings from '../components/ProjectSettings.vue';
-import ToolBar from '../components/ToolBar.vue';
 import { ViewModel } from '../commands/ViewModel';
 import { NewProjectCommand } from '../commands/NewProjectCommand';
 
@@ -43,7 +42,6 @@ export default Vue.extend({
     ValidationProvider,
     ValidationObserver,
     ProjectSettings,
-    ToolBar,
   },
   props: {
     viewModel: {
