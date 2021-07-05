@@ -5,7 +5,6 @@ export interface Command {
     viewModel: ViewModel;
 	icon: string;
 	text: string;
-	color?: string;
 	disabled: boolean;
     progress: boolean;
     action: () => void;

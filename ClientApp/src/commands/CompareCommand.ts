@@ -4,21 +4,20 @@ import { ViewModel } from './ViewModel';
 export class CompareCommand implements Command {
     name = 'set-compare';
     viewModel: ViewModel;
-    icon = 'mdi-file-compare';
+    public get icon(): string {
+        if(!this.viewModel.isCompare){
+            return 'mdi-file-document';
+        }
+        return 'mdi-file-compare';
+    }
     public get text(): string {
         if(!this.viewModel.isCompare){
             return 'Show Changes: On';
         }
         return 'Show Changes: Off';
     }
-    public get color(): string {
-        if(!this.viewModel.isCompare){
-            return 'rgba(255, 255, 255, 0.2)';
-        }
-        return '#ffffff';
-    }
     
-    disabled = true;
+    disabled = false;
     progress = false;
     constructor(viewModel: ViewModel) {
         this.viewModel = viewModel;
