@@ -26,7 +26,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { Command } from '../utils/Command';
+import { Command } from '../commands/Command';
 
 export default Vue.extend({
 	props: {

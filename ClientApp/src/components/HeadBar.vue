@@ -30,8 +30,8 @@ import { required } from 'vee-validate/dist/rules';
 import { extend, ValidationObserver, ValidationProvider } from 'vee-validate';
 import ProjectSettings from '../components/ProjectSettings.vue';
 import ToolBar from '../components/ToolBar.vue';
-import { ViewModel } from '../utils/ViewModel';
-import { NewProjectCommand } from '../utils/Command';
+import { ViewModel } from '../commands/ViewModel';
+import { NewProjectCommand } from '../commands/NewProjectCommand';
 
 extend('required', {
   ...required,

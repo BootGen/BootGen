@@ -95,9 +95,15 @@ import ToolBar from '../components/ToolBar.vue';
 import {GeneratedFile} from '../models/GeneratedFile';
 import {CRC32} from 'crc_32_ts';
 import axios from 'axios';
-import {ViewModel}from '../utils/ViewModel';
-import { Command, ProjectSettingsCommand, UndoCommand, SaveCommand, PrettyPrintCommand, GenerateCommand, CompareCommand, DownloadCommand } from '../utils/Command';
-import { setSnackbar, setHighlightedDifferences, setActiveFile, validateAndGenerate, hideSnackbar } from '../utils/Command';
+import {ViewModel}from '../commands/ViewModel';
+import { Command } from '../commands/Command';
+import { ProjectSettingsCommand } from '../commands/ProjectSettingsCommand';
+import { UndoCommand } from '../commands/UndoCommand';
+import { SaveCommand } from '../commands/SaveCommand';
+import { PrettyPrintCommand } from '../commands/PrettyPrintCommand';
+import { GenerateCommand } from '../commands/GenerateCommand';
+import { CompareCommand } from '../commands/CompareCommand';
+import { DownloadCommand } from '../commands/DownloadCommand';
 
 export default Vue.extend({
   components: {
@@ -141,12 +147,12 @@ export default Vue.extend({
       this.viewModel.frontend = this.$store.state.projects.lastProject.frontend;
       this.callPrettyPrint();
       this.viewModel.undoStack.push(this.viewModel.activeProject.json);
-      setActiveFile(this.viewModel);
+      this.viewModel.setActiveFile();
       this.viewModel.crc32Saved = this.viewModel.crc32ForSaving;
       this.viewModel.crc32ProjectName = CRC32.str(this.viewModel.activeProject.name);
     }else{
       this.viewModel.activeProject.json = (await axios.get(`${this.$root.$data.baseUrl}/example_input.json`, {responseType: 'text'})).data;
-      validateAndGenerate(this.viewModel, this.generateCommand);
+      this.viewModel.validateAndGenerate(this.generateCommand);
     }
   },
   methods: {
@@ -169,13 +175,13 @@ export default Vue.extend({
     },
     removeErrors: function(){
       this.viewModel.jsonErrors = [];
-      hideSnackbar(this.viewModel);
+      this.viewModel.hideSnackbar();
     },
     callPrettyPrint: function(){
       const result = validateJson(this.viewModel.activeProject.json);
       if (result.error) {
         this.viewModel.jsonErrors.push({line: result.line, color: 'rgba(255, 0, 0, 0.3)'});
-        setSnackbar(this.viewModel, 'orange darken-2', result.message, -1);
+        this.viewModel.setSnackbar('orange darken-2', result.message, -1);
       }
       this.viewModel.activeProject.json = prettyPrint(this.viewModel.activeProject.json);
     },
@@ -215,7 +221,7 @@ export default Vue.extend({
     },
     selectFile: function(data: GeneratedFile){
       this.viewModel.activeFile = data;
-      setHighlightedDifferences(this.viewModel);
+      this.viewModel.setHighlightedDifferences();
     },
   },
 });
