@@ -20,7 +20,7 @@
         </div>
       </v-col>
     </v-row>
-    <project-settings v-if="viewModel.newProjectDialog" @save="newProject" @cancel="viewModel.newProjectDialog = false" title="Create new project" :backends="backends" :frontends="frontends"></project-settings>
+    <project-settings v-if="viewModel.newProjectDialog" :modify="false" @save="newProject" @cancel="viewModel.newProjectDialog = false" title="Create new project" :backends="backends" :frontends="frontends"></project-settings>
   </v-container>
 </template>
 

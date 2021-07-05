@@ -10,12 +10,10 @@
         <base-material-generator-card>
           <template v-slot:heading>
             <div class="d-flex align-center justify-space-between pa-2">
-              <div class="d-flex">
+              <div class="d-flex select">
                 <span class="display-1 font-weight-light pa-2">JSON</span>
                 <v-icon class="mr-1">mdi-arrow-right</v-icon>
-                <tool-bar class="freamworkSettings" :buttons="[projectSettingsCommand]"></tool-bar>
-                <project-settings v-if="viewModel.projectSettings" @save="saveProjectSettings" @cancel="cancelProjectSettings" title="Project Settings" :activeProject="viewModel.activeProject" :backends="backends" :frontends="frontends"></project-settings>
-                <div class="d-flex select">
+                <div class="d-flex">
                   <v-select
                     v-model="viewModel.activeProject.backend"
                     :items="backends"
@@ -34,7 +32,10 @@
                   ></v-select>
                 </div>
               </div>
-              <div>
+              <div class="d-flex">
+                <tool-bar class="freamworkSettings" :buttons="[projectSettingsCommand]"></tool-bar>
+                <project-settings v-if="viewModel.projectSettings" :modify="true" @save="saveProjectSettings" @cancel="cancelProjectSettings" title="Project Settings" :activeProject="viewModel.activeProject" :backends="backends" :frontends="frontends"></project-settings>
+
                 <tool-bar v-if="$store.state.auth.jwt" :buttons="[undoCommand, saveCommand, prettyPrintCommand, generateCommand]"></tool-bar>
                 <tool-bar v-else :buttons="[undoCommand, prettyPrintCommand, generateCommand]"></tool-bar>
               </div>
@@ -237,8 +238,8 @@ export default Vue.extend({
   .head{
     z-index: 99;
   }
-  .freamworkSettings{
-    display: none;
+  .container.freamworkSettings {
+    display: none!important;
   }
   .pathElement{
     cursor: pointer!important;
@@ -253,8 +254,8 @@ export default Vue.extend({
     .d-flex.select{
       display: none!important;
     }
-    .freamworkSettings{
-      display: flex;
+    .container.freamworkSettings{
+      display: flex!important;
     }
   }
 </style>

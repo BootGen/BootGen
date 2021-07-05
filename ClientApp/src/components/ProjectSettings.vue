@@ -25,7 +25,8 @@
           <v-card-actions>
             <v-spacer></v-spacer>
             <v-btn class="mr-0 ml-3" color="primary" @click="cancel">Cancel</v-btn>
-            <v-btn class="mr-0 ml-3" color="primary" @click="save" :disabled="invalid">Ok</v-btn>
+            <v-btn v-if="modify" class="mr-0 ml-3" color="primary" @click="save" :disabled="invalid">Ok</v-btn>
+            <v-btn v-else class="mr-0 ml-3" color="primary" @click="save" :disabled="invalid">Create</v-btn>
           </v-card-actions>
         </ValidationObserver>
       </v-card>
@@ -50,6 +51,7 @@ export default Vue.extend({
     ValidationObserver,
   },
   props: {
+    modify: Boolean,
     title: String,
     activeProject: Object as () => Project,
     backends: {
@@ -77,7 +79,10 @@ export default Vue.extend({
   },
   methods: {
     save: function(){
-      if(this.existsProjectName()){
+      if(this.modify){
+        this.$emit('save', this.backend, this.frontend, this.projectName);
+        this.dialog = false;
+      }else if(this.existsProjectName()){
         this.errorMsg = true;
       }else{
         this.$emit('save', this.backend, this.frontend, this.projectName);
