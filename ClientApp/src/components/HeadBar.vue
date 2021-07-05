@@ -9,7 +9,7 @@
               <v-text-field v-model="projectName" placeholder="Name your project" type="text" :error-messages="errors" required @input="changeName" :disabled="disabled"></v-text-field>
             </ValidationProvider>
           </ValidationObserver>
-          <v-btn class="mr-0 ml-3" color="primary" small @click="newProjectCommand.action()" v-if="$store.state.auth.jwt" :disabled="newProjectCommand.disabled">{{ newProjectCommand.text }}</v-btn>
+          <v-btn class="mr-0 ml-3" color="primary" small @click="openNewProjectDialogCommand.action()" v-if="$store.state.auth.jwt" :disabled="openNewProjectDialogCommand.disabled">{{ openNewProjectDialogCommand.text }}</v-btn>
         </div>
         <div class="d-flex align-center mr-5">
           <span class="mr-5" v-if="!$store.state.auth.jwt">for save<router-link class="pl-2" to="/login" @click="toLogin()">sign in</router-link></span>
@@ -30,7 +30,7 @@ import { required } from 'vee-validate/dist/rules';
 import { extend, ValidationObserver, ValidationProvider } from 'vee-validate';
 import ProjectSettings from '../components/ProjectSettings.vue';
 import { ViewModel } from '../commands/ViewModel';
-import { NewProjectCommand } from '../commands/NewProjectCommand';
+import { OpenNewProjectDialogCommand } from '../commands/OpenNewProjectDialog';
 
 extend('required', {
   ...required,
@@ -58,7 +58,7 @@ export default Vue.extend({
   },
   data: function () {
     return {
-      newProjectCommand: new NewProjectCommand(this.viewModel),
+      openNewProjectDialogCommand: new OpenNewProjectDialogCommand(this.viewModel),
       errorMsg: false,
       projectName: 'My Project',
       darkTheme: false,

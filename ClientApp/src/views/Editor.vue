@@ -33,7 +33,7 @@
                 </div>
               </div>
               <div class="d-flex">
-                <tool-bar class="freamworkSettings" :buttons="[projectSettingsCommand]"></tool-bar>
+                <tool-bar class="freamworkSettings" :buttons="[openSettingsDialogCommand]"></tool-bar>
                 <project-settings v-if="viewModel.projectSettings" :modify="true" @save="saveProjectSettings" @cancel="cancelProjectSettings" title="Project Settings" :activeProject="viewModel.activeProject" :backends="backends" :frontends="frontends"></project-settings>
 
                 <tool-bar v-if="$store.state.auth.jwt" :buttons="[undoCommand, saveCommand, prettyPrintCommand, generateCommand]"></tool-bar>
@@ -98,13 +98,13 @@ import {CRC32} from 'crc_32_ts';
 import axios from 'axios';
 import {ViewModel}from '../commands/ViewModel';
 import { Command } from '../commands/Command';
-import { ProjectSettingsCommand } from '../commands/ProjectSettingsCommand';
-import { UndoCommand } from '../commands/UndoCommand';
-import { SaveCommand } from '../commands/SaveCommand';
-import { PrettyPrintCommand } from '../commands/PrettyPrintCommand';
-import { GenerateCommand } from '../commands/GenerateCommand';
-import { CompareCommand } from '../commands/CompareCommand';
-import { DownloadCommand } from '../commands/DownloadCommand';
+import { OpenSettingsDialogCommand } from '../commands/OpenSettingsDialog';
+import { UndoCommand } from '../commands/Undo';
+import { SaveCommand } from '../commands/Save';
+import { PrettyPrintCommand } from '../commands/PrettyPrint';
+import { GenerateCommand } from '../commands/Generate';
+import { CompareCommand } from '../commands/Compare';
+import { DownloadCommand } from '../commands/Download';
 
 export default Vue.extend({
   components: {
@@ -118,7 +118,7 @@ export default Vue.extend({
   data: function () {
     return {
       viewModel: new ViewModel(),
-      projectSettingsCommand: null as (Command | null),
+      openSettingsDialogCommand: null as (Command | null),
       undoCommand: null as (Command | null),
       saveCommand: null as (Command | null),
       prettyPrintCommand: null as (Command | null),
@@ -133,7 +133,7 @@ export default Vue.extend({
     };
   },
   created: async function(){
-    this.projectSettingsCommand = new ProjectSettingsCommand(this.viewModel);
+    this.openSettingsDialogCommand = new OpenSettingsDialogCommand(this.viewModel);
     this.undoCommand = new UndoCommand(this.viewModel);
     this.saveCommand = new SaveCommand(this.viewModel);
     this.prettyPrintCommand = new PrettyPrintCommand(this.viewModel);

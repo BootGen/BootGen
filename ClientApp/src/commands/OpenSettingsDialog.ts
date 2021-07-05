@@ -1,12 +1,11 @@
-
 import { Command } from './Command';
 import { ViewModel } from './ViewModel';
 
-export class NewProjectCommand implements Command {
-    name = 'new-project';
+export class OpenSettingsDialogCommand implements Command {
+    name = 'project-settings';
     viewModel: ViewModel;
-    icon = 'mdi-plus';
-    text = 'New project';
+    icon = 'mdi-cog';
+    text = 'Project settings';
     public get disabled(): boolean {
         return this.viewModel.generateLoading;
     }
@@ -16,6 +15,6 @@ export class NewProjectCommand implements Command {
     }
 
     action() {
-        this.viewModel.newProjectDialog = true;
+        this.viewModel.projectSettings = true;
     }
 }
