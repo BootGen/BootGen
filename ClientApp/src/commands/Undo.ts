@@ -1,8 +1,10 @@
 import { Command } from './Command';
+import { CommandType } from './CommandStore';
 import { ViewModel } from './ViewModel';
 
 export class UndoCommand implements Command {
     name = 'undo';
+    type = CommandType.Undo;
     viewModel: ViewModel;
     icon = 'mdi-undo';
     text = 'Rollback to the last generated state';

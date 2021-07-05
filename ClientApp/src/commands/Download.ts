@@ -1,10 +1,12 @@
 import api from '@/api';
 import { Command } from './Command';
+import { CommandType } from './CommandStore';
 import { ViewModel } from './ViewModel';
 import { delay, toCamelCase } from '../utils/Helper';
 
 export class DownloadCommand implements Command {
     name = 'download';
+    type = CommandType.Download;
     viewModel: ViewModel;
     icon = 'mdi-download';
     text = 'Download';

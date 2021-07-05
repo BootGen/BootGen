@@ -1,4 +1,5 @@
 import { Command } from './Command';
+import { CommandType } from './CommandStore';
 import { ViewModel } from './ViewModel';
 import { Project } from '@/models/Project';
 import store from '../store/index';
@@ -14,6 +15,7 @@ function getProjectByName(projectName: string): Project | null{
 
 export class SaveCommand implements Command {
     name = 'save';
+    type = CommandType.Save;
     viewModel: ViewModel;
     icon = 'mdi-floppy';
     text = 'Save';

@@ -2,7 +2,7 @@
   <v-container fluid class="editor">
     <v-row class="d-flex">
       <v-col cols="12" class="head pa-0">
-        <head-bar :viewModel="viewModel" :activeProjectName="viewModel.activeProject.name" :backends="backends" :frontends="frontends" :disabled="viewModel.generateLoading" @new-project="createNewProject" @change-project-name="changeProjectName"></head-bar>
+        <head-bar :viewModel="viewModel" :commandStore="commandStore" :activeProjectName="viewModel.activeProject.name" :backends="backends" :frontends="frontends" @new-project="createNewProject" @change-project-name="changeProjectName"></head-bar>
       </v-col>
     </v-row>
     <v-row class="d-flex align-center">
@@ -33,11 +33,11 @@
                 </div>
               </div>
               <div class="d-flex">
-                <tool-bar class="freamworkSettings" :buttons="[openSettingsDialogCommand]"></tool-bar>
+                <tool-bar class="freamworkSettings" :buttonTypes="[CommandType.OpenSettingsDialog]" :commandStore="commandStore"></tool-bar>
                 <project-settings v-if="viewModel.projectSettings" :modify="true" @save="saveProjectSettings" @cancel="cancelProjectSettings" title="Project Settings" :activeProject="viewModel.activeProject" :backends="backends" :frontends="frontends"></project-settings>
 
-                <tool-bar v-if="$store.state.auth.jwt" :buttons="[undoCommand, saveCommand, prettyPrintCommand, generateCommand]"></tool-bar>
-                <tool-bar v-else :buttons="[undoCommand, prettyPrintCommand, generateCommand]"></tool-bar>
+                <tool-bar v-if="$store.state.auth.jwt" :buttonTypes="[CommandType.Undo, CommandType.Save, CommandType.PrettyPrint, CommandType.Generate]" :commandStore="commandStore"></tool-bar>
+                <tool-bar v-else :buttonTypes="[CommandType.Undo, CommandType.PrettyPrint, CommandType.Generate]" :commandStore="commandStore"></tool-bar>
               </div>
             </div>
           </template>
@@ -62,7 +62,7 @@
                 </span>
               </div>
               <div class="d-flex">
-                <tool-bar :buttons="[compareCommand, downloadCommand]"></tool-bar>
+                <tool-bar :buttonTypes="[CommandType.Compare, CommandType.Download]" :commandStore="commandStore"></tool-bar>
               </div>
             </div>
           </template>
@@ -98,13 +98,8 @@ import {CRC32} from 'crc_32_ts';
 import axios from 'axios';
 import {ViewModel}from '../commands/ViewModel';
 import { Command } from '../commands/Command';
-import { OpenSettingsDialogCommand } from '../commands/OpenSettingsDialog';
-import { UndoCommand } from '../commands/Undo';
-import { SaveCommand } from '../commands/Save';
-import { PrettyPrintCommand } from '../commands/PrettyPrint';
 import { GenerateCommand } from '../commands/Generate';
-import { CompareCommand } from '../commands/Compare';
-import { DownloadCommand } from '../commands/Download';
+import { CommandStore, CommandType } from '../commands/CommandStore';
 
 export default Vue.extend({
   components: {
@@ -118,13 +113,9 @@ export default Vue.extend({
   data: function () {
     return {
       viewModel: new ViewModel(),
-      openSettingsDialogCommand: null as (Command | null),
-      undoCommand: null as (Command | null),
-      saveCommand: null as (Command | null),
-      prettyPrintCommand: null as (Command | null),
+      commandStore: null as (CommandStore | null),
+      CommandType: CommandType,
       generateCommand: null as (Command | null),
-      compareCommand: null as (Command | null),
-      downloadCommand: null as (Command | null),
       newProject: {id: -1, ownerId: -1, name: 'My Project', json: '', backend: 'ASP.NET', frontend: 'Vue 2 + JS'},
       drawer: false,
       openPath: '',
@@ -133,13 +124,8 @@ export default Vue.extend({
     };
   },
   created: async function(){
-    this.openSettingsDialogCommand = new OpenSettingsDialogCommand(this.viewModel);
-    this.undoCommand = new UndoCommand(this.viewModel);
-    this.saveCommand = new SaveCommand(this.viewModel);
-    this.prettyPrintCommand = new PrettyPrintCommand(this.viewModel);
+    this.commandStore = new CommandStore(this.viewModel);
     this.generateCommand = new GenerateCommand(this.viewModel);
-    this.compareCommand = new CompareCommand(this.viewModel);
-    this.downloadCommand = new DownloadCommand(this.viewModel);
     this.newProject.json = JSON.stringify((await axios.get(`${this.$root.$data.baseUrl}/new_project_input.json`, {responseType: 'json'})).data);
     if(this.$store.state.projects.lastProject.json){
       this.viewModel.activeProject = this.$store.state.projects.lastProject;
@@ -193,12 +179,12 @@ export default Vue.extend({
       this.newProject.frontend = frontend;
       this.viewModel.activeProject = {...this.newProject};
       this.callPrettyPrint();
-      if(this.saveCommand){
-        await this.saveCommand.action();
+      if(this.commandStore){
+        this.commandStore.do(CommandType.Save);
       }
       this.viewModel.undoStack.clear();
-      if(this.generateCommand){
-        await this.generateCommand.action();
+      if(this.commandStore){
+        this.commandStore.do(CommandType.Generate);
       }
       this.viewModel.highlightedDifferences = [];
     },

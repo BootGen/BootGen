@@ -1,8 +1,10 @@
 import { Command } from './Command';
+import { CommandType } from './CommandStore';
 import { ViewModel } from './ViewModel';
 
 export class CompareCommand implements Command {
     name = 'set-compare';
+    type = CommandType.Compare;
     viewModel: ViewModel;
     public get icon(): string {
         if(!this.viewModel.isCompare){

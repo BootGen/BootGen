@@ -1,9 +1,11 @@
 import { Command } from './Command';
+import { CommandType } from './CommandStore';
 import { ViewModel } from './ViewModel';
 import { prettyPrint, validateJson } from '../utils/PrettyPrint';
 
 export class PrettyPrintCommand implements Command {
     name = 'pretty-print';
+    type = CommandType.PrettyPrint;
     viewModel: ViewModel;
     icon = 'mdi-format-align-left';
     text = 'Formatting';

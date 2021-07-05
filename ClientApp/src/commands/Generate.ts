@@ -1,5 +1,6 @@
 import api from '@/api';
 import { Command } from './Command';
+import { CommandType } from './CommandStore';
 import { ViewModel } from './ViewModel';
 import { prettyPrint, validateJson } from '../utils/PrettyPrint';
 import { getJsonLength, toCamelCase } from '../utils/Helper';
@@ -10,6 +11,7 @@ import { CRC32 } from 'crc_32_ts';
 
 export class GenerateCommand implements Command {
     name = 'generate';
+    type = CommandType.Generate;
     viewModel: ViewModel;
     icon = 'mdi-arrow-right-bold';
     text = 'Generate';

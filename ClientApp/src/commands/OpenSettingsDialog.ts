@@ -1,8 +1,10 @@
 import { Command } from './Command';
+import { CommandType } from './CommandStore';
 import { ViewModel } from './ViewModel';
 
 export class OpenSettingsDialogCommand implements Command {
     name = 'project-settings';
+    type = CommandType.OpenSettingsDialog;
     viewModel: ViewModel;
     icon = 'mdi-cog';
     text = 'Project settings';
