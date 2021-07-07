@@ -97,8 +97,6 @@ import {GeneratedFile} from '../models/GeneratedFile';
 import {CRC32} from 'crc_32_ts';
 import axios from 'axios';
 import {ViewModel}from '../commands/ViewModel';
-import { Command } from '../commands/Command';
-import { GenerateCommand } from '../commands/Generate';
 import { CommandStore, CommandType } from '../commands/CommandStore';
 
 export default Vue.extend({
@@ -115,7 +113,6 @@ export default Vue.extend({
       viewModel: new ViewModel(),
       commandStore: null as (CommandStore | null),
       CommandType: CommandType,
-      generateCommand: null as (Command | null),
       newProject: {id: -1, ownerId: -1, name: 'My Project', json: '', backend: 'ASP.NET', frontend: 'Vue 2 + JS'},
       drawer: false,
       openPath: '',
@@ -124,8 +121,7 @@ export default Vue.extend({
     };
   },
   created: async function(){
-    this.commandStore = new CommandStore(this.viewModel);
-    this.generateCommand = new GenerateCommand(this.viewModel);
+    this.commandStore = new CommandStore(this.viewModel, this.$gtag);
     this.newProject.json = JSON.stringify((await axios.get(`${this.$root.$data.baseUrl}/new_project_input.json`, {responseType: 'json'})).data);
     if(this.$store.state.projects.lastProject.json){
       this.viewModel.activeProject = this.$store.state.projects.lastProject;
@@ -139,7 +135,7 @@ export default Vue.extend({
       this.viewModel.crc32ProjectName = CRC32.str(this.viewModel.activeProject.name);
     }else{
       this.viewModel.activeProject.json = (await axios.get(`${this.$root.$data.baseUrl}/example_input.json`, {responseType: 'text'})).data;
-      this.viewModel.validateAndGenerate(this.generateCommand);
+      this.commandStore.do(CommandType.Generate);
     }
   },
   methods: {
