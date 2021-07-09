@@ -17,7 +17,7 @@ export class UndoCommand implements Command {
     }
 
     action() {
-        if (this.viewModel.isPristine) {
+        if (this.viewModel.isJsonPristine) {
             this.viewModel.undoStack.pop();
         }
         const top = this.viewModel.undoStack.top();
