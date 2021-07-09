@@ -9,7 +9,12 @@
       <h1 class="slogan">
         Getting Started
       </h1>
-      <p>To start using BootGen all you need to do, is to create a sample dataset for your next application in JSON. You do not need to install anything, and you do not need to register. Just go to the editor, and enjoy the head start for your project!</p>
+      <h2 class="slogan">
+        Online project generator for ASP.Net 5 with Vue.js
+      </h2>
+      <h3>
+        BootGen generates an ASP.Net 5 project with Vue.js based on the sample JSON data you provide. From this sample data it infers the types you need, and creates entity classes, data services, controllers and Vuex state management that fits your use case.
+      </h3>
       <div class="slogan">
         <v-btn class="ma-2" to="/editor" color="primary"> Try Online </v-btn>
       </div>
