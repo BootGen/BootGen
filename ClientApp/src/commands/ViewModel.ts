@@ -11,7 +11,7 @@ export class ViewModel {
     generatedFiles = Array<GeneratedFile>();
     previousFiles = Array<GeneratedFile>();
     undoStack = new UndoStack();
-    crc32ProjectName = CRC32.str('My Project');
+    crc32Generated = 0;
     crc32Saved = 0;
     activeProject: Project = {id: -1, ownerId: -1, name: 'My Project', json: '', backend: 'ASP.NET', frontend: 'Vue 2 + JS'};
     newProjectDialog = false;
@@ -34,32 +34,19 @@ export class ViewModel {
         timeout: 5000,
     }
     public get isPristine(): boolean {
-        const top = this.undoStack.top();
-        if(top){
-            if((top.crc32 === CRC32.str(this.activeProject.json)) &&
-                (this.crc32ProjectName === CRC32.str(this.activeProject.name)) &&
-                (this.backend === this.activeProject.backend) &&
-                (this.frontend === this.activeProject.frontend)
-            ){
-                return true;
-            }
-        }
-        return false;
+        return this.crc32Generated === this.crc32 &&
+            this.backend === this.activeProject.backend &&
+            this.frontend === this.activeProject.frontend;
     }
     public get isJsonPristine(): boolean {
         const top = this.undoStack.top();
         if(top){
-            if(top.crc32 === CRC32.str(this.activeProject.json)){
-            return true;
-            }
+            return top.crc32 === CRC32.str(this.activeProject.json);
         }
         return false;
     }
-    public get crc32ForSaving(): number {
+    public get crc32(): number {
       return CRC32.str(this.activeProject.name + this.activeProject.json);
-    }
-    public get saveDisabled(): boolean {
-        return this.crc32Saved === this.crc32ForSaving;
     }
     
     public setSnackbar(type: string, text: string, timeout: number){

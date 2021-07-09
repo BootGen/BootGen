@@ -56,7 +56,7 @@ export class GenerateCommand implements Command {
             this.viewModel.generatedFiles = generateResult.generatedFiles;
             store.commit('projects/setLastProject', this.viewModel.activeProject);
             store.commit('projects/setLastGeneratedFiles', this.viewModel.generatedFiles);
-            this.viewModel.crc32ProjectName = CRC32.str(this.viewModel.activeProject.name);
+            this.viewModel.crc32Generated = this.viewModel.crc32;
             if(this.viewModel.activeProject.backend === this.viewModel.backend && this.viewModel.activeProject.frontend === this.viewModel.frontend){
               this.viewModel.showChanges = true;
               this.viewModel.highlightedDifferences = [];

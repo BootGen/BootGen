@@ -131,8 +131,7 @@ export default Vue.extend({
       this.callPrettyPrint();
       this.viewModel.undoStack.push(this.viewModel.activeProject.json);
       this.viewModel.setActiveFile();
-      this.viewModel.crc32Saved = this.viewModel.crc32ForSaving;
-      this.viewModel.crc32ProjectName = CRC32.str(this.viewModel.activeProject.name);
+      this.viewModel.crc32Saved = this.viewModel.crc32;
     }else{
       this.viewModel.activeProject.json = (await axios.get(`${this.$root.$data.baseUrl}/example_input.json`, {responseType: 'text'})).data;
       this.commandStore.do(CommandType.Generate);

@@ -1,7 +1,6 @@
 <template>
   <v-container fluid class="d-flex pa-0 ma-0">
     <v-tooltip v-for="(buttonType, idx) in buttonTypes" :key="idx" bottom>
-      {{buttonType}}-{{idx}}
       <template v-slot:activator="{ on, attrs }">
         <v-btn class="mr-1" color="white" elevation="1" fab small @click="commandStore.do(buttonType)" v-bind="attrs" v-on="on" :disabled="commandStore.command(buttonType).disabled">
           <v-icon v-if="!commandStore.command(buttonType).progress" color="primary">{{ commandStore.command(buttonType).icon }}</v-icon>

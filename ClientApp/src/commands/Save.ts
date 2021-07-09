@@ -20,7 +20,7 @@ export class SaveCommand implements Command {
     icon = 'mdi-floppy';
     text = 'Save';
     public get disabled(): boolean {
-        return this.viewModel.saveDisabled || this.viewModel.generateLoading;
+        return this.viewModel.crc32Saved === this.viewModel.crc32 || this.viewModel.generateLoading;
     }
     progress = false;
     constructor(viewModel: ViewModel) {
@@ -32,7 +32,7 @@ export class SaveCommand implements Command {
           const project = getProjectByName(this.viewModel.activeProject.name);
           if (!project && this.viewModel.activeProject.id === -1) {
             this.viewModel.setSnackbar('success', 'The new project was successfully created!', 5000);
-            this.viewModel.crc32Saved = this.viewModel.crc32ForSaving;
+            this.viewModel.crc32Saved = this.viewModel.crc32;
             this.viewModel.activeProject.id = 0;
             if(store.state.auth.user){
                 this.viewModel.activeProject.ownerId = store.state.auth.user.id;
@@ -41,7 +41,7 @@ export class SaveCommand implements Command {
           } else if(project && project.id !== this.viewModel.activeProject.id) {
             this.viewModel.setSnackbar('error', 'This name is already in use, please enter another name!', 5000);
           } else {
-            this.viewModel.crc32Saved = this.viewModel.crc32ForSaving;
+            this.viewModel.crc32Saved = this.viewModel.crc32;
             this.viewModel.setSnackbar('success', 'Project updated successfully!', 5000);
             await store.dispatch('projects/updateProject', this.viewModel.activeProject);
             this.viewModel.setSnackbar('success', 'Project updated successfully!', 5000);
