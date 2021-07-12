@@ -26,16 +26,10 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { required } from 'vee-validate/dist/rules';
-import { extend, ValidationObserver, ValidationProvider } from 'vee-validate';
+import { ValidationObserver, ValidationProvider } from 'vee-validate';
 import ProjectSettings from '../components/ProjectSettings.vue';
 import { ViewModel } from '../commands/ViewModel';
 import { CommandStore, CommandType } from '../commands/CommandStore';
-
-extend('required', {
-  ...required,
-  message: '{_field_} can not be empty',
-});
 
 export default Vue.extend({
   components: {

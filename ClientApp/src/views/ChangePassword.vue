@@ -89,35 +89,8 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { required, min } from 'vee-validate/dist/rules';
-import { extend, ValidationObserver, ValidationProvider } from 'vee-validate';
+import { ValidationObserver, ValidationProvider } from 'vee-validate';
 import api from '../api';
-
-extend('required', {
-  ...required,
-  message: '{_field_} can not be empty',
-});
-
-extend('min', {
-  ...min,
-  message: '{_field_} may not be less than {length} characters',
-});
-
-extend('oldPassword', {
-  params: ['target'],
-  validate(value, { target }: any) {
-    return !(value === target);
-  },
-  message: 'Password cannot match the current one',
-});
-
-extend('password', {
-  params: ['target'],
-  validate(value, { target }: any) {
-    return value === target;
-  },
-  message: 'Password confirmation does not match',
-});
 
 export default Vue.extend({
   components: {
