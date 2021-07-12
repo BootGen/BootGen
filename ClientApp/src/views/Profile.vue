@@ -16,7 +16,7 @@
           <v-form>
             <v-container>
               <ValidationObserver v-slot="{ invalid }">
-                <ValidationProvider v-slot="{ errors }" name="user name" rules="required">
+                <ValidationProvider v-slot="{ errors }" name="user name" rules="required|username">
                   <v-text-field
                     label="User Name"
                     v-model="$store.state.auth.user.userName"
@@ -82,6 +82,13 @@ extend('required', {
 extend('min', {
   ...min,
   message: '{_field_} may not be less than {length} characters',
+});
+
+extend('username', {
+  validate(value) {
+    return (/^(?![_. ])(?!.*[_. ]{2})[A-zÀ-ű0-9._ ]+(?<![. ])$/.test(value));
+  },
+  message: 'User name must be valid',
 });
 
 export default Vue.extend({
