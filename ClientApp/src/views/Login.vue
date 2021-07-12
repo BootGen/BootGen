@@ -13,7 +13,7 @@
           <v-form>
             <v-container>
               <ValidationObserver v-slot="{ invalid }">
-                <ValidationProvider v-slot="{ errors }" name="email" rules="required|custom_email">
+                <ValidationProvider v-slot="{ errors }" name="email" rules="required|email">
                 <v-text-field
                   name="email"
                   label="E-mail"
@@ -47,26 +47,8 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { required, email, min } from 'vee-validate/dist/rules';
-import { extend, ValidationObserver, ValidationProvider } from 'vee-validate';
+import { ValidationObserver, ValidationProvider } from 'vee-validate';
 import {LoginError} from '../models/LoginError';
-
-extend('required', {
-  ...required,
-  message: '{_field_} can not be empty',
-});
-
-extend('min', {
-  ...min,
-  message: '{_field_} may not be less than {length} characters',
-});
-
-extend('custom_email', {
-  validate(value) {
-    return (/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(value.trim()));
-  },
-  message: 'Email must be valid',
-});
 
 export default Vue.extend({
   components: {

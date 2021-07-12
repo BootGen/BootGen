@@ -18,7 +18,7 @@
           <v-form v-else>
             <v-container>
               <ValidationObserver v-slot="{ invalid }">
-                <ValidationProvider v-slot="{ errors }" name="user name" rules="required">
+                <ValidationProvider v-slot="{ errors }" name="user name" rules="required|username">
                   <v-text-field
                     v-model="userName"
                     :error-messages="errors"
@@ -68,31 +68,8 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { required, email, min } from 'vee-validate/dist/rules';
-import { extend, ValidationObserver, ValidationProvider } from 'vee-validate';
+import { ValidationObserver, ValidationProvider } from 'vee-validate';
 import api from '../api'
-extend('required', {
-  ...required,
-  message: '{_field_} can not be empty',
-});
-
-extend('min', {
-  ...min,
-  message: '{_field_} may not be less than {length} characters',
-});
-
-extend('email', {
-  ...email,
-  message: 'Email must be valid',
-});
-
-extend('password', {
-  params: ['target'],
-  validate(value, {target}: any) {
-    return value === target;
-  },
-  message: 'Password confirmation does not match'
-});
 
 export default Vue.extend({
   components: {

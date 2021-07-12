@@ -16,7 +16,7 @@
           <v-form>
             <v-container>
               <ValidationObserver v-slot="{ invalid }">
-                <ValidationProvider v-slot="{ errors }" name="user name" rules="required">
+                <ValidationProvider v-slot="{ errors }" name="user name" rules="required|username">
                   <v-text-field
                     label="User Name"
                     v-model="$store.state.auth.user.userName"
@@ -70,19 +70,8 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { required, min } from 'vee-validate/dist/rules';
-import { extend, ValidationObserver, ValidationProvider } from 'vee-validate';
+import { ValidationObserver, ValidationProvider } from 'vee-validate';
 import api from '../api'
-
-extend('required', {
-  ...required,
-  message: '{_field_} can not be empty',
-});
-
-extend('min', {
-  ...min,
-  message: '{_field_} may not be less than {length} characters',
-});
 
 export default Vue.extend({
   components: {
