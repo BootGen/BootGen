@@ -22,7 +22,7 @@
                   prepend-icon="mdi-email-outline"
                 ></v-text-field>
                 </ValidationProvider>
-                <ValidationProvider v-slot="{ errors }" name="password" rules="required">
+                <ValidationProvider v-slot="{ errors }" name="password" rules="required|customPassword">
                   <v-text-field
                     name="password"
                     label="Password"
