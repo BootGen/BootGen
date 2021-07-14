@@ -21,7 +21,6 @@ let errorMassage = 'min length 8 chars, and must include 1 lower-case, upper-cas
 extend('customPassword', {
   message: field => `The ${field}  ${errorMassage}`,
   validate: value => {
-    console.log(value, 'ffff')
     const validChars = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
     const isValidChars = validChars.test(value);
     if (isValidChars) {
