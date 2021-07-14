@@ -19,9 +19,11 @@ namespace Editor.Services
             dbContext.SaveChanges();
         }
 
-        public void LogException(Exception e)
+        public void LogException(Exception e, string info)
         {
-            dbContext.AppErrors.Add(ConvertToAppError(e));
+            var appError = ConvertToAppError(e);
+            appError.Info = info;
+            dbContext.AppErrors.Add(appError);
             if (e.InnerException != null)
                 dbContext.AppErrors.Add(ConvertToAppError(e.InnerException));
             dbContext.SaveChanges();

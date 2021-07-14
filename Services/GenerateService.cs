@@ -47,7 +47,7 @@ namespace Editor.Services
             catch (Exception e)
             {
                 if (!(e is JsonReaderException))
-                    ErrorService.LogException(e);
+                    ErrorService.LogException(e, request.Data);
                 return new GenerateResponse
                     {
                         Success = false,
@@ -75,7 +75,7 @@ namespace Editor.Services
             }
             catch (Exception e)
             {
-                ErrorService.LogException(e);
+                ErrorService.LogException(e, request.Data);
                 return null;
             }
             finally
