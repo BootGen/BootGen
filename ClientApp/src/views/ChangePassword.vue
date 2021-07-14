@@ -43,7 +43,7 @@
                 <ValidationProvider
                   v-slot="{ errors }"
                   name="confirmation"
-                  rules="required|min:8"
+                  rules="required|customPassword"
                 >
                   <v-text-field
                     v-model="confirmPassword"
