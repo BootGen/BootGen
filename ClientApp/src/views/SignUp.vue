@@ -34,7 +34,7 @@
                   prepend-icon="mdi-email-outline"
                   ></v-text-field>
                 </ValidationProvider>
-                <ValidationProvider v-slot="{ errors }" name="password" rules="required|customPassword|password:@confirmation">
+                <ValidationProvider v-slot="{ errors }" name="password" rules="required|customPassword|min:8|password:@confirmation">
                   <v-text-field
                     v-model="password"
                     :error-messages="errors"
@@ -43,7 +43,7 @@
                     prepend-icon="mdi-form-textbox-password"
                   ></v-text-field>
                 </ValidationProvider>
-                <ValidationProvider v-slot="{ errors }" name="confirmation" rules='required|min:8'>
+                <ValidationProvider v-slot="{ errors }" name="confirmation" rules='required'>
                   <v-text-field
                     v-model="confirmPassword"
                     :error-messages="errors"

@@ -23,6 +23,13 @@ extend('email', {
     message: 'Email must be valid',
 });
 
+extend('customPassword', {
+    validate(value) {
+        return (/^(?=.*[A-Z])(?=.*[0-9])[A-Za-z\d@$!%*?&.-_]+$/.test(value));
+    },
+    message: field => `${field} must include 1 lower-case, upper-case and number`,
+})
+
 extend('password', {
     params: ['target'],
     validate(value, { target }: any) {
