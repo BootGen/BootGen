@@ -27,7 +27,7 @@ extend('customPassword', {
     validate(value) {
         return (/^(?=.*[A-Z])(?=.*[0-9])[A-Za-z\d@$!%*?&.-_]+$/.test(value));
     },
-    message: field => `${field} must include 1 lower-case, upper-case and number`,
+    message: field => `${field} must include a lower-case, an upper-case letter and a number`,
 })
 
 extend('password', {
