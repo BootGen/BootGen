@@ -13,7 +13,7 @@ extend('min', {
 
 extend('username', {
     validate(value) {
-        return (/^(?![_. ])(?!.*[_. ]{2})[A-zÀ-ű0-9._ ]+(?<![. ])$/.test(value));
+        return (/^[A-zÀ-ű0-9._ ]+$/.test(value));
     },
     message: 'User name must be valid',
 });

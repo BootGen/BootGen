@@ -89,6 +89,7 @@ export default Vue.extend({
     saveUser: async function () {
       this.$gtag?.event('update-profile');
       this.successMsg = '';
+      this.$store.state.auth.user.userName = this.$store.state.auth.user.userName.trim();
       const response = await api.updateProfile(this.$store.state.auth.user, this.$store.state.auth.jwt);
       if (response.isUserNameInUse) {
         this.errorMsg = 'This user name already exists!';
