@@ -133,7 +133,8 @@ export default Vue.extend({
       this.viewModel.setActiveFile();
       this.viewModel.crc32Saved = this.viewModel.crc32;
     }else{
-      this.viewModel.activeProject.json = (await axios.get(`${this.$root.$data.baseUrl}/example_input.json`, {responseType: 'text'})).data;
+      this.viewModel.activeProject.json = JSON.stringify((await axios.get(`${this.$root.$data.baseUrl}/example_input.json`, {responseType: 'json'})).data);
+      this.viewModel.activeProject.json = prettyPrint(this.viewModel.activeProject.json);
       this.commandStore.do(CommandType.Generate);
     }
   },

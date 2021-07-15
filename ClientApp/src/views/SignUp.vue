@@ -34,7 +34,7 @@
                   prepend-icon="mdi-email-outline"
                   ></v-text-field>
                 </ValidationProvider>
-                <ValidationProvider v-slot="{ errors }" name="password" rules="required|min:8|password:@confirmation">
+                <ValidationProvider v-slot="{ errors }" name="password" rules="required|customPassword|min:8|password:@confirmation">
                   <v-text-field
                     v-model="password"
                     :error-messages="errors"
@@ -43,7 +43,7 @@
                     prepend-icon="mdi-form-textbox-password"
                   ></v-text-field>
                 </ValidationProvider>
-                <ValidationProvider v-slot="{ errors }" name="confirmation" rules='required|min:8'>
+                <ValidationProvider v-slot="{ errors }" name="confirmation" rules='required'>
                   <v-text-field
                     v-model="confirmPassword"
                     :error-messages="errors"
@@ -91,7 +91,7 @@ export default Vue.extend({
     trySignUp: async function () {
       this.$gtag?.event('sign-up');
       const response = await api.register({
-        userName: this.userName,
+        userName: this.userName.trim(),
         email: this.email,
         newsletter: this.newsletter,
         password: this.password,
