@@ -122,7 +122,7 @@ export default Vue.extend({
   },
   created: async function(){
     this.commandStore = new CommandStore(this.viewModel, this.$gtag);
-    this.newProject.json = JSON.stringify((await axios.get(`${this.$root.$data.baseUrl}/new_project_input.json`, {responseType: 'json'})).data);
+    this.newProject.json = (await axios.get(`${this.$root.$data.baseUrl}/new_project_input.json`, {responseType: 'text'})).data;
     if(this.$store.state.projects.lastProject.json){
       this.viewModel.activeProject = this.$store.state.projects.lastProject;
       this.viewModel.generatedFiles = [...this.$store.state.projects.lastGeneratedFiles];
@@ -133,7 +133,7 @@ export default Vue.extend({
       this.viewModel.setActiveFile();
       this.viewModel.crc32Saved = this.viewModel.crc32;
     }else{
-      this.viewModel.activeProject.json = JSON.stringify((await axios.get(`${this.$root.$data.baseUrl}/example_input.json`, {responseType: 'json'})).data);
+      this.viewModel.activeProject.json = (await axios.get(`${this.$root.$data.baseUrl}/example_input.json`, {responseType: 'text'})).data;
       this.viewModel.activeProject.json = prettyPrint(this.viewModel.activeProject.json);
       this.commandStore.do(CommandType.Generate);
     }
