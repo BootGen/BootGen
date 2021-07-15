@@ -122,7 +122,7 @@ export default Vue.extend({
   },
   created: async function(){
     this.commandStore = new CommandStore(this.viewModel, this.$gtag);
-    this.newProject.json = (await axios.get(`${this.$root.$data.baseUrl}/new_project_input.json`, {responseType: 'text'})).data;
+    this.newProject.json = await this.getProjectContentFromServer('new_project_input');
     if(this.$store.state.projects.lastProject.json){
       this.viewModel.activeProject = this.$store.state.projects.lastProject;
       this.viewModel.generatedFiles = [...this.$store.state.projects.lastGeneratedFiles];
@@ -133,12 +133,18 @@ export default Vue.extend({
       this.viewModel.setActiveFile();
       this.viewModel.crc32Saved = this.viewModel.crc32;
     }else{
-      this.viewModel.activeProject.json = (await axios.get(`${this.$root.$data.baseUrl}/example_input.json`, {responseType: 'text'})).data;
+      this.viewModel.activeProject.json = await this.getProjectContentFromServer('example_input');
       this.viewModel.activeProject.json = prettyPrint(this.viewModel.activeProject.json);
       this.commandStore.do(CommandType.Generate);
     }
   },
   methods: {
+    getProjectContentFromServer: async function(name: string): Promise<string> {
+      const data = (await axios.get(`${this.$root.$data.baseUrl}/${name}.json`, {responseType: 'text'})).data;
+      if (typeof data === 'string')
+        return data;
+      return JSON.stringify(data);
+    },
     saveProjectSettings: function(backend: string, frontend: string, name: string){
       this.$gtag?.event('save-project-settings');
       this.viewModel.activeProject.backend = backend;
