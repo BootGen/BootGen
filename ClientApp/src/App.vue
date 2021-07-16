@@ -42,9 +42,9 @@
             <v-btn color="primary" @click="customizeCookies()" small>customize</v-btn>
           </div>
         </div>
-        <a class="repositoryLink" href="https://github.com/BootGen/Editor" target="_blank" @click="openGithub()">
+        <a class="repositoryLink" href="https://github.com/BootGen/BootGen" target="_blank" @click="openGithub()">
           <v-icon class="pr-2">mdi-github</v-icon>
-          github.com/BootGen/Editor
+          github.com/BootGen/BootGen
         </a>
       </div>
     </v-navigation-drawer>
