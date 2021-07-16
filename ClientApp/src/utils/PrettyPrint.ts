@@ -1,3 +1,6 @@
+
+import axios from 'axios';
+
 function getLine(idx: number, str: string): number{
   if(navigator.userAgent.indexOf('Firefox') != -1){
     return idx;
@@ -34,6 +37,11 @@ export function validateJson(text: string): JsonValidationResult {
         errorLine++;
       }
     }
+    axios.post('errors/log', {
+      kind: 'JSON',
+      message: 'validation error',
+      info: text
+    });
     return {error: true, line: errorLine, message: err.message};
   }
 }
