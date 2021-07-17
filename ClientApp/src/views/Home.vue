@@ -7,7 +7,7 @@
         alt="BootGen logo"
       ></v-img>
       <h1 class="slogan">
-        Don’t start from scratch!
+        Develop ASP.NET + Vue applications much faster!
       </h1>
       <h2 class="slogan">
         Online project generator for ASP.Net 5 with Vue.js

@@ -16,10 +16,10 @@
         {{ open ? 'mdi-chevron-down ' : 'mdi-chevron-right' }}
       </v-icon>
       <v-icon :color="darkColors[item.type]" v-else-if="$vuetify.theme.dark">
-        {{ icons[item.type] }}
+        {{ getIcon(item) }}
       </v-icon>
       <v-icon :color="colors[item.type]" v-else>
-        {{ icons[item.type] }}
+        {{ getIcon(item) }}
       </v-icon>
     </template>
     <template v-slot:append="{ item }">
@@ -99,6 +99,12 @@ export default Vue.extend({
         ts: 'mdi-language-typescript',
         js: 'mdi-language-javascript',
         yml: 'mdi-exclamation-thick ',
+        md: 'mdi-language-markdown',
+        json: 'mdi-code-braces',
+        html: 'mdi-code-tags',
+        gitignore: 'mdi-git',
+        csproj: 'mdi-rss',
+        editorconfig: 'mdi-cog'
       },
       ChangeType: ChangeType,
     };
@@ -117,6 +123,12 @@ export default Vue.extend({
     this.setDefaultNodes();
   },
   methods: {
+    getIcon: function(item: Node): string {
+      const icon = (this.icons as any)[item.type];
+      if (icon)
+        return icon;
+      return 'mdi-text'
+    },
     selectFile: function (node: Node[]) {
       if (node[0]) {
         const file = this.getFile(node[0]);
