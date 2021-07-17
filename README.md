@@ -1,19 +1,26 @@
-# BootGen Editor
+<p align="center">
+  <img src="ClientApp/src/assets/img/bootgen_full.png" width="50%">
+</p>
+<h1 align="center">Develop ASP.NET + Vue applications much faster!</h1> 
 
-Online rapid prototyping tool for ASP.Net and Vue.js projects. Turn JSON into well coded application at https://bootgen.com!
+BootGen generates an ASP.Net 5 project with Vue.js based on the sample JSON data you provide. From this sample data it infers the types you need, and creates entity classes, data services, controllers and Vuex state management that fits your use case. 
+  
+Turn JSON into well coded application at https://bootgen.com!
 
 
 ## How Does it Work?
-
-[<img width="800px" height="450px" src="Images/diff_demo.gif">](https://youtu.be/bdgWl8Ia7u8)
-
+<p align="center">
+<a href="https://youtu.be/bdgWl8Ia7u8" target="_blank"><img width="800px" height="450px" src="Images/diff_demo.gif"></a>
+</p>
 Create sample JSON data, and generate your application. Edit the JSON, and regenerate until you are satisfied with the result. Changes will be highlighted in the generated files.
 
 When you are finnished click download, and start coding!
 
 ### The Generated Application
 
+<p align="center">
 <img width="800px" height="450px" src="Images/app_demo.gif">
+</p>
 
 The application has an ASP.Net 5 backend and a Vue.js 2 frontend.
 The backend has:
