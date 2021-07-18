@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import VueRouter, { RouteConfig } from 'vue-router'
 import Login from '../views/Login.vue'
+import GithubLoginCallback from '../views/GithubLoginCallback.vue'
 import Logout from '../views/Logout.vue'
 import SignUp from '../views/SignUp.vue'
 import Activation from '../views/Activation.vue'
@@ -95,6 +96,20 @@ const loggedOutGuard = (to: Route, from: Route, next: NavigationGuardNext) => {
     name: 'Logout',
     beforeEnter: loggedInGuard,
     component: Logout
+  },
+  {
+    path: '/oauth',
+    component: {
+      render: (c) => c('router-view')
+    },
+    children: [
+      {
+        path: 'github/callback',
+        name: 'GithubLoginCallback',
+        component: GithubLoginCallback,
+        props: (route) => ({code: route.query.code})
+      }
+    ]
   },
   {
     path: '*',

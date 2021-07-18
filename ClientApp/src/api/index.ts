@@ -8,6 +8,8 @@ import {AuthenticationData} from '@/models/AuthenticationData';
 import {LoginSuccess} from '@/models/LoginSuccess';
 import {GenerateRequest} from '@/models/GenerateRequest';
 import {GenerateResponse} from '@/models/GenerateResponse';
+import {OAuthLoginSuccess} from '@/models/OAuthLoginSuccess';
+import {OAuthLoginData} from '@/models/OAuthLoginData';
 
 const dateFormat = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/;
 
@@ -52,6 +54,10 @@ function projectToDto(project: Project): Project {
 const api = {
   login: async function (data: AuthenticationData): Promise<LoginSuccess> {
     const response = await axios.post('authentication/login', data);
+    return response.data;
+  },
+  githubLogin: async function (data: OAuthLoginData): Promise<OAuthLoginSuccess> {
+    const response = await axios.post('oauth/github/login', data);
     return response.data;
   },
   register: async function (data: RegistrationData): Promise<ProfileResponse> {

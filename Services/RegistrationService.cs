@@ -1,5 +1,7 @@
 using System;
 using System.Linq;
+using System.Threading.Tasks;
+using Editor.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using SendGrid;
@@ -11,11 +13,15 @@ namespace Editor.Services
     {
         private readonly ApplicationDbContext dbContext;
         private readonly IConfiguration configuration;
+        private readonly IGithubService githubService;
+        private readonly IOAuthService oAuthService;
 
-        public RegistrationService(ApplicationDbContext dbContext, IConfiguration configuration)
+        public RegistrationService(ApplicationDbContext dbContext, IConfiguration configuration, IGithubService githubService, IOAuthService oAuthService)
         {
             this.dbContext = dbContext;
             this.configuration = configuration;
+            this.githubService = githubService;
+            this.oAuthService = oAuthService;
         }
 
         public bool Activate(string activationToken)
@@ -52,7 +58,8 @@ namespace Editor.Services
                     Email = data.Email,
                     Newsletter = data.Newsletter,
                     IsActive = false,
-                    ActivationToken = Guid.NewGuid().ToString()
+                    ActivationToken = Guid.NewGuid().ToString(),
+                    RegistrationProvider = RegistrationProvider.Default
                 };
                 newUser.PasswordHash = new PasswordHasher<User>().HashPassword(newUser, data.Password);
                 dbContext.Users.Add(newUser);
@@ -70,6 +77,37 @@ namespace Editor.Services
                 }
             }
             return response;
+        }
+
+        public async Task<GithubUser> RegisterViaGithub(GithubRegistrationData data, GithubUserInfo githubUserInfo)
+        {
+            var githubUser = new GithubUser();
+
+            var isRegisteredViaGithub = oAuthService.IsGithubUserRegistered(githubUserInfo.Id);
+            if (!isRegisteredViaGithub)
+            {
+                var newUser = new User 
+                          {
+                              Email = githubUserInfo.Email,
+                              IsActive = true, 
+                              ActivationToken = null,
+                              RegistrationProvider = RegistrationProvider.Github
+                          };
+                var savedUser = dbContext.Users.Add(newUser);
+                
+                githubUser = new GithubUser
+                                     {
+                                         User = savedUser.Entity,
+                                         GithubId = githubUserInfo.Id,
+                                         Email = githubUserInfo.Email,
+                                         Login = githubUserInfo.Login
+                                     };
+                dbContext.GithubUsers.Add(githubUser);
+                
+                await dbContext.SaveChangesAsync();
+            }
+            
+            return githubUser;
         }
     }
 }

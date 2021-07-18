@@ -9,6 +9,7 @@ namespace Editor
     public class ApplicationDbContext : DbContext
     {
         public DbSet<User> Users { get; set; }
+        public DbSet<GithubUser> GithubUsers { get; set; }
         public DbSet<Project> Projects { get; set; }
         public DbSet<AppError> AppErrors { get; set; }
         public DbSet<Statistic> Statistics { get; set; }
@@ -19,10 +20,26 @@ namespace Editor
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<AppError>()
+                        .Property(e => e.Id)
+                        .ValueGeneratedOnAdd();
+            
             modelBuilder.Entity<Project>()
                 .HasOne(p => p.Owner)
                 .WithMany()
                 .HasForeignKey(p => p.OwnerId);
+
+            modelBuilder.Entity<User>()
+                        .Property(u => u.RegistrationProvider)
+                        .HasDefaultValue(RegistrationProvider.Default);
+
+            modelBuilder.Entity<GithubUser>()
+                        .HasKey(gu => gu.UserId);
+            modelBuilder.Entity<GithubUser>()
+                        .HasOne(gu => gu.User)
+                        .WithOne()
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
             var passwordHasher = new PasswordHasher<User>();
             var user1 = new User {
@@ -30,7 +47,8 @@ namespace Editor
                 UserName = "Sample User",
                 Email = "example@email.com",
                 Newsletter = true,
-                IsActive = true
+                IsActive = true,
+                RegistrationProvider = RegistrationProvider.Default
             };
             user1.PasswordHash = passwordHasher.HashPassword(user1, "password123");
             modelBuilder.Entity<User>().HasData(user1);
@@ -39,7 +57,8 @@ namespace Editor
                 UserName = "Sample User 2",
                 Email = "example2@email.com",
                 Newsletter = true,
-                IsActive = true
+                IsActive = true,
+                RegistrationProvider = RegistrationProvider.Default
             };
             user2.PasswordHash = passwordHasher.HashPassword(user2, "password123");
             modelBuilder.Entity<User>().HasData(user2);
@@ -48,7 +67,8 @@ namespace Editor
                 UserName = "Sample User 3",
                 Email = "example3@email.com",
                 Newsletter = false,
-                IsActive = true
+                IsActive = true,
+                RegistrationProvider = RegistrationProvider.Default
             };
             user3.PasswordHash = passwordHasher.HashPassword(user3, "password123");
             modelBuilder.Entity<User>().HasData(user3);

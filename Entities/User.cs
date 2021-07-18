@@ -1,6 +1,8 @@
 using System;
 using System.Text.Json.Serialization;
 using System.Collections.Generic;
+using Editor;
+
 namespace Editor
 {
     public class User
@@ -15,5 +17,6 @@ namespace Editor
         public bool IsActive { get; set; }
         [JsonIgnore]
         public string ActivationToken { get; set; }
+        public RegistrationProvider RegistrationProvider { get; set; }
     }
 }
