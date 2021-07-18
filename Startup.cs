@@ -125,7 +125,7 @@ namespace Editor
             {
                 app.UseSpa(spa =>
                 {
-                    spa.UseProxyToSpaDevelopmentServer("http://lvh.me:8080");
+                    spa.UseProxyToSpaDevelopmentServer("http://localhost:8080");
                 });
             }
         }
