@@ -36,6 +36,9 @@
                 <div class="text-center">
                   <v-btn color="primary" large @click="tryLogin" :disabled="invalid">Sign in</v-btn>
                 </div>
+                <div class="text-center">
+                  <v-btn color="primary" large @click="loginViaGithub">Sign in via GitHub</v-btn>
+                </div>
               </ValidationObserver>
             </v-container>
           </v-form>
@@ -81,6 +84,10 @@ export default Vue.extend({
           this.errorMsg = 'Incorrect email or password';
         }
       }
+    },
+
+    loginViaGithub: function () {
+      this.$store.dispatch('githubAuthorize');
     }
   },
 });

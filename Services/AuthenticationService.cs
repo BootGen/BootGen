@@ -4,6 +4,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
+using Editor;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Identity;
@@ -46,6 +47,25 @@ namespace Editor.Services
             };
         }
 
+        public OAuthLoginResponse GithubOAuthLogin(GithubUser githubUser, string accessToken)
+        {
+            User user = dbContext.Users.FirstOrDefault(u => u.Id == githubUser.UserId);
+            if (user != null)
+            {
+                return new OAuthLoginResponse
+                           {
+                               Success = true,
+                               Jwt = GenerateJSONWebToken(user),
+                               AccessToken = accessToken
+                           };
+            }
+            
+            return new OAuthLoginResponse
+                   {
+                       Success = false
+                   };
+        }
+
         private string GenerateJSONWebToken(User user)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["Jwt:Key"]));
@@ -53,8 +73,13 @@ namespace Editor.Services
             List<Claim> claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(ClaimTypes.Name, user.UserName)
+                new Claim(ClaimTypes.AuthenticationMethod, user.RegistrationProvider.ToString("G")),
             };
+
+            if (!string.IsNullOrEmpty(user.UserName))
+            {
+                claims.Add(new Claim(ClaimTypes.Name, user.UserName));
+            }
 
             var token = new JwtSecurityToken(config["Jwt:Issuer"],
               config["Jwt:Issuer"],

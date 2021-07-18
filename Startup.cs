@@ -1,4 +1,8 @@
+using System;
+using System.Net.Http.Headers;
 using System.Text;
+using Editor.Config;
+using Editor.Controllers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -8,6 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Editor.Services;
+using Editor.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace Editor
@@ -57,6 +62,23 @@ namespace Editor
                 };
             });
 
+            services.AddHttpClient("GithubApiClient",
+                                   client =>
+                                   {
+                                       client.BaseAddress = new Uri("https://api.github.com/");
+                                       client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("BootGen", "1.0"));
+                                       client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/vnd.github.v3+json"));
+                                   });
+
+            services.AddHttpClient("GithubClient",
+                                   client =>
+                                   {
+                                       client.BaseAddress = new Uri("https://github.com/");
+                                       client.DefaultRequestHeaders
+                                             .Accept
+                                             .Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                                   });
+
             services.AddScoped<IAuthenticationService, AuthenticationService>();
             services.AddScoped<IRegistrationService, RegistrationService>();
             services.AddScoped<IProfileService, ProfileService>();
@@ -64,6 +86,8 @@ namespace Editor
             services.AddScoped<IProjectsService, ProjectsService>();
             services.AddScoped<IErrorService, ErrorService>();
             services.AddScoped<IStatisticsService, StatisticsService>();
+            services.AddScoped<IGithubService, GithubService>();
+            services.AddScoped<IOAuthService, OAuthService>();
             if (Configuration["DataBaseType"] == "MySQL")
             {
                 services.AddDbContext<ApplicationDbContext>(options => options.UseMySql(Configuration.GetConnectionString("MySQL"), ServerVersion.FromString(Configuration["DataBaseVersion"])));
@@ -101,7 +125,7 @@ namespace Editor
             {
                 app.UseSpa(spa =>
                 {
-                    spa.UseProxyToSpaDevelopmentServer("http://localhost:8080");
+                    spa.UseProxyToSpaDevelopmentServer("http://lvh.me:8080");
                 });
             }
         }
