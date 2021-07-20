@@ -16,10 +16,10 @@
         {{ open ? 'mdi-chevron-down ' : 'mdi-chevron-right' }}
       </v-icon>
       <v-icon :color="darkColors[item.type]" v-else-if="$vuetify.theme.dark">
-        {{ icons[item.type] }}
+        {{ getIcon(item) }}
       </v-icon>
       <v-icon :color="colors[item.type]" v-else>
-        {{ icons[item.type] }}
+        {{ getIcon(item) }}
       </v-icon>
     </template>
     <template v-slot:append="{ item }">
@@ -85,6 +85,13 @@ export default Vue.extend({
         ts: '#267F99',
         yml: '#AF00DB',
         js: '#dbc021',
+        html: '#D16969',
+        md: '#0000FF',
+        json: '#cf8e16',
+        gitignore: '#FF0000',
+        browserslistrc: '#dbc021',
+        sh: '#FF0000',
+        csproj: '#AF00DB',
         tsx: '#267F99',
       },
       darkColors: {
@@ -93,6 +100,13 @@ export default Vue.extend({
         ts: '#569CD6',
         yml: '#AF00DB',
         js: '#DCDC8B',
+        html: '#CE9178',
+        md: '#569CD6',
+        json: '#DCDC8B',
+        gitignore: '#D16969',
+        browserslistrc: '#DCDC8B',
+        sh: '#D16969',
+        csproj: '#AF00DB',
         tsx: '#569CD6',
       },
       icons: {
@@ -101,6 +115,12 @@ export default Vue.extend({
         ts: 'mdi-language-typescript',
         js: 'mdi-language-javascript',
         yml: 'mdi-exclamation-thick ',
+        md: 'mdi-language-markdown',
+        json: 'mdi-code-braces',
+        html: 'mdi-code-tags',
+        gitignore: 'mdi-git',
+        csproj: 'mdi-rss',
+        editorconfig: 'mdi-cog',
         tsx: 'mdi-react',
       },
       ChangeType: ChangeType,
@@ -120,6 +140,12 @@ export default Vue.extend({
     this.setDefaultNodes();
   },
   methods: {
+    getIcon: function(item: Node): string {
+      const icon = (this.icons as any)[item.type];
+      if (icon)
+        return icon;
+      return 'mdi-text'
+    },
     selectFile: function (node: Node[]) {
       if (node[0]) {
         const file = this.getFile(node[0]);
@@ -259,12 +285,9 @@ export default Vue.extend({
 </script>
 
 <style>
-.treeView {
-  height: calc(100% - 40px);
-  overflow: auto;
-}
-.v-treeview-node__label {
-  overflow: unset !important;
+.v-treeview {
+    overflow: auto;
+    height: calc(100% - 40px);
 }
 button.v-icon.notranslate {
   display: none;

@@ -19,9 +19,11 @@ namespace Editor.Services
             dbContext.SaveChanges();
         }
 
-        public void LogException(Exception e)
+        public void LogException(Exception e, string info)
         {
-            dbContext.AppErrors.Add(ConvertToAppError(e));
+            var appError = ConvertToAppError(e);
+            appError.Info = info;
+            dbContext.AppErrors.Add(appError);
             if (e.InnerException != null)
                 dbContext.AppErrors.Add(ConvertToAppError(e.InnerException));
             dbContext.SaveChanges();
@@ -34,9 +36,9 @@ namespace Editor.Services
             {
                 Kind = "C#",
                 Type = e.GetType().Name,
-                LineNumber = frame.GetFileLineNumber(),
-                ColumnNumber = frame.GetFileColumnNumber(),
-                FileName = frame.GetFileName(),
+                LineNumber = frame?.GetFileLineNumber() ?? 0,
+                ColumnNumber = frame?.GetFileColumnNumber() ?? 0,
+                FileName = frame?.GetFileName() ?? string.Empty,
                 Message = e.Message,
                 StackTrace = e.StackTrace,
                 TimeStamp = DateTime.Now

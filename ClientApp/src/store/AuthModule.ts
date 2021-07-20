@@ -4,11 +4,15 @@ import { AuthenticationData } from '@/models/AuthenticationData'
 import { LoginSuccess } from '@/models/LoginSuccess'
 import { User } from '@/models/User'
 import { State } from '.';
-import api from '@/api'
+import api from '@/api';
+import githubApi from '@/github-api'
 import { ProfileResponse } from '@/models/ProfileResponse';
+import { OAuthLoginSuccess } from '@/models/OAuthLoginSuccess';
+import { OAuthLoginData } from '@/models/OAuthLoginData';
 
 export interface AuthState {
   jwt: string;
+  githubToken: string;
   user: User | null;
 }
 type Context = ActionContext<AuthState, State>;
@@ -16,6 +20,7 @@ type Context = ActionContext<AuthState, State>;
 export default {
   state: {
     jwt: '',
+    githubToken: '',
     user: null
   },
   mutations: {
@@ -26,6 +31,18 @@ export default {
           localStorage.setItem('jwt', jwt);
         } else {
           localStorage.removeItem('jwt');
+        }
+      } catch {
+        console.log('Local storage is not available.')
+      }
+    },
+    setGithubToken: function(state: AuthState, githubToken: string) {
+      state.githubToken = githubToken;
+      try {
+        if (githubToken) {
+          localStorage.setItem('githubToken', githubToken);
+        } else {
+          localStorage.removeItem('githubToken');
         }
       } catch {
         console.log('Local storage is not available.')
@@ -44,6 +61,16 @@ export default {
     },
     login: async function (context: Context, data: AuthenticationData): Promise<LoginSuccess> {
       const response = await api.login(data);
+      context.commit('setJwt', response.jwt);
+      await context.dispatch('profile');
+      return response;
+    },
+    githubAuthorize: async function (context: Context): Promise<void> {
+      await githubApi.authorize();
+    },
+    githubLogin: async function (context: Context, data: OAuthLoginData): Promise<OAuthLoginSuccess> {
+      const response = await api.githubLogin(data);
+      context.commit('setGithubToken', response.accessToken);
       context.commit('setJwt', response.jwt);
       await context.dispatch('profile');
       return response;

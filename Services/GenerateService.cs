@@ -25,6 +25,14 @@ namespace Editor.Services
             try
             {
                 var virtualDisk = new VirtualDisk();
+                
+                var templateDir = $"extracted_templates/{request.Backend}_{request.Frontend}";
+                #if DEBUG
+                templateDir = Path.Combine(Path.GetTempPath(), templateDir);
+                #endif
+                if (!Directory.Exists(templateDir))
+                    ZipFile.ExtractToDirectory($"templates/{request.Backend}_{request.Frontend}/WebProject.zip", templateDir);
+                LoadTemplateFiles(templateDir, templateDir, virtualDisk, request.NameSpace);
                 BootGen.Project project = InitProject(request, virtualDisk);
                 project.GenerateFiles(request.NameSpace, "http://localhost:5000");
                 var files = new List<GeneratedFile>();
@@ -47,7 +55,7 @@ namespace Editor.Services
             catch (Exception e)
             {
                 if (!(e is JsonReaderException))
-                    ErrorService.LogException(e);
+                    ErrorService.LogException(e, request.Data);
                 return new GenerateResponse
                     {
                         Success = false,
@@ -75,7 +83,7 @@ namespace Editor.Services
             }
             catch (Exception e)
             {
-                ErrorService.LogException(e);
+                ErrorService.LogException(e, request.Data);
                 return null;
             }
             finally
@@ -111,8 +119,8 @@ namespace Editor.Services
             Directory.CreateDirectory(tempDir);
             ZipFile.ExtractToDirectory($"templates/{request.Backend}_{request.Frontend}/WebProject.zip", tempDir);
             File.Move(Path.Combine(tempDir, "WebProject.csproj"), Path.Combine(tempDir, $"{request.NameSpace}.csproj"));
-            ReplaceNamespace(tempDir, request.NameSpace);
             var disk = new Disk(tempDir);
+            ReplaceNamespace(tempDir, request.NameSpace);
             BootGen.Project project = InitProject(request, disk);
             project.GenerateFiles(request.NameSpace, "http://localhost:5000");
             ZipFile.CreateFromDirectory(tempDir, tempFile);
@@ -141,6 +149,30 @@ namespace Editor.Services
             foreach( var path in Directory.GetDirectories(tempDir))
             {
                 ReplaceNamespace(path, namespce);
+            }
+        }
+
+        
+        private static void LoadTemplateFiles(string rootdDir, string dir,  VirtualDisk disk, string namespce)
+        {
+            foreach( var path in Directory.GetFiles(dir)) {
+                if (path.EndsWith(".ico"))
+                    continue;
+                var content = File.ReadAllText(path);
+                if (path.EndsWith(".cs") || path.EndsWith(".json"))
+                {
+                    content = content.Replace("WebProject", namespce);
+                    File.WriteAllText(path, content);
+                }
+
+                string folder = "";
+                if (rootdDir != dir)
+                    folder = Path.GetDirectoryName(path).Substring(rootdDir.Length + 1).Replace("\\", "/");
+                disk.WriteText(folder, Path.GetFileName(path), File.ReadAllText(path));
+            }
+            foreach( var path in Directory.GetDirectories(dir))
+            {
+                LoadTemplateFiles(rootdDir, path, disk, namespce);
             }
         }
 

@@ -1,0 +1,26 @@
+{
+	"users": [
+		{
+			"userName": "Test User",
+			"email": "example@email.com",
+			"tasks": [
+				//timestamps
+				{
+					"title": "Task Title",
+					"description": "Task description",
+					"isOpen": true,
+					"dueDate": "2021-12-30T12:00:05",
+					"estimatedHours": 1.5,
+					"priority": 1,
+					"tags": [
+						//manyToMany
+						{
+							"name": "important",
+							"color": "red"
+						}
+					]
+				}
+			]
+		}
+	]
+}

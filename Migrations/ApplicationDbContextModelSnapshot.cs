@@ -55,11 +55,36 @@ namespace Editor.Migrations
                     b.ToTable("AppErrors");
                 });
 
+            modelBuilder.Entity("Editor.GithubUser", b =>
+                {
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+
+                    b.Property<int>("GithubId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Login")
+                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+
+                    b.HasKey("UserId");
+
+                    b.ToTable("GithubUsers");
+                });
+
             modelBuilder.Entity("Editor.Project", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    b.Property<string>("Backend")
+                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+
+                    b.Property<string>("Frontend")
+                        .HasColumnType("longtext CHARACTER SET utf8mb4");
 
                     b.Property<string>("Json")
                         .HasColumnType("longtext CHARACTER SET utf8mb4");
@@ -80,6 +105,8 @@ namespace Editor.Migrations
                         new
                         {
                             Id = 1,
+                            Backend = "ASP.NET",
+                            Frontend = "Vue 2 + JS",
                             Json = "{'users': [{'userName': 'Test User', 'email': 'aa@bb@cc'}]}",
                             Name = "First Project",
                             OwnerId = 1
@@ -145,6 +172,11 @@ namespace Editor.Migrations
                     b.Property<string>("PasswordHash")
                         .HasColumnType("longtext CHARACTER SET utf8mb4");
 
+                    b.Property<int>("RegistrationProvider")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
                     b.Property<string>("UserName")
                         .HasColumnType("longtext CHARACTER SET utf8mb4");
 
@@ -159,7 +191,8 @@ namespace Editor.Migrations
                             Email = "example@email.com",
                             IsActive = true,
                             Newsletter = true,
-                            PasswordHash = "AQAAAAEAACcQAAAAEJDgdPzzW8vIeFqlb55ARisJNIbxJw5ymbV0PaoEiwt+WHEXXrNxdOpcqFLanEtSuA==",
+                            PasswordHash = "AQAAAAEAACcQAAAAEAkyTU6QCME95LPh3/gkMGjVGsg7xjOFXrTrMRYKKEIEj1xsKx3tKv+ZhJplVayCiQ==",
+                            RegistrationProvider = 0,
                             UserName = "Sample User"
                         },
                         new
@@ -168,7 +201,8 @@ namespace Editor.Migrations
                             Email = "example2@email.com",
                             IsActive = true,
                             Newsletter = true,
-                            PasswordHash = "AQAAAAEAACcQAAAAEH9t4DjcR+seGM3qxaYrsRajiLcPQdwCep4nuF9DVaG6Aed3SjNHGUnrpx8VMYEYxw==",
+                            PasswordHash = "AQAAAAEAACcQAAAAEDBMyze9Vvw/t1wAK7Od4M8EeP8nz9aH7GpI33FV0tn1yOUy9IGVxX1E7eZ/KCpg5Q==",
+                            RegistrationProvider = 0,
                             UserName = "Sample User 2"
                         },
                         new
@@ -177,9 +211,21 @@ namespace Editor.Migrations
                             Email = "example3@email.com",
                             IsActive = true,
                             Newsletter = false,
-                            PasswordHash = "AQAAAAEAACcQAAAAEHclQLooH3XJH5+1iiko+BOJtAQbYxBwRePldOaBDHN1sifvRWjhTr2CrGFr7nt1TQ==",
+                            PasswordHash = "AQAAAAEAACcQAAAAEN2zRQdwYmZdliBxB+R4HFO9ZDzhAWUZmcReL9u8FCm0rmopv9JnxchSoQFgxeFFDQ==",
+                            RegistrationProvider = 0,
                             UserName = "Sample User 3"
                         });
+                });
+
+            modelBuilder.Entity("Editor.GithubUser", b =>
+                {
+                    b.HasOne("Editor.User", "User")
+                        .WithOne()
+                        .HasForeignKey("Editor.GithubUser", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Editor.Project", b =>

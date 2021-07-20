@@ -1,6 +1,6 @@
 <template>
   <v-container fluid class="cm">
-    <codemirror v-if="mode == 'json'" :id="cmId" :value="value" @input="onInput" return-object :options="cmOptions" @scroll="onScroll" />
+    <codemirror v-if="!cmOptions.readOnly" :id="cmId" :value="value" @input="onInput" return-object :options="cmOptions" @scroll="onScroll" />
     <codemirror v-else :id="cmId" :value="value" :options="cmOptions" @scroll="onScroll" ref="vueCm" />
   </v-container>
 </template>
@@ -14,6 +14,11 @@ import 'codemirror/mode/clike/clike.js';
 import 'codemirror/mode/yaml/yaml.js';
 import 'codemirror/mode/vue/vue.js';
 import 'codemirror/mode/javascript/javascript.js';
+import 'codemirror/mode/htmlmixed/htmlmixed.js';
+import 'codemirror/mode/markdown/markdown.js';
+import 'codemirror/mode/shell/shell.js';
+import 'codemirror/mode/xml/xml.js';
+import 'codemirror/mode/dockerfile/dockerfile.js';
 
 export default Vue.extend({
   props: {
@@ -44,7 +49,7 @@ export default Vue.extend({
     mode: function (mode: string) {
         if(mode === 'json'){
           this.cmOptions.mode = 'text/javascript';
-        }if(mode === 'cs'){
+        }else if(mode === 'cs'){
           this.cmOptions.mode = 'text/x-csharp';
         }else if(mode === 'ts'){
           this.cmOptions.mode = 'text/typescript';
@@ -52,8 +57,18 @@ export default Vue.extend({
           this.cmOptions.mode = 'text/javascript';
         }else if(mode === 'vue'){
           this.cmOptions.mode = 'text/x-vue';
-        }else{
+        }else if(mode === 'html'){
+          this.cmOptions.mode = 'text/html';
+        }else if(mode === 'csproj'){
+          this.cmOptions.mode = 'application/xml';
+        }else if(mode === 'md'){
+          this.cmOptions.mode = 'text/x-markdown';
+        }else if(mode === 'sh'){
+          this.cmOptions.mode = 'text/x-sh';
+        }else if(mode === 'yml'){
           this.cmOptions.mode = 'text/x-yaml';
+        }else{
+          this.cmOptions.mode = 'text/x-dockerfile';
         }
     },
     linesToColor: function (linesToColor: {line: number; color: string}[]) {

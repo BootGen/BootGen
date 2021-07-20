@@ -3,12 +3,13 @@ import App from './App.vue'
 import router from './router/index'
 import store from './store/index'
 import vuetify from './plugins/vuetify'
-import './plugins/vee-validate'
 import VueGtag from 'vue-gtag';
 import axios from 'axios'
 import { AppError } from './models/AppError'
 import MaterialCard from './components/base/MaterialCard.vue'
 import MaterialGeneratorCard from './components/base/MaterialGeneratorCard.vue'
+import './plugins/vee-validate'
+import './plugins/validationConfig'
 
 Vue.component('base-material-card', MaterialCard)
 Vue.component('base-material-generator-card', MaterialGeneratorCard)
