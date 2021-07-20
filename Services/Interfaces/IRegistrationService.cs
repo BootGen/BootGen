@@ -6,6 +6,6 @@ namespace Editor.Services
     {
         ProfileResponse Register(RegistrationData data);
         bool Activate(string activationCode);
-        Task<GithubUser> RegisterViaGithub(GithubRegistrationData data, GithubUserInfo githubUserInfo);
+        Task<OAuthUser> RegisterViaGithub(GithubRegistrationData data, GithubUserInfo githubUserInfo);
     }
 }

@@ -12,10 +12,10 @@ namespace Editor.Services
             this.dbContext = dbContext;
         }
 
-        public GithubUser GetGithubUser(int githubId) => 
-            dbContext.GithubUsers.FirstOrDefault(u => u.GithubId == githubId);
+        public OAuthUser GetGithubUser(int githubId) => 
+            dbContext.OAuthUsers.FirstOrDefault(u => u.OAuthId == githubId);
 
         public bool IsGithubUserRegistered(int githubId) => 
-            dbContext.GithubUsers.Any(u => u.GithubId == githubId);
+            dbContext.OAuthUsers.Any(u => u.OAuthId == githubId);
     }
 }

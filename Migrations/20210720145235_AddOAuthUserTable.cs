@@ -2,31 +2,24 @@
 
 namespace Editor.Migrations
 {
-    public partial class AddGithubUserTable : Migration
+    public partial class AddOAuthUserTable : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<int>(
-                name: "RegistrationProvider",
-                table: "Users",
-                type: "int",
-                nullable: false,
-                defaultValue: 0);
-
             migrationBuilder.CreateTable(
-                name: "GithubUsers",
+                name: "OAuthUsers",
                 columns: table => new
                 {
                     UserId = table.Column<int>(type: "int", nullable: false),
-                    GithubId = table.Column<int>(type: "int", nullable: false),
+                    OAuthId = table.Column<int>(type: "int", nullable: false),
                     Login = table.Column<string>(type: "longtext CHARACTER SET utf8mb4", nullable: true),
                     Email = table.Column<string>(type: "longtext CHARACTER SET utf8mb4", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_GithubUsers", x => x.UserId);
+                    table.PrimaryKey("PK_OAuthUsers", x => x.UserId);
                     table.ForeignKey(
-                        name: "FK_GithubUsers_Users_UserId",
+                        name: "FK_OAuthUsers_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
@@ -38,31 +31,27 @@ namespace Editor.Migrations
                 keyColumn: "Id",
                 keyValue: 1,
                 column: "PasswordHash",
-                value: "AQAAAAEAACcQAAAAEAkyTU6QCME95LPh3/gkMGjVGsg7xjOFXrTrMRYKKEIEj1xsKx3tKv+ZhJplVayCiQ==");
+                value: "AQAAAAEAACcQAAAAEK1BJQKgDOVASwkNZ7jlCklllPsWY3d4PDTufzKy5r+ZxuBT9/p+1sIr/2tdzOMhTA==");
 
             migrationBuilder.UpdateData(
                 table: "Users",
                 keyColumn: "Id",
                 keyValue: 2,
                 column: "PasswordHash",
-                value: "AQAAAAEAACcQAAAAEDBMyze9Vvw/t1wAK7Od4M8EeP8nz9aH7GpI33FV0tn1yOUy9IGVxX1E7eZ/KCpg5Q==");
+                value: "AQAAAAEAACcQAAAAEIpgyvbDbKMPqdNfyBPHm/Trwkmx8nWWVGBsIv/y9m9L9nL+ckerWIKgJhabz7q3lQ==");
 
             migrationBuilder.UpdateData(
                 table: "Users",
                 keyColumn: "Id",
                 keyValue: 3,
                 column: "PasswordHash",
-                value: "AQAAAAEAACcQAAAAEN2zRQdwYmZdliBxB+R4HFO9ZDzhAWUZmcReL9u8FCm0rmopv9JnxchSoQFgxeFFDQ==");
+                value: "AQAAAAEAACcQAAAAEECaYXyhswTid0a42NY2cAqS0nZ6oPQ8bL566BM4RTUpDjPkGYimTLngJxzxsXJXaQ==");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "GithubUsers");
-
-            migrationBuilder.DropColumn(
-                name: "RegistrationProvider",
-                table: "Users");
+                name: "OAuthUsers");
 
             migrationBuilder.UpdateData(
                 table: "Users",
