@@ -9,7 +9,10 @@
               <v-icon class="pa-2">mdi-account-arrow-left</v-icon>
             </div>
           </template>
-
+          <v-tabs>
+            <v-tab><v-icon class="mr-2">mdi-email</v-icon> Email</v-tab>
+            <v-tab @click="loginViaGithub"><v-icon class="mr-2">mdi-github</v-icon> GitHub</v-tab>
+          </v-tabs>
           <v-form>
             <v-container>
               <ValidationObserver v-slot="{ invalid }">
@@ -34,10 +37,8 @@
                 </ValidationProvider>
                 <v-alert class="text-left" type="error" v-if="errorMsg">{{ errorMsg }}</v-alert>
                 <div class="text-center">
-                  <v-btn color="primary" large @click="tryLogin" :disabled="invalid">Sign in</v-btn>
-                </div>
-                <div class="text-center">
-                  <v-btn color="primary" large @click="loginViaGithub">Sign in via GitHub</v-btn>
+                  <v-btn class="mr-3" color="primary" large @click="tryLogin" :disabled="invalid">Sign in</v-btn>
+                  <p class="ma-0 pt-3">Don't have an account?<router-link class="pl-2" to="/sign-up">Sign up</router-link></p>
                 </div>
               </ValidationObserver>
             </v-container>
