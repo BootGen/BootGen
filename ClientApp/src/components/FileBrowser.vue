@@ -268,12 +268,9 @@ export default Vue.extend({
 </script>
 
 <style>
-.treeView {
-  height: calc(100% - 40px);
-  overflow: auto;
-}
-.v-treeview-node__label {
-  overflow: unset !important;
+.v-treeview {
+    overflow: auto;
+    height: calc(100% - 40px);
 }
 button.v-icon.notranslate {
   display: none;
