@@ -1,6 +1,6 @@
 <template>
   <v-container fluid class="cm">
-    <codemirror v-if="mode == 'json'" :id="cmId" :value="value" @input="onInput" return-object :options="cmOptions" @scroll="onScroll" />
+    <codemirror v-if="mode === 'json' && cmId === 0" :id="cmId" :value="value" @input="onInput" return-object :options="cmOptions" @scroll="onScroll" />
     <codemirror v-else :id="cmId" :value="value" :options="cmOptions" @scroll="onScroll" ref="vueCm" />
   </v-container>
 </template>
@@ -49,7 +49,7 @@ export default Vue.extend({
     mode: function (mode: string) {
         if(mode === 'json'){
           this.cmOptions.mode = 'text/javascript';
-        }if(mode === 'cs'){
+        }else if(mode === 'cs'){
           this.cmOptions.mode = 'text/x-csharp';
         }else if(mode === 'ts'){
           this.cmOptions.mode = 'text/typescript';
@@ -65,7 +65,7 @@ export default Vue.extend({
           this.cmOptions.mode = 'text/x-markdown';
         }else if(mode === 'sh'){
           this.cmOptions.mode = 'text/x-sh';
-        }else if(mode === 'yaml'){
+        }else if(mode === 'yml'){
           this.cmOptions.mode = 'text/x-yaml';
         }else{
           this.cmOptions.mode = 'text/x-dockerfile';

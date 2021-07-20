@@ -94,7 +94,6 @@ import Snackbar from '../components/Snackbar.vue';
 import ProjectSettings from '../components/ProjectSettings.vue';
 import ToolBar from '../components/ToolBar.vue';
 import {GeneratedFile} from '../models/GeneratedFile';
-import {CRC32} from 'crc_32_ts';
 import axios from 'axios';
 import {ViewModel}from '../commands/ViewModel';
 import { CommandStore, CommandType } from '../commands/CommandStore';
@@ -157,8 +156,9 @@ export default Vue.extend({
       this.viewModel.projectSettings = false;
     },
     getMode: function(): string {
-      if(this.viewModel.activeFile.name){
-        return this.viewModel.activeFile.name.split('.')[1];
+      const splittedName = this.viewModel.activeFile.name.split('.')
+      if(splittedName.length > 0){
+        return splittedName[splittedName.length-1];
       }
       return '';
     },
