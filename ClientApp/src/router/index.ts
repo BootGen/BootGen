@@ -105,7 +105,7 @@ const loggedOutGuard = (to: Route, from: Route, next: NavigationGuardNext) => {
     children: [
       {
         path: 'github/callback',
-        name: 'GithubLoginCallback',
+        name: 'Redirecting ...',
         component: GithubLoginCallback,
         props: (route) => ({code: route.query.code})
       }
