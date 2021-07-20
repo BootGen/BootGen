@@ -1,7 +1,6 @@
 import { Action, Reducer } from 'redux';
 import { setArray, setItem, patchArray } from './util';
 import { {{ resource.class.name }} } from '../models/{{ resource.class.name }}';
-
 {{~ for alternate in resource.alternate_resources
   parent = alternate.parent_resource
   ~}}
@@ -18,15 +17,28 @@ export interface Set{{ resource.class.name }}Action { type: 'SET_{{ resource.cla
 export interface Add{{ resource.class.name }}Action { type: 'ADD_{{ resource.class.name }}', {{ camel_case resource.class.name }}: {{ resource.class.name }} }
 export interface Update{{ resource.class.name }}Action { type: 'UPDATE_{{ resource.class.name }}', {{ camel_case resource.class.name }}: {{ resource.class.name }} }
 export interface Delete{{ resource.class.name }}Action { type: 'DELETE_{{ resource.class.name }}', {{ camel_case resource.class.name }}: {{ resource.class.name }} }
-export interface Set{{ resource.class.name.plural }}OfTaskAction { type: 'SET_{{ resource.class.name.plural }}_OF_Task', {{ camel_case resource.class.name }}s: {{ resource.class.name }}[] }
-export interface Add{{ resource.class.name }}ToTaskAction { type: 'ADD_{{ resource.class.name }}_TO_Task', {{ camel_case resource.class.name }}: {{ resource.class.name }} }
-export interface Delete{{ resource.class.name }}OfTaskAction { type: 'DELETE_{{ resource.class.name }}_OF_Task', {{ camel_case resource.class.name }}: {{ resource.class.name }} }
+{{~ for alternate in resource.alternate_resources
+parent = alternate.parent_resource
+~}}
+export interface Set{{ resource.class.name.plural }}Of{{ parent.name }}Action { type: 'SET_{{ resource.class.name.plural }}_OF_{{ parent.name }}', {{ camel_case resource.class.name }}s: {{ resource.class.name }}[] }
+export interface Add{{ resource.class.name }}To{{ parent.name }}Action { type: 'ADD_{{ resource.class.name }}_TO_{{ parent.name }}', {{ camel_case resource.class.name }}: {{ resource.class.name }} }
+{{~ if alternate.pivot ~}}
+export interface Delete{{ resource.class.name }}Of{{ parent.name }}Action { type: 'DELETE_{{ resource.class.name }}_OF_{{ parent.name }}', {{ camel_case resource.class.name }}: {{ resource.class.name }} }
+{{~ end ~}}
+{{~ end ~}}
 
 export type KnownAction =
   Set{{ resource.class.name.plural }}Action | Set{{ resource.class.name }}Action 
   | Add{{ resource.class.name }}Action | Update{{ resource.class.name }}Action | Delete{{ resource.class.name }}Action
-  | Set{{ resource.class.name.plural }}OfTaskAction
-  | Add{{ resource.class.name }}ToTaskAction | Delete{{ resource.class.name }}OfTaskAction
+  {{~ for alternate in resource.alternate_resources
+  parent = alternate.parent_resource
+  ~}}
+  | Set{{ resource.class.name.plural }}Of{{ parent.name }}Action
+  | Add{{ resource.class.name }}To{{ parent.name }}Action
+  {{~ if alternate.pivot ~}}
+  | Delete{{ resource.class.name }}Of{{ parent.name }}Action
+  {{~ end ~}}
+  {{~ end ~}}
 
 export const actionCreators = {
   set{{ resource.class.name.plural }}: ({{ camel_case resource.class.name.plural }}: {{ resource.class.name }}[]) => ({ type: 'SET_{{ resource.class.name.plural }}', {{ camel_case resource.class.name.plural }}: {{ camel_case resource.class.name.plural }} } as Set{{ resource.class.name.plural }}Action),
@@ -34,64 +46,100 @@ export const actionCreators = {
   add{{ resource.class.name }}: ({{ camel_case resource.class.name }}: {{ resource.class.name }}) => ({ type: 'ADD_{{ resource.class.name }}', {{ camel_case resource.class.name }}: {{ camel_case resource.class.name }} } as Add{{ resource.class.name }}Action),
   update{{ resource.class.name }}: ({{ camel_case resource.class.name }}: {{ resource.class.name }}) => ({ type: 'UPDATE_{{ resource.class.name }}', {{ camel_case resource.class.name }}: {{ camel_case resource.class.name }} } as Update{{ resource.class.name }}Action),
   delete{{ resource.class.name }}: ({{ camel_case resource.class.name }}: {{ resource.class.name }}) => ({ type: 'DELETE_{{ resource.class.name }}', {{ camel_case resource.class.name }}: {{ camel_case resource.class.name }} } as Delete{{ resource.class.name }}Action), 
-  set{{ resource.class.name.plural }}OfTask: ({{ camel_case resource.class.name.plural }}: {{ resource.class.name }}[]) => ({ type: 'SET_{{ resource.class.name.plural }}_OF_Task', {{ camel_case resource.class.name.plural }}: {{ camel_case resource.class.name.plural }} } as Set{{ resource.class.name.plural }}OfTaskAction),
-  add{{ resource.class.name }}ToTask: ({{ camel_case resource.class.name }}: {{ resource.class.name }}) => ({ type: 'ADD_{{ resource.class.name }}_TO_Task', {{ camel_case resource.class.name }}: {{ camel_case resource.class.name }} } as Add{{ resource.class.name }}ToTaskAction),
-  delete{{ resource.class.name }}OfTask: ({{ camel_case resource.class.name }}: {{ resource.class.name }}) => ({ type: 'DELETE_{{ resource.class.name }}_OF_Task', {{ camel_case resource.class.name }}: {{ camel_case resource.class.name }} } as Delete{{ resource.class.name }}OfTaskAction),
-  
-  get{{ resource.class.name.plural }}Async (jwt: string): any{
-    return async (dispatch: any) => {
-      let {{ camel_case resource.class.name.plural }} = await api.get{{ resource.class.name.plural }}(jwt);
-      dispatch(this.set{{ resource.class.name.plural }}({{ camel_case resource.class.name.plural }}));
-      return {{ camel_case resource.class.name.plural }};
-    };
+  {{~ for alternate in resource.alternate_resources
+  parent = alternate.parent_resource
+  ~}}
+  set{{ resource.class.name.plural }}Of{{ parent.name }}: ({{ camel_case resource.class.name.plural }}: {{ resource.class.name }}[]) => ({ type: 'SET_{{ resource.class.name.plural }}_OF_{{ parent.name }}', {{ camel_case resource.class.name.plural }}: {{ camel_case resource.class.name.plural }} } as Set{{ resource.class.name.plural }}Of{{ parent.name }}Action),
+  add{{ resource.class.name }}To{{ parent.name }}: ({{ camel_case resource.class.name }}: {{ resource.class.name }}) => ({ type: 'ADD_{{ resource.class.name }}_TO_{{ parent.name }}', {{ camel_case resource.class.name }}: {{ camel_case resource.class.name }} } as Add{{ resource.class.name }}To{{ parent.name }}Action),
+  {{~ if alternate.pivot ~}}
+  delete{{ resource.class.name }}Of{{ parent.name }}: ({{ camel_case resource.class.name }}: {{ resource.class.name }}) => ({ type: 'DELETE_{{ resource.class.name }}_OF_{{ parent.name }}', {{ camel_case resource.class.name }}: {{ camel_case resource.class.name }} } as Delete{{ resource.class.name }}Of{{ parent.name }}Action),
+  {{~ end ~}}
+  {{~ end ~}}
+
+  get{{ resource.class.name.plural }}Async (): any{
+    const jwt: string | null = localStorage.getItem('jwt');
+    if(jwt){
+      return async (dispatch: any) => {
+        let {{ camel_case resource.class.name.plural }} = await api.get{{ resource.class.name.plural }}(jwt);
+        dispatch(this.set{{ resource.class.name.plural }}({{ camel_case resource.class.name.plural }}));
+        return {{ camel_case resource.class.name.plural }};
+      };
+    }
   },
-  get{{ resource.class.name }}Async (jwt: string, id: number): any{
-    return async (dispatch: any) => {
-      let {{ camel_case resource.class.name }} = await api.get{{ resource.class.name }}(id, jwt);
-      dispatch(this.set{{ resource.class.name }}({{ camel_case resource.class.name }}));
-      return {{ camel_case resource.class.name }};
-    };
+  get{{ resource.class.name }}Async (id: number): any{
+    const jwt: string | null = localStorage.getItem('jwt');
+    if(jwt){
+      return async (dispatch: any) => {
+        let {{ camel_case resource.class.name }} = await api.get{{ resource.class.name }}(id, jwt);
+        dispatch(this.set{{ resource.class.name }}({{ camel_case resource.class.name }}));
+        return {{ camel_case resource.class.name }};
+      };
+    }
   },
-  add{{ resource.class.name }}Async (jwt: string, {{ camel_case resource.class.name }}: {{ resource.class.name }}): any{
-    return async (dispatch: any) => {
-      let new{{ resource.class.name }} = await api.add{{ resource.class.name }}({{ camel_case resource.class.name }}, jwt);
-      dispatch(this.add{{ resource.class.name }}(new{{ resource.class.name }}));
-      return new{{ resource.class.name }};
-    };
+  add{{ resource.class.name }}Async ({{ camel_case resource.class.name }}: {{ resource.class.name }}): any{
+    const jwt: string | null = localStorage.getItem('jwt');
+    if(jwt){
+      return async (dispatch: any) => {
+        let new{{ resource.class.name }} = await api.add{{ resource.class.name }}({{ camel_case resource.class.name }}, jwt);
+        dispatch(this.add{{ resource.class.name }}(new{{ resource.class.name }}));
+        return new{{ resource.class.name }};
+      };
+    }
   },
-  update{{ resource.class.name }}Async (jwt: string, {{ camel_case resource.class.name }}: {{ resource.class.name }}): any{
-    return async (dispatch: any) => {
-      let updated{{ resource.class.name }} = await api.update{{ resource.class.name }}({{ camel_case resource.class.name }}, jwt);
-      dispatch(this.update{{ resource.class.name }}(updated{{ resource.class.name }}));
-      return updated{{ resource.class.name }};
-    };
+  update{{ resource.class.name }}Async ({{ camel_case resource.class.name }}: {{ resource.class.name }}): any{
+    const jwt: string | null = localStorage.getItem('jwt');
+    if(jwt){
+      return async (dispatch: any) => {
+        let updated{{ resource.class.name }} = await api.update{{ resource.class.name }}({{ camel_case resource.class.name }}, jwt);
+        dispatch(this.update{{ resource.class.name }}(updated{{ resource.class.name }}));
+        return updated{{ resource.class.name }};
+      };
+    }
   },
-  delete{{ resource.class.name }}Async (jwt: string, {{ camel_case resource.class.name }}: {{ resource.class.name }}): any{
-    return async (dispatch: any) => {
-      await api.delete{{ resource.class.name }}({{ camel_case resource.class.name }}, jwt);
-      dispatch(this.delete{{ resource.class.name }}({{ camel_case resource.class.name }}));
-    };
+  delete{{ resource.class.name }}Async ({{ camel_case resource.class.name }}: {{ resource.class.name }}): any{
+    const jwt: string | null = localStorage.getItem('jwt');
+    if(jwt){
+      return async (dispatch: any) => {
+        await api.delete{{ resource.class.name }}({{ camel_case resource.class.name }}, jwt);
+        dispatch(this.delete{{ resource.class.name }}({{ camel_case resource.class.name }}));
+      };
+    }
   },
-  get{{ resource.class.name.plural }}OfTaskAsync (jwt: string, task: Task): any{
-    return async (dispatch: any) => {
-      let {{ camel_case resource.class.name.plural }} = await api.get{{ resource.class.name.plural }}OfTask(task, jwt);
-      dispatch(this.set{{ resource.class.name.plural }}OfTask({{ camel_case resource.class.name.plural }}));
-      return {{ camel_case resource.class.name.plural }};
-    };
+  {{~ for alternate in resource.alternate_resources
+  parent = alternate.parent_resource
+  ~}}
+  get{{ resource.class.name.plural }}Of{{ parent.name }}Async ({{ camel_case parent.name }}: {{ parent.name }}): any{
+    const jwt: string | null = localStorage.getItem('jwt');
+    if(jwt){
+      return async (dispatch: any) => {
+        let {{ camel_case resource.class.name.plural }} = await api.get{{ resource.class.name.plural }}Of{{ parent.name }}({{ camel_case parent.name }}, jwt);
+        dispatch(this.set{{ resource.class.name.plural }}Of{{ parent.name }}({{ camel_case resource.class.name.plural }}));
+        return {{ camel_case resource.class.name.plural }};
+      };
+    }
   },
-  add{{ resource.class.name }}ToTaskAsync (jwt: string, data: { {{ camel_case resource.class.name }}: {{ resource.class.name }}, task: Task}): any{
-    return async (dispatch: any) => {
-      let added{{ resource.class.name }} = await api.add{{ resource.class.name }}ToTask(data.{{ camel_case resource.class.name }}, data.task, jwt);
-      dispatch(this.add{{ resource.class.name }}ToTask(added{{ resource.class.name }}));
+  add{{ resource.class.name }}To{{ parent.name }}Async (data: { {{ camel_case resource.class.name }}: {{ resource.class.name }}, {{ camel_case parent.name }}: {{ parent.name }}}): any{
+    const jwt: string | null = localStorage.getItem('jwt');
+    if(jwt){
+      return async (dispatch: any) => {
+      let added{{ resource.class.name }} = await api.add{{ resource.class.name }}To{{ parent.name }}(data.{{ camel_case resource.class.name }}, data.{{ camel_case parent.name }}, jwt);
+      dispatch(this.add{{ resource.class.name }}To{{ parent.name }}(added{{ resource.class.name }}));
       return added{{ resource.class.name }};
     };
+    }
   },
-  delete{{ resource.class.name }}OfTaskAsync (jwt: string, data: { {{ camel_case resource.class.name }}: {{ resource.class.name }}, task: Task}): any{
-    return async (dispatch: any) => {
-      await api.delete{{ resource.class.name }}OfTask(data.{{ camel_case resource.class.name }}, data.task, jwt);
-      dispatch(this.delete{{ resource.class.name }}OfTask(data.{{ camel_case resource.class.name }}));
+  {{~ if alternate.pivot ~}}
+  delete{{ resource.class.name }}Of{{ parent.name }}Async (data: { {{ camel_case resource.class.name }}: {{ resource.class.name }}, {{ camel_case parent.name }}: Task}): any{
+    const jwt: string | null = localStorage.getItem('jwt');
+    if(jwt){
+      return async (dispatch: any) => {
+      await api.delete{{ resource.class.name }}Of{{ parent.name }}(data.{{ camel_case resource.class.name }}, data.{{ camel_case parent.name }}, jwt);
+      dispatch(this.delete{{ resource.class.name }}Of{{ parent.name }}(data.{{ camel_case resource.class.name }}));
     };
+    }
   },
+  {{~ end ~}}
+  {{~ end ~}}
 };
 
 export const reducer: Reducer<{{ resource.class.name }}State> = (state: {{ resource.class.name }}State | undefined, incomingAction: Action): {{ resource.class.name }}State => {
@@ -118,15 +166,21 @@ export const reducer: Reducer<{{ resource.class.name }}State> = (state: {{ resou
       const {{ camel_case resource.class.name.plural }} = state.{{ camel_case resource.class.name.plural }}.filter(i => i !== action.{{ camel_case resource.class.name }});
       setArray(state.{{ camel_case resource.class.name.plural }}, {{ camel_case resource.class.name.plural }});
       return {...state, {{ camel_case resource.class.name.plural }}: {{ camel_case resource.class.name.plural }}};
-    case 'SET_{{ resource.class.name.plural }}_OF_Task':
+    {{~ for alternate in resource.alternate_resources
+    parent = alternate.parent_resource
+    ~}}
+    case 'SET_{{ resource.class.name.plural }}_OF_{{ parent.name }}':
       patchArray(action.{{ camel_case resource.class.name.plural }}, state.{{ camel_case resource.class.name.plural }});
       return state;
-    case 'ADD_{{ resource.class.name }}_TO_Task':
+    case 'ADD_{{ resource.class.name }}_TO_{{ parent.name }}':
       setItem(state.{{ camel_case resource.class.name.plural }}, action.{{ camel_case resource.class.name }});
       return state;
-    case 'DELETE_{{ resource.class.name }}_OF_Task':
+    {{~ if alternate.pivot ~}}
+    case 'DELETE_{{ resource.class.name }}_OF_{{ parent.name }}':
       setItem(state.{{ camel_case resource.class.name.plural }}, action.{{ camel_case resource.class.name }});
       return state;
+    {{~ end ~}}
+    {{~ end ~}}
     default:
       return state;
   }

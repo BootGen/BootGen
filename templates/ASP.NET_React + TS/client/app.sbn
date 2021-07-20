@@ -9,7 +9,9 @@ import SignUp from './components/SignUp';
 import Profile from './components/Profile';
 import Logout from './components/Logout';
 import EditProfile from './components/EditProfile';
-import TaskList from './components/TaskList';
+{{~ for property in class.common_properties ~}}
+import { {{ property.class.name }}List } from './{{ property.class.name }}List';
+{{~ end ~}}
 
 export default () => (
     <Layout>
@@ -21,7 +23,9 @@ export default () => (
             <Route exact path='/logout' component={Logout} />
             <Route exact path='/change-password' component={ChangePassword} />
             <Route exact path='/edit-profile' component={EditProfile} />
-            <Route exact path='/tasks' component={TaskList} />
+            {{~ for property in class.common_properties ~}}
+            <Route exact path='/{{ camel_case property.class.name.plural }}' component={{{ property.class.name }}List} />
+            {{~ end ~}}
         </Switch>
     </Layout>
 );

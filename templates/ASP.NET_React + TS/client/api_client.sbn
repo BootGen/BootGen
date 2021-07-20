@@ -1,11 +1,11 @@
 import axios from 'axios';
-import { ProfileResponse } from '@/models/ProfileResponse';
-import { ChangePasswordData } from '@/models/ChangePasswordData';
-import { AuthenticationData } from '@/models/AuthenticationData';
-import { RegistrationData } from '@/models/RegistrationData';
-import { LoginResponse } from '@/models/LoginResponse';
+import { ProfileResponse } from '../models/ProfileResponse';
+import { ChangePasswordData } from '../models/ChangePasswordData';
+import { AuthenticationData } from '../models/AuthenticationData';
+import { RegistrationData } from '../models/RegistrationData';
+import { LoginResponse } from '../models/LoginResponse';
 {{~ for class in classes ~}}
-import { {{class.name}} } from '@/models/{{class.name}}';
+import { {{class.name}} } from '../models/{{class.name}}';
 {{~ end ~}}
 
 const dateFormat = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/;

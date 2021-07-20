@@ -19,6 +19,7 @@ import 'codemirror/mode/markdown/markdown.js';
 import 'codemirror/mode/shell/shell.js';
 import 'codemirror/mode/xml/xml.js';
 import 'codemirror/mode/dockerfile/dockerfile.js';
+import 'codemirror/mode/jsx/jsx.js';
 
 export default Vue.extend({
   props: {
@@ -67,6 +68,8 @@ export default Vue.extend({
           this.cmOptions.mode = 'text/x-sh';
         }else if(mode === 'yml'){
           this.cmOptions.mode = 'text/x-yaml';
+        }else if(mode === 'tsx'){
+          this.cmOptions.mode = 'text/typescript';
         }else{
           this.cmOptions.mode = 'text/x-dockerfile';
         }
