@@ -14,6 +14,11 @@ import 'codemirror/mode/clike/clike.js';
 import 'codemirror/mode/yaml/yaml.js';
 import 'codemirror/mode/vue/vue.js';
 import 'codemirror/mode/javascript/javascript.js';
+import 'codemirror/mode/htmlmixed/htmlmixed.js';
+import 'codemirror/mode/markdown/markdown.js';
+import 'codemirror/mode/shell/shell.js';
+import 'codemirror/mode/xml/xml.js';
+import 'codemirror/mode/dockerfile/dockerfile.js';
 
 export default Vue.extend({
   props: {
@@ -52,8 +57,18 @@ export default Vue.extend({
           this.cmOptions.mode = 'text/javascript';
         }else if(mode === 'vue'){
           this.cmOptions.mode = 'text/x-vue';
-        }else{
+        }else if(mode === 'html'){
+          this.cmOptions.mode = 'text/html';
+        }else if(mode === 'csproj'){
+          this.cmOptions.mode = 'application/xml';
+        }else if(mode === 'md'){
+          this.cmOptions.mode = 'text/x-markdown';
+        }else if(mode === 'sh'){
+          this.cmOptions.mode = 'text/x-sh';
+        }else if(mode === 'yaml'){
           this.cmOptions.mode = 'text/x-yaml';
+        }else{
+          this.cmOptions.mode = 'text/x-dockerfile';
         }
     },
     linesToColor: function (linesToColor: {line: number; color: string}[]) {
