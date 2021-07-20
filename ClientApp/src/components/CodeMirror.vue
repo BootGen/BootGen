@@ -1,6 +1,6 @@
 <template>
   <v-container fluid class="cm">
-    <codemirror v-if="mode === 'json' && cmId === 0" :id="cmId" :value="value" @input="onInput" return-object :options="cmOptions" @scroll="onScroll" />
+    <codemirror v-if="!cmOptions.readOnly" :id="cmId" :value="value" @input="onInput" return-object :options="cmOptions" @scroll="onScroll" />
     <codemirror v-else :id="cmId" :value="value" :options="cmOptions" @scroll="onScroll" ref="vueCm" />
   </v-container>
 </template>
