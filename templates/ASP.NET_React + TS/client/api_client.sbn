@@ -8,6 +8,8 @@ import { LoginResponse } from '../models/LoginResponse';
 import { {{class.name}} } from '../models/{{class.name}}';
 {{~ end ~}}
 
+axios.defaults.baseURL = 'http://localhost:5000';
+
 const dateFormat = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/;
 
 function reviver(key: string, value: string) {
