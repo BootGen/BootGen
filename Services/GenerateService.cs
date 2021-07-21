@@ -29,6 +29,7 @@ namespace Editor.Services
                 var templateDir = $"extracted_templates/{request.Backend}_{request.Frontend}";
                 #if DEBUG
                 templateDir = Path.Combine(Path.GetTempPath(), templateDir);
+                Directory.Delete(templateDir, true);
                 #endif
                 if (!Directory.Exists(templateDir))
                     ZipFile.ExtractToDirectory($"templates/{request.Backend}_{request.Frontend}/WebProject.zip", templateDir);
@@ -198,12 +199,15 @@ namespace Editor.Services
             var seedStore = new SeedDataStore(collection);
             seedStore.Load(jObject);
             var clientExtension = "ts";
+            var ClientRouterExtension = "ts";
             var clientComponentExtension = "vue";
-            if(request.Frontend.Contains("JS")){
+            if(request.Frontend.Contains("Vue 2 + JS")){
                 clientExtension = "js";
+                ClientRouterExtension = "js";
             }
             if(request.Frontend.Contains("React + TS")){
                 clientComponentExtension = "tsx";
+                ClientRouterExtension = "tsx";
             }
             var project = new BootGen.Project
             {
@@ -212,12 +216,17 @@ namespace Editor.Services
                 EntityFolder = "Entities",
                 ClientFolder = "ClientApp/src",
                 ClientExtension = clientExtension,
+                ClientRouterExtension = ClientRouterExtension,
                 ClientComponentExtension = clientComponentExtension,
                 Disk = disk,
                 ResourceCollection = collection,
                 SeedStore = seedStore,
                 TemplateRoot = $"templates/{request.Backend}_{request.Frontend}"
             };
+            if(request.Frontend.Contains("React")){
+                project.ClientViewsFolder = "components";
+                project.ClientRouterFolder = "components";
+            }
             return project;
         }
 
