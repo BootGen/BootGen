@@ -126,6 +126,6 @@ class {{ class.name }}List extends React.PureComponent<{{ class.name }}ListProps
 };
 
 export default connect(
-  (state: ApplicationState) => state.auth,
+  (state: ApplicationState) => ({ state }),
   {{ class.name }}Module.actionCreators
 )({{ class.name }}List);

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import './custom.css';
 import { Route, Switch } from 'react-router';
-import Layout from './components/Layout';
+import Layout from './components/index';
 import Home from './components/Home';
 import Login from './components/Login';
 import ChangePassword from './components/ChangePassword';
@@ -10,7 +10,7 @@ import Profile from './components/Profile';
 import Logout from './components/Logout';
 import EditProfile from './components/EditProfile';
 {{~ for class in classes ~}}
-import {{class.name}}List from './views/{{class.name}}List';
+import {{class.name}}List from './components/{{class.name}}List';
 {{~ end ~}}
 
 export default () => (
