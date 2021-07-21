@@ -1,0 +1,232 @@
+import * as React from 'react';
+import clsx from 'clsx';
+import { AppBar, createStyles, CssBaseline, Drawer, IconButton, List, ListItem, ListItemIcon, ListItemText, makeStyles, Theme, Toolbar, Typography } from '@material-ui/core';
+import { Link } from 'react-router-dom'
+import MenuIcon from '@material-ui/icons/Menu';
+import PersonAddOutlinedIcon from '@material-ui/icons/PersonAddOutlined';
+import PersonOutlinedIcon from '@material-ui/icons/PersonOutlined';
+import VpnKeyOutlinedIcon from '@material-ui/icons/VpnKeyOutlined';
+import ListIcon from '@material-ui/icons/List';
+
+const drawerWidth = 240;
+
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    root: {
+      display: 'flex',
+    },
+    appBar: {
+      transition: theme.transitions.create(['margin', 'width'], {
+        easing: theme.transitions.easing.sharp,
+        duration: theme.transitions.duration.leavingScreen,
+      }),
+    },
+    appBarShift: {
+      width: `calc(100% - ${drawerWidth}px)`,
+      marginLeft: drawerWidth,
+      transition: theme.transitions.create(['margin', 'width'], {
+        easing: theme.transitions.easing.easeOut,
+        duration: theme.transitions.duration.enteringScreen,
+      }),
+    },
+    menuButton: {
+      marginRight: theme.spacing(2),
+    },
+    hide: {
+      display: 'none',
+    },
+    drawer: {
+      width: drawerWidth,
+      flexShrink: 0,
+    },
+    drawerPaper: {
+      width: drawerWidth,
+    },
+    drawerHeader: {
+      display: 'flex',
+      alignItems: 'center',
+      padding: theme.spacing(0, 1),
+      // necessary for content to be below app bar
+      ...theme.mixins.toolbar,
+      justifyContent: 'flex-end',
+    },
+    content: {
+      flexGrow: 1,
+      padding: theme.spacing(3),
+      transition: theme.transitions.create('margin', {
+        easing: theme.transitions.easing.sharp,
+        duration: theme.transitions.duration.leavingScreen,
+      }),
+      marginLeft: -drawerWidth,
+    },
+    contentShift: {
+      transition: theme.transitions.create('margin', {
+        easing: theme.transitions.easing.easeOut,
+        duration: theme.transitions.duration.enteringScreen,
+      }),
+      marginLeft: 0,
+    },
+  }),
+);
+
+export default function Layout(props: { children?: React.ReactNode }) {
+  const classes = useStyles();
+  const [open, setOpen] = React.useState(true);
+  const [jwt, setJwt] = React.useState(localStorage.getItem('jwt'));
+
+
+  const storageChange = (storageEvent: StorageEvent) => {
+    if(storageEvent.key === 'jwt') {
+      setJwt(localStorage.getItem('jwt'));
+    }
+  }
+
+  React.useEffect(() => {
+    window.addEventListener('storage', e => {
+      storageChange(e);
+    });
+  })
+
+  const handleDrawer = () => {
+    setOpen(!open);
+  };
+  let items;
+  if(!jwt){
+    items = <List>
+        <Link to={"/login"}>
+            <ListItem button>
+                <ListItemIcon><PersonOutlinedIcon /></ListItemIcon>
+                <ListItemText primary="Login" />
+            </ListItem>
+        </Link>
+        <Link to={"/sign-up"}>
+            <ListItem button>
+                <ListItemIcon><PersonAddOutlinedIcon /></ListItemIcon>
+                <ListItemText primary="Sign up" />
+            </ListItem>
+        </Link><Link to={"/profile"}>
+            <ListItem button>
+                <ListItemIcon><PersonOutlinedIcon /></ListItemIcon>
+                <ListItemText primary="Profile" />
+            </ListItem>
+        </Link>
+        <Link to={"/logout"}>
+            <ListItem button>
+                <ListItemIcon><PersonOutlinedIcon /></ListItemIcon>
+                <ListItemText primary="Logout" />
+            </ListItem>
+        </Link>
+        <Link to={"/change-password"}>
+            <ListItem button>
+                <ListItemIcon><VpnKeyOutlinedIcon /></ListItemIcon>
+                <ListItemText primary="Change Password" />
+            </ListItem>
+        </Link>
+        <Link to={"/edit-profile"}>
+            <ListItem button>
+                <ListItemIcon><PersonOutlinedIcon /></ListItemIcon>
+                <ListItemText primary="Edit Profile" />
+            </ListItem>
+        </Link>
+        {{~ for class in classes ~}}
+        <Link to={"/{{camel_case class.name.plural}}"}>
+            <ListItem button>
+                <ListItemIcon><ListIcon /></ListItemIcon>
+                <ListItemText primary="{{class.name.plural}}" />
+            </ListItem>
+        </Link>
+        {{~ end ~}}
+      </List>
+  }else{
+    items = <List>
+    <Link to={"/login"}>
+        <ListItem button>
+            <ListItemIcon><PersonOutlinedIcon /></ListItemIcon>
+            <ListItemText primary="Login" />
+        </ListItem>
+    </Link>
+    <Link to={"/sign-up"}>
+        <ListItem button>
+            <ListItemIcon><PersonAddOutlinedIcon /></ListItemIcon>
+            <ListItemText primary="Sign up" />
+        </ListItem>
+    </Link>
+    <Link to={"/profile"}>
+        <ListItem button>
+            <ListItemIcon><PersonOutlinedIcon /></ListItemIcon>
+            <ListItemText primary="Profile" />
+        </ListItem>
+    </Link>
+    <Link to={"/logout"}>
+        <ListItem button>
+            <ListItemIcon><PersonOutlinedIcon /></ListItemIcon>
+            <ListItemText primary="Logout" />
+        </ListItem>
+    </Link>
+    <Link to={"/change-password"}>
+        <ListItem button>
+            <ListItemIcon><VpnKeyOutlinedIcon /></ListItemIcon>
+            <ListItemText primary="Change Password" />
+        </ListItem>
+    </Link>
+    <Link to={"/edit-profile"}>
+        <ListItem button>
+            <ListItemIcon><PersonOutlinedIcon /></ListItemIcon>
+            <ListItemText primary="Edit Profile" />
+        </ListItem>
+    </Link>
+    {{~ for class in classes ~}}
+    <Link to={"/{{camel_case class.name.plural}}"}>
+        <ListItem button>
+            <ListItemIcon><ListIcon /></ListItemIcon>
+            <ListItemText primary="{{class.name.plural}}" />
+        </ListItem>
+    </Link>
+    {{~ end ~}}
+    </List>
+  }
+  return (
+    <div className={classes.root}>
+      <CssBaseline />
+      <AppBar
+        position="fixed"
+        className={clsx(classes.appBar, {
+          [classes.appBarShift]: open,
+        })}
+      >
+        <Toolbar>
+          <IconButton
+            color="inherit"
+            aria-label="open drawer"
+            onClick={handleDrawer}
+            edge="start"
+          >
+            <MenuIcon />
+          </IconButton>
+          <Typography variant="h6" noWrap>
+            Persistent drawer
+          </Typography>
+        </Toolbar>
+      </AppBar>
+      <Drawer
+        className={classes.drawer}
+        variant="persistent"
+        anchor="left"
+        open={open}
+        classes={%%{{{
+          paper: classes.drawerPaper,
+        }}}%%}
+      >
+        {items}
+      </Drawer>
+      <main
+        className={clsx(classes.content, {
+          [classes.contentShift]: open,
+        })}
+      >
+        <div className={classes.drawerHeader} />
+        {props.children}
+      </main>
+    </div>
+  );
+}
