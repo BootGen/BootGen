@@ -101,7 +101,7 @@ export class ViewModel {
         this.jsonErrors = [];
         const result = validateJson(this.activeProject.json);
         if(!result.error) {
-            prettyPrint(this.activeProject.json);
+            this.activeProject.json = prettyPrint(this.activeProject.json);
             const jsonLength = getJsonLength(this.activeProject.json);
             if(jsonLength > 2000) {
                 this.setSnackbar('orange darken-2', `Exceeded character limit: ${jsonLength} / 2000`, -1);

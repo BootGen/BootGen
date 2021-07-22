@@ -1,5 +1,6 @@
 
 import axios from 'axios';
+import { toCamelCase } from './Helper';
 
 function getLine(idx: number, str: string): number{
   if(navigator.userAgent.indexOf('Firefox') != -1){
@@ -98,6 +99,18 @@ function replaceToCommentBlock(comments: string[], lines: string[]): string[]{
   });
   return lines;
 }
+function replaceToKey(strings: string[], lines: string[]): string[]{
+  strings.forEach(key => {
+    const name = key.replace(/"([^"]*)":/g, '$1')
+    for(let i = 0; i < lines.length; i++){
+      if(lines[i].includes('key')){
+        lines[i] = lines[i].replace('key', `"${toCamelCase(name)}": `);
+        break;
+      }
+    }
+  });
+  return lines;
+}
 function replaceToString(strings: string[], lines: string[]): string[]{
   strings.forEach(comment => {
     for(let i = 0; i < lines.length; i++){
@@ -112,6 +125,8 @@ function replaceToString(strings: string[], lines: string[]): string[]{
 export function prettyPrint(json: string): string {
   json = json.replaceAll('\r','');
   json = json.replaceAll('\'','"');
+  const keys = json.match(/"([^"]*)":/g);
+  json = json.replace(/"([^"]*)":/g, 'key');
   const strings = json.match(/"[^"]*"/g);
   json = json.replace(/"[^"]*"/g, '""');
   const comments = json.match(/\/\/.+?(?=\n)/g);
@@ -126,6 +141,9 @@ export function prettyPrint(json: string): string {
   if (comments) {
     lines = replaceToComment(comments, lines);
   }
+  if (keys) {
+    lines = replaceToKey(keys, lines);
+  }  
   if (strings) {
     lines = replaceToString(strings, lines);
   }
