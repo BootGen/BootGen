@@ -1,14 +1,9 @@
-import Vue from 'vue';
-import Vuex from 'vuex';
-import axios from 'axios';
+import { createStore } from 'vuex'
 import authModule, { AuthState } from '@/store/AuthModule';
 {{~ for class in classes ~}}
 import {{camel_case class.name}}Module, { {{class.name.plural}}State } from '@/store/{{class.name}}Module';
 {{~ end ~}}
 
-Vue.use(Vuex);
-
-axios.defaults.baseURL = '{{base_url}}';
 
 export interface State {
   auth: AuthState;
@@ -17,7 +12,7 @@ export interface State {
   {{~ end ~}}
 }
 
-export default new Vuex.Store<State>({
+export default createStore<State>({
   modules: {
     auth: authModule,
     {{~ for class in classes ~}}

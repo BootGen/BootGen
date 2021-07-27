@@ -1,34 +1,30 @@
-import Vue from 'vue';
-import VueRouter, {NavigationGuardNext, Route, RouteConfig} from 'vue-router';
+import { createRouter, createWebHistory, RouteRecordRaw, NavigationGuardNext, RouteLocationNormalized } from 'vue-router'
 import Login from '../views/Login.vue';
-import Logout from '../views/Logout.vue';
 import SignUp from '../views/SignUp.vue';
 import Profile from '../views/Profile.vue';
 import ChangePassword from '../views/ChangePassword.vue';
-import EditProfile from '../views/EditProfile.vue';
 import store from '../store';
 {{~ for class in classes ~}}
 import {{ class.name }}List from '../views/{{ class.name }}List.vue';
 {{~ end ~}}
 
-Vue.use(VueRouter);
 
-const loggedInGuard = (to: Route, from: Route, next: NavigationGuardNext) => {
-  if(store.state.auth.jwt){
+const loggedOutGuard = (to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext) => {
+  if (store.state.auth.user) {
+    next('/profile');
+  } else {
     next();
-  }else{
+  }
+};
+const loggedInGuard = (to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext) => {
+  if (store.state.auth.user) {
+    next();
+  } else {
     next('/');
   }
 };
 
-const loggedOutGuard = (to: Route, from: Route, next: NavigationGuardNext) => {
-  if(store.state.auth.jwt){
-    next('/profile');
-  }else{
-    next();
-  }
-};
-  const routes: Array<RouteConfig> = [
+const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
     name: 'Login',
@@ -53,18 +49,6 @@ const loggedOutGuard = (to: Route, from: Route, next: NavigationGuardNext) => {
     beforeEnter: loggedInGuard,
     component: ChangePassword
   },
-  {
-    path: '/edit-profile',
-    name: 'Edit Profile',
-    beforeEnter: loggedInGuard,
-    component: EditProfile
-  },
-  {
-    path: '/logout',
-    name: 'Logout',
-    beforeEnter: loggedInGuard,
-    component: Logout
-  },
   {{~ for class in classes ~}}
   {
     path: '/{{ camel_case class.name.plural }}',
@@ -75,10 +59,9 @@ const loggedOutGuard = (to: Route, from: Route, next: NavigationGuardNext) => {
   {{~ end ~}}
 ]
 
-const router = new VueRouter({
-  mode: 'history',
-  base: process.env.BASE_URL,
+const router = createRouter({
+  history: createWebHistory(process.env.BASE_URL),
   routes
 })
 
-export default router;
+export default router
