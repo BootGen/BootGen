@@ -2,7 +2,7 @@ import api from '@/api';
 import { Command } from './Command';
 import { CommandType } from './CommandStore';
 import { ViewModel } from './ViewModel';
-import { delay, toCamelCase } from '../utils/Helper';
+import { toCamelCase } from '../utils/Helper';
 
 export class DownloadCommand implements Command {
     name = 'download';
@@ -23,15 +23,12 @@ export class DownloadCommand implements Command {
     async action() {
         if(!this.viewModel.downLoading){
             this.viewModel.downLoading = true;
-            await Promise.all([
-            delay(3000),
-            api.download({
+            await api.download({
                 data: this.viewModel.activeProject.json,
                 nameSpace: toCamelCase(this.viewModel.activeProject.name),
                 backend: this.viewModel.activeProject.backend,
                 frontend: this.viewModel.activeProject.frontend
-            })
-        ]);
+            });
         this.viewModel.downLoading = false;
       }
     }
