@@ -1,7 +1,7 @@
 <p align="center">
   <img src="ClientApp/src/assets/img/bootgen_full.png" width="50%">
 </p>
-<h1 align="center">Develop ASP.NET + Vue applications much faster!</h1> 
+<h1 align="center">Starter Project Generator <br> Develop ASP.NET + Vue applications much faster!</h1> 
 
 BootGen generates an ASP.Net 5 project with Vue.js based on the sample JSON data you provide. From this sample data it infers the types you need, and creates entity classes, data services, controllers and Vuex state management that fits your use case. 
   
