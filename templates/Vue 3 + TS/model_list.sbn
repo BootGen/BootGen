@@ -1,6 +1,14 @@
 <template>
   <div class="container-fluid"> 
-    <{{ camel_case class.name }}-view v-for="item in {{ camel_case class.name.plural }}" :key="item.id" :{{ camel_case class.name }}="item"></{{ camel_case class.name }}-view>
+    <div class="row">
+      <div
+        class="col-md-2"
+        v-for="item in {{ camel_case class.name.plural }}"
+        :key="item.id"
+      >
+        <{{ camel_case class.name }}-view  :{{ camel_case class.name }}="item"  @delete="deletePet(item)"></{{ camel_case class.name }}-view>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -18,6 +26,11 @@ export default defineComponent({
     const {{ camel_case class.name.plural }} = await store.dispatch('{{ camel_case class.name.plural }}/get{{ class.name.plural }}');
     return { {{ camel_case class.name.plural }} }
   },
-  methods: {}
+  methods: {
+    delete{{ class.name }}({{ camel_case class.name }}: {{ class.name }}){
+      if (confirm(`Are you sure to delete {{ class.name }} with id ${pet.id}?`))
+        this.store.dispatch("{{ camel_case class.name.plural }}/delete{{ class.name }}", {{ camel_case class.name }})
+    }
+  }
 });
 </script>
