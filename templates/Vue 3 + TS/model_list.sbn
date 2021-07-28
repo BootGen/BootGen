@@ -3,7 +3,7 @@
     <div class="row">
       <div
         class="col-md-2"
-        v-for="item in {{ camel_case class.name.plural }}"
+        v-for="item in store.state.{{ camel_case class.name.plural }}.items"
         :key="item.id"
       >
         <{{ camel_case class.name }}-view  :{{ camel_case class.name }}="item"  @delete="deletePet(item)"></{{ camel_case class.name }}-view>
@@ -21,14 +21,14 @@ import { {{ class.name }} } from '../models/{{ class.name }}';
 
 export default defineComponent({
   components: { {{ class.name }}View },
-  setup: async function () {
+  setup: function () {
     const store = useStore<State>();
-    const {{ camel_case class.name.plural }} = await store.dispatch('{{ camel_case class.name.plural }}/get{{ class.name.plural }}');
-    return { {{ camel_case class.name.plural }} }
+    store.dispatch('{{ camel_case class.name.plural }}/get{{ class.name.plural }}');
+    return { store }
   },
   methods: {
     delete{{ class.name }}({{ camel_case class.name }}: {{ class.name }}){
-      if (confirm(`Are you sure to delete {{ class.name }} with id ${pet.id}?`))
+      if (confirm(`Are you sure to delete {{ class.name }} with id ${ {{ camel_case class.name }}.id }?`))
         this.store.dispatch("{{ camel_case class.name.plural }}/delete{{ class.name }}", {{ camel_case class.name }})
     }
   }
