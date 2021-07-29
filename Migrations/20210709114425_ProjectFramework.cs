@@ -23,7 +23,7 @@ namespace Editor.Migrations
                 keyColumn: "Id",
                 keyValue: 1,
                 columns: new[] { "Backend", "Frontend" },
-                values: new object[] { "ASP.NET", "Vue 2 + JS" });
+                values: new object[] { "ASP.NET", "Vue 3 JavaScript" });
 
             migrationBuilder.UpdateData(
                 table: "Users",

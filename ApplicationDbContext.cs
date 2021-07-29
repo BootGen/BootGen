@@ -71,7 +71,7 @@ namespace Editor
                 Json = "{'users': [{'userName': 'Test User', 'email': 'aa@bb@cc'}]}",
                 OwnerId = 1,
                 Backend = "ASP.NET",
-                Frontend= "Vue 2 + JS"
+                Frontend= "Vue 3 JavaScript"
             });
         }
     }

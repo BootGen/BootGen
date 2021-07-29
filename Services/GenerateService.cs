@@ -11,6 +11,11 @@ using Newtonsoft.Json.Linq;
 
 namespace Editor.Services
 {
+    public class ClientTemplate {
+        public VirtualDisk Templates { get; set; }
+        public VirtualDisk Files { get; set; }
+        public ClientConfig Config { get; set; }
+    }
     public class GenerateService : IGenerateService
     {
         public IErrorService ErrorService { get; }
@@ -31,9 +36,9 @@ namespace Editor.Services
                 var clientDisk = new VirtualDisk();
 
                 (var serverProject, var clientProject) = InitProject(request, virtualDisk, clientDisk);
-                virtualDisk.Mount(clientDisk, "ClientApp/src");
                 serverProject.GenerateFiles(request.NameSpace, "http://localhost:5000");
                 clientProject.GenerateFiles(request.NameSpace, "http://localhost:5000");
+                virtualDisk.Mount(clientDisk, "ClientApp/src");
                 var files = new List<GeneratedFile>();
                 foreach (var file in virtualDisk.Files)
                 {
@@ -67,23 +72,53 @@ namespace Editor.Services
 
         private VirtualDisk LoadStaticFiles(GenerateRequest request)
         {
-            var backendDisk = Cache.GetOrCreate<VirtualDisk>(request.Backend, entry => LoadTemplateFiles(request.Backend));
-            var frontendDisk = Cache.GetOrCreate<VirtualDisk>(request.Frontend, entry => LoadTemplateFiles(request.Frontend));
+            var backendDisk = Cache.GetOrCreate<VirtualDisk>(request.Backend, entry => LoadStaticFiles(request.Backend));
+            var frontendDisk = GetClientTemplate(request);
             var virtualDisk = SetNamespace(backendDisk, request.NameSpace);
-            Mount(virtualDisk, frontendDisk, "ClientApp");
+            Mount(virtualDisk, frontendDisk.Files, "ClientApp");
             return virtualDisk;
         }
 
-        private static VirtualDisk LoadTemplateFiles(string templateName)
+        private ClientTemplate GetClientTemplate(GenerateRequest request)
+        {
+            return Cache.GetOrCreate<ClientTemplate>(request.Frontend, entry => LoadClientTemplate(request.Frontend));
+        }
+
+        private static VirtualDisk LoadStaticFiles(string templateName)
         {
             var disk = new VirtualDisk();
             var templateDir = Path.Combine(Path.GetTempPath(), $"extracted_templates/{templateName}");
             if (Directory.Exists(templateDir))
                 Directory.Delete(templateDir, true);
             ZipFile.ExtractToDirectory($"templates/{templateName}/files.zip", templateDir);
-            LoadTemplateFiles(templateDir, templateDir, disk);
+            LoadStaticFiles(templateDir, templateDir, disk);
             Directory.Delete(templateDir, true);
             return disk;
+        }
+
+        private static ClientTemplate LoadClientTemplate(string name) {
+            
+            var result = new ClientTemplate();
+            var templateDir = Path.Combine(Path.GetTempPath(), $"extracted_templates/{name}");
+            if (Directory.Exists(templateDir))
+                Directory.Delete(templateDir, true);
+            ZipFile.ExtractToDirectory($"templates/client/{name}.zip", templateDir);
+            var staticFilesDir = Path.Combine(templateDir, "files");
+            result.Files = new VirtualDisk();
+            LoadStaticFiles(staticFilesDir, staticFilesDir, result.Files);
+
+            result.Config = JObject.Parse(File.ReadAllText(Path.Combine(templateDir, "config.json"))).ToObject<ClientConfig>();
+
+            result.Templates = new VirtualDisk();
+            foreach(var file in Directory.EnumerateFiles(Path.Combine(templateDir, "templates"))) {
+                result.Templates.Files.Add(new VirtualFile {
+                    Name = Path.GetFileName(file),
+                    Path = "",
+                    Content = File.ReadAllText(file)
+                });
+            }
+
+            return result;
         }
 
         private int? GetLine(Exception e)
@@ -180,7 +215,7 @@ namespace Editor.Services
         }
 
         
-        private static void LoadTemplateFiles(string rootdDir, string dir,  VirtualDisk disk)
+        private static void LoadStaticFiles(string rootdDir, string dir,  VirtualDisk disk)
         {
             foreach( var path in Directory.GetFiles(dir)) {
                 if (path.EndsWith(".ico"))
@@ -193,7 +228,7 @@ namespace Editor.Services
             }
             foreach( var path in Directory.GetDirectories(dir))
             {
-                LoadTemplateFiles(rootdDir, path, disk);
+                LoadStaticFiles(rootdDir, path, disk);
             }
         }
 
@@ -228,7 +263,7 @@ namespace Editor.Services
             }
         }
 
-        private static Tuple<ServerProject, ClientProject> InitProject(GenerateRequest request, IDisk serverDisk, IDisk clientDisk)
+        private Tuple<ServerProject, ClientProject> InitProject(GenerateRequest request, IDisk serverDisk, IDisk clientDisk)
         {
             DataModel dataModel = new DataModel();
             var jObject = JObject.Parse(request.Data, new JsonLoadSettings { CommentHandling = CommentHandling.Load, DuplicatePropertyNameHandling = DuplicatePropertyNameHandling.Error });
@@ -249,10 +284,6 @@ namespace Editor.Services
             });
             var seedStore = new SeedDataStore(collection);
             seedStore.Load(jObject);
-            var clientExtension = "ts";
-            if(request.Frontend.Contains("JS")){
-                clientExtension = "js";
-            }
             var serverProject = new ServerProject
             {
                 Config = new ServerConfig {
@@ -265,18 +296,14 @@ namespace Editor.Services
                 SeedStore = seedStore,
                 Templates = new Disk($"templates/{request.Backend}")
             };
+            var clientTemplate = GetClientTemplate(request);
             var clientProject = new ClientProject
             {
-                Config = new ClientConfig {
-                    Extension = clientExtension,
-                    ComponentExtension = "vue",
-                    RouterFileName = $"index.{clientExtension}",
-                    RouterFolder = "router"
-                },
+                Config = clientTemplate.Config,
                 Disk = clientDisk,
                 ResourceCollection = collection,
                 SeedStore = seedStore,
-                Templates = new Disk($"templates/{request.Frontend}")
+                Templates = clientTemplate.Templates
             };
             return Tuple.Create(serverProject, clientProject);
         }
