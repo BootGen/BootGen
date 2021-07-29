@@ -38,7 +38,7 @@ namespace Editor.Services
                     files.Add(new GeneratedFile
                     {
                         Name = file.Name,
-                        Path = file.Path,
+                        Path = file.Path.Replace("\\", "/"),
                         Content = file.Content
                     });
                 }
