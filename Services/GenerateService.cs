@@ -28,8 +28,10 @@ namespace Editor.Services
             try
             {
                 var virtualDisk = LoadStaticFiles(request);
+                var clientDisk = new VirtualDisk();
 
-                (var serverProject, var clientProject) = InitProject(request, virtualDisk);
+                (var serverProject, var clientProject) = InitProject(request, virtualDisk, clientDisk);
+                virtualDisk.Mount(clientDisk, "ClientApp/src");
                 serverProject.GenerateFiles(request.NameSpace, "http://localhost:5000");
                 clientProject.GenerateFiles(request.NameSpace, "http://localhost:5000");
                 var files = new List<GeneratedFile>();
@@ -142,9 +144,10 @@ namespace Editor.Services
                     Directory.CreateDirectory(dir);
                 File.WriteAllText(Path.Combine(dir, file.Name), file.Content);
             }
-            var disk = new Disk(tempDir);
+            var serverDisk = new Disk(tempDir);
+            var clientDisk = new Disk(Path.Combine(tempDir, "ClientApp/src"));
             ReplaceNamespace(tempDir, request.NameSpace);
-            (var serverProject, var clientProject) = InitProject(request, disk);
+            (var serverProject, var clientProject) = InitProject(request, serverDisk, clientDisk);
             serverProject.GenerateFiles(request.NameSpace, "http://localhost:5000");
             clientProject.GenerateFiles(request.NameSpace, "http://localhost:5000");
             ZipFile.CreateFromDirectory(tempDir, tempFile);
@@ -225,7 +228,7 @@ namespace Editor.Services
             }
         }
 
-        private static Tuple<ServerProject, ClientProject> InitProject(GenerateRequest request, IDisk disk)
+        private static Tuple<ServerProject, ClientProject> InitProject(GenerateRequest request, IDisk serverDisk, IDisk clientDisk)
         {
             DataModel dataModel = new DataModel();
             var jObject = JObject.Parse(request.Data, new JsonLoadSettings { CommentHandling = CommentHandling.Load, DuplicatePropertyNameHandling = DuplicatePropertyNameHandling.Error });
@@ -252,25 +255,28 @@ namespace Editor.Services
             }
             var serverProject = new ServerProject
             {
-                ControllerFolder = "Controllers",
-                ServiceFolder = "Services",
-                EntityFolder = "Entities",
-                Disk = disk,
+                Config = new ServerConfig {
+                    ControllerFolder = "Controllers",
+                    ServiceFolder = "Services",
+                    EntityFolder = "Entities"
+                },
+                Disk = serverDisk,
                 ResourceCollection = collection,
                 SeedStore = seedStore,
-                TemplateRoot = $"templates/{request.Backend}"
+                Templates = new Disk($"templates/{request.Backend}")
             };
             var clientProject = new ClientProject
             {
-                Folder = "ClientApp/src",
-                Extension = clientExtension,
-                ComponentExtension = "vue",
-                RouterFileName = $"index.{clientExtension}",
-                RouterFolder = "router",
-                Disk = disk,
+                Config = new ClientConfig {
+                    Extension = clientExtension,
+                    ComponentExtension = "vue",
+                    RouterFileName = $"index.{clientExtension}",
+                    RouterFolder = "router"
+                },
+                Disk = clientDisk,
                 ResourceCollection = collection,
                 SeedStore = seedStore,
-                TemplateRoot = $"templates/{request.Frontend}"
+                Templates = new Disk($"templates/{request.Frontend}")
             };
             return Tuple.Create(serverProject, clientProject);
         }
