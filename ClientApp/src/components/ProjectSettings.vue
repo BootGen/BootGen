@@ -61,7 +61,7 @@ export default Vue.extend({
       dialog: true,
       projectName: 'My Project',
       backend: 'ASP.NET',
-      frontend: 'Vue 2 + JS',
+      frontend: 'Vue 3 JavaScript',
     };
   },
   created: function(){
