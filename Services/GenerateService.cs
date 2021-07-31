@@ -99,10 +99,10 @@ namespace Editor.Services
         private static ClientTemplate LoadClientTemplate(string name) {
             
             var result = new ClientTemplate();
-            var templateDir = Path.Combine(Path.GetTempPath(), $"extracted_templates/{name}");
+            var templateDir = Path.Combine(Path.GetTempPath(), $"extracted_plugins/{name}");
             if (Directory.Exists(templateDir))
                 Directory.Delete(templateDir, true);
-            ZipFile.ExtractToDirectory($"templates/client/{name}.zip", templateDir);
+            ZipFile.ExtractToDirectory($"plugins/client/{name}.zip", templateDir);
             var staticFilesDir = Path.Combine(templateDir, "files");
             result.Files = new VirtualDisk();
             LoadStaticFiles(staticFilesDir, staticFilesDir, result.Files);
