@@ -60,7 +60,7 @@ export default Vue.extend({
       errorMsg: false,
       dialog: true,
       projectName: 'My Project',
-      backend: 'ASP.NET',
+      backend: 'ASP.NET 5',
       frontend: 'Vue 3 JavaScript',
     };
   },

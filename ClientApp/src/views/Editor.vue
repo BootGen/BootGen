@@ -112,10 +112,10 @@ export default Vue.extend({
       viewModel: new ViewModel(),
       commandStore: null as (CommandStore | null),
       CommandType: CommandType,
-      newProject: {id: -1, ownerId: -1, name: 'My Project', json: '', backend: 'ASP.NET', frontend: 'Vue 3 JavaScript'},
+      newProject: {id: -1, ownerId: -1, name: 'My Project', json: '', backend: 'ASP.NET 5', frontend: 'Vue 3 JavaScript'},
       drawer: false,
       openPath: '',
-      backends: ['ASP.NET'],
+      backends: ['ASP.NET 5'],
       frontends: ['Vue 3 JavaScript', 'Vue 3 TypeScript'],
     };
   },
