@@ -70,7 +70,7 @@ namespace Editor
                 Name = "First Project",
                 Json = "{'users': [{'userName': 'Test User', 'email': 'aa@bb@cc'}]}",
                 OwnerId = 1,
-                Backend = "ASP.NET",
+                Backend = "ASP.NET 5",
                 Frontend= "Vue 3 JavaScript"
             });
         }

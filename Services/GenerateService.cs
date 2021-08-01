@@ -11,11 +11,6 @@ using Newtonsoft.Json.Linq;
 
 namespace Editor.Services
 {
-    public class ClientTemplate {
-        public VirtualDisk Templates { get; set; }
-        public VirtualDisk Files { get; set; }
-        public ClientConfig Config { get; set; }
-    }
     public class GenerateService : IGenerateService
     {
         public IErrorService ErrorService { get; }
@@ -72,16 +67,20 @@ namespace Editor.Services
 
         private VirtualDisk LoadStaticFiles(GenerateRequest request)
         {
-            var backendDisk = Cache.GetOrCreate<VirtualDisk>(request.Backend, entry => LoadStaticFiles(request.Backend));
-            var frontendDisk = GetClientTemplate(request);
+            var backendDisk = GetServerPlugin(request).Files;
+            var frontendDisk = GetClientPlugin(request).Files;
             var virtualDisk = SetNamespace(backendDisk, request.NameSpace);
-            Mount(virtualDisk, frontendDisk.Files, "ClientApp");
+            Mount(virtualDisk, frontendDisk, "ClientApp");
             return virtualDisk;
         }
 
-        private ClientTemplate GetClientTemplate(GenerateRequest request)
+        private ClientPlugin GetClientPlugin(GenerateRequest request)
         {
-            return Cache.GetOrCreate<ClientTemplate>(request.Frontend, entry => LoadClientTemplate(request.Frontend));
+            return Cache.GetOrCreate<ClientPlugin>(request.Frontend, entry => LoadPlugin<ClientPlugin, ClientConfig>("plugins/client", request.Frontend));
+        }
+        private ServerPlugin GetServerPlugin(GenerateRequest request)
+        {
+            return Cache.GetOrCreate<ServerPlugin>(request.Backend, entry => LoadPlugin<ServerPlugin, ServerConfig>("plugins/server", request.Backend));
         }
 
         private static VirtualDisk LoadStaticFiles(string templateName)
@@ -96,18 +95,18 @@ namespace Editor.Services
             return disk;
         }
 
-        private static ClientTemplate LoadClientTemplate(string name) {
+        private static P LoadPlugin<P, T>(string folder, string name) where P : IPlugin<T>, new() {
             
-            var result = new ClientTemplate();
+            var result = new P();
             var templateDir = Path.Combine(Path.GetTempPath(), $"extracted_plugins/{name}");
             if (Directory.Exists(templateDir))
                 Directory.Delete(templateDir, true);
-            ZipFile.ExtractToDirectory($"plugins/client/{name}.zip", templateDir);
+            ZipFile.ExtractToDirectory(Path.Combine(folder, $"{name}.zip"), templateDir);
             var staticFilesDir = Path.Combine(templateDir, "files");
             result.Files = new VirtualDisk();
             LoadStaticFiles(staticFilesDir, staticFilesDir, result.Files);
 
-            result.Config = JObject.Parse(File.ReadAllText(Path.Combine(templateDir, "config.json"))).ToObject<ClientConfig>();
+            result.Config = JObject.Parse(File.ReadAllText(Path.Combine(templateDir, "config.json"))).ToObject<T>();
 
             result.Templates = new VirtualDisk();
             foreach(var file in Directory.EnumerateFiles(Path.Combine(templateDir, "templates"))) {
@@ -284,26 +283,23 @@ namespace Editor.Services
             });
             var seedStore = new SeedDataStore(collection);
             seedStore.Load(jObject);
+            var serverPlugin = GetServerPlugin(request);
             var serverProject = new ServerProject
             {
-                Config = new ServerConfig {
-                    ControllerFolder = "Controllers",
-                    ServiceFolder = "Services",
-                    EntityFolder = "Entities"
-                },
+                Config = serverPlugin.Config,
                 Disk = serverDisk,
                 ResourceCollection = collection,
                 SeedStore = seedStore,
-                Templates = new Disk($"templates/{request.Backend}")
+                Templates = serverPlugin.Templates
             };
-            var clientTemplate = GetClientTemplate(request);
+            var clientPlugin = GetClientPlugin(request);
             var clientProject = new ClientProject
             {
-                Config = clientTemplate.Config,
+                Config = clientPlugin.Config,
                 Disk = clientDisk,
                 ResourceCollection = collection,
                 SeedStore = seedStore,
-                Templates = clientTemplate.Templates
+                Templates = clientPlugin.Templates
             };
             return Tuple.Create(serverProject, clientProject);
         }
