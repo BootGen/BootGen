@@ -40,7 +40,7 @@ We generate code for you, not just the compiler. We intend to create code that i
 }
 ```
 
-For this example an appllication with two entity classes `User` and `Pet` will be created. The database will be seeded with entities for Jon, Garfield and Odie. [Try it online!](https://bootgen.com/editor)
+For this example, an appllication with two entity classes `User` and `Pet` will be created. The database will be seeded with entities for Jon, Garfield and Odie. [Try it online!](https://bootgen.com/editor)
 
 #### JSON conventions
    * Property and class names should be camelCase.
