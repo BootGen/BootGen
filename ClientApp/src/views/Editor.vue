@@ -116,7 +116,7 @@ export default Vue.extend({
       drawer: false,
       openPath: '',
       backends: ['ASP.NET 5'],
-      frontends: ['Vue 3 JavaScript', 'Vue 3 TypeScript'],
+      frontends: ['Vue 3 JavaScript', 'Vue 3 TypeScript', 'React TypeScript'],
     };
   },
   created: async function(){
