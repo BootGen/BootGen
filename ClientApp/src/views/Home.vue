@@ -7,20 +7,23 @@
         alt="BootGen logo"
       ></v-img>
       <h1 class="slogan">
-        Develop ASP.NET 5 + Vue applications much faster!
-      </h1>
+        Starter Project Generator
+      </h1> 
       <h2 class="slogan">
-        Online project generator for ASP.NET 5 with Vue.js
+        Develop ASP.NET 5 + Vue 3 applications much faster!
       </h2>
       <p>
-        BootGen generates an ASP.NET 5 project with Vue.js based on the sample JSON data you provide. From this sample data it infers the types you need, and creates entity classes, data services, controllers and Vuex state management that fits your use case.
+        BootGen generates a well coded, human readable, ASP.NET 5 project with Vue 3 based on the sample JSON data you provide. From this sample data it infers the types you need, and creates entity classes, data services, controllers and Vuex state management that fits your use case. 
       </p>
-      <div class="d-flex justify-center">
+      <div class="d-flex justify-center video">
         <iframe width="560" height="315" src="https://www.youtube.com/embed/bdgWl8Ia7u8" title="BootGen tutorial" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
       </div>
+      <p>Create sample JSON data, and generate your application. Edit the JSON, and regenerate until you are satisfied with the result. Changes will be highlighted in the generated files.</p>
+      <p>When you are finnished click download, and start coding!</p>
+      <p>We generate code for you, not just the compiler. We intend to create code that is easy to read, understand and edit.</p>
       <div class="slogan">
         <v-btn class="ma-2" to="/editor" color="primary"> Try Online </v-btn>
-        <v-btn class="ma-2" to="/getting-started" color="primary"> Getting Started </v-btn>
+        <v-btn class="ma-2" to="/advanced-features" color="primary"> Advanced Features </v-btn>
       </div>
     </v-card>
   </v-container>
@@ -43,6 +46,10 @@
   margin: 10px;
 }
 h2 {
+  margin-top: 30px;
+  margin-bottom: 30px;
+}
+.video {
   margin-top: 30px;
   margin-bottom: 30px;
 }
