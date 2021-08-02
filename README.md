@@ -46,7 +46,7 @@ For this example, an appllication with two entity classes `User` and `Pet` will 
    * Property and class names should be camelCase.
    * Array names should be plural nouns, everything else should be in singular form.
 
-## Advanced Usage
+## Advanced Features
 
 Although comments are non-standard feature in JSON, many JSON processing libraries support it. We use them as annotations. Annotations can be placed at the beginning of arrays. Possible annotations:
   * `timestamps`: Adds a `Created` and an `Updated` timestamp property to the class.
