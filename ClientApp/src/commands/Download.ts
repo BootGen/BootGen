@@ -2,7 +2,7 @@ import api from '@/api';
 import { Command } from './Command';
 import { CommandType } from './CommandStore';
 import { ViewModel } from './ViewModel';
-import { toCamelCase } from '../utils/Helper';
+import { toPascalCase } from '../utils/Helper';
 
 export class DownloadCommand implements Command {
     name = 'download';
@@ -25,7 +25,7 @@ export class DownloadCommand implements Command {
             this.viewModel.downLoading = true;
             await api.download({
                 data: this.viewModel.activeProject.json,
-                nameSpace: toCamelCase(this.viewModel.activeProject.name),
+                nameSpace: toPascalCase(this.viewModel.activeProject.name),
                 backend: this.viewModel.activeProject.backend,
                 frontend: this.viewModel.activeProject.frontend
             });
