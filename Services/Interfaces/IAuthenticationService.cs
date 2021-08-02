@@ -5,6 +5,6 @@ namespace Editor.Services
     public interface IAuthenticationService
     {
         LoginResponse Login(AuthenticationData data);
-        OAuthLoginResponse GithubOAuthLogin(GithubUser githubUser, string accessToken);
+        OAuthLoginResponse GithubOAuthLogin(OAuthUser githubUser, string accessToken);
     }
 }

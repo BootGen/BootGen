@@ -2,7 +2,7 @@
 {
     public interface IOAuthService
     {
-        GithubUser GetGithubUser(int githubId);
+        OAuthUser GetGithubUser(int githubId);
         bool IsGithubUserRegistered(int githubId);
     }
 }

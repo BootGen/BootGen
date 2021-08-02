@@ -41,11 +41,11 @@ namespace Editor.Services
             bool isEmailInUse = dbContext.Users.Where(u => u.Email == data.Email).Any();
             bool isUserNameInUse = dbContext.Users.Where(u => u.UserName == data.UserName).Any();
             return new ProfileResponse
-                {
-                    Success = !isUserNameInUse && !isEmailInUse,
-                    IsUserNameInUse = isUserNameInUse,
-                    IsEmailInUse = isEmailInUse
-                };
+            {
+                Success = !isUserNameInUse && !isEmailInUse,
+                IsUserNameInUse = isUserNameInUse,
+                IsEmailInUse = isEmailInUse
+            };
         }
 
         public ProfileResponse Register(RegistrationData data)
@@ -53,19 +53,20 @@ namespace Editor.Services
             var response = CheckRegistration(data);
             if (response.Success)
             {
-                User newUser = new User {
+                User newUser = new User
+                {
                     UserName = data.UserName,
                     Email = data.Email,
                     Newsletter = data.Newsletter,
                     IsActive = false,
-                    ActivationToken = Guid.NewGuid().ToString(),
-                    RegistrationProvider = RegistrationProvider.Default
+                    ActivationToken = Guid.NewGuid().ToString()
                 };
                 newUser.PasswordHash = new PasswordHasher<User>().HashPassword(newUser, data.Password);
                 dbContext.Users.Add(newUser);
                 dbContext.SaveChanges();
                 var apiKey = configuration["SendGridApiKey"];
-                if (!string.IsNullOrWhiteSpace(apiKey)) {
+                if (!string.IsNullOrWhiteSpace(apiKey))
+                {
                     var client = new SendGridClient(apiKey);
                     var from = new EmailAddress("info@bootgen.com", "BootGen");
                     var subject = "confirm e-mail address";
@@ -79,34 +80,35 @@ namespace Editor.Services
             return response;
         }
 
-        public async Task<GithubUser> RegisterViaGithub(GithubRegistrationData data, GithubUserInfo githubUserInfo)
+        public async Task<OAuthUser> RegisterViaGithub(GithubRegistrationData data, GithubUserInfo githubUserInfo)
         {
-            var githubUser = new GithubUser();
+            var githubUser = new OAuthUser();
 
-            var isRegisteredViaGithub = oAuthService.IsGithubUserRegistered(githubUserInfo.Id);
-            if (!isRegisteredViaGithub)
+            if (!oAuthService.IsGithubUserRegistered(githubUserInfo.Id))
             {
-                var newUser = new User 
-                          {
-                              Email = githubUserInfo.Email,
-                              IsActive = true, 
-                              ActivationToken = null,
-                              RegistrationProvider = RegistrationProvider.Github
-                          };
-                var savedUser = dbContext.Users.Add(newUser);
-                
-                githubUser = new GithubUser
-                                     {
-                                         User = savedUser.Entity,
-                                         GithubId = githubUserInfo.Id,
-                                         Email = githubUserInfo.Email,
-                                         Login = githubUserInfo.Login
-                                     };
-                dbContext.GithubUsers.Add(githubUser);
-                
+                var user = dbContext.Users.FirstOrDefault(u => u.Email == githubUserInfo.Email);
+                if (user == null)
+                {
+                    user = dbContext.Users.Add(new User
+                    {
+                        UserName = githubUserInfo.Login,
+                        Email = githubUserInfo.Email,
+                        IsActive = true,
+                        ActivationToken = null
+                    }).Entity;
+                }
+                githubUser = new OAuthUser
+                {
+                    User = user,
+                    OAuthId = githubUserInfo.Id,
+                    Email = githubUserInfo.Email,
+                    Login = githubUserInfo.Login
+                };
+                dbContext.OAuthUsers.Add(githubUser);
+
                 await dbContext.SaveChangesAsync();
             }
-            
+
             return githubUser;
         }
     }

@@ -47,7 +47,7 @@ namespace Editor.Services
             };
         }
 
-        public OAuthLoginResponse GithubOAuthLogin(GithubUser githubUser, string accessToken)
+        public OAuthLoginResponse GithubOAuthLogin(OAuthUser githubUser, string accessToken)
         {
             User user = dbContext.Users.FirstOrDefault(u => u.Id == githubUser.UserId);
             if (user != null)
@@ -72,8 +72,7 @@ namespace Editor.Services
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
             List<Claim> claims = new List<Claim>
             {
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(ClaimTypes.AuthenticationMethod, user.RegistrationProvider.ToString("G")),
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
             };
 
             if (!string.IsNullOrEmpty(user.UserName))

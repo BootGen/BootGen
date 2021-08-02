@@ -1,12 +1,11 @@
 <p align="center">
   <img src="ClientApp/src/assets/img/bootgen_full.png" width="50%">
 </p>
-<h1 align="center">Develop ASP.NET + Vue applications much faster!</h1> 
+<h1 align="center">Starter Project Generator <br> Develop ASP.NET 5 + Vue 3 applications much faster!</h1> 
 
-BootGen generates an ASP.Net 5 project with Vue.js based on the sample JSON data you provide. From this sample data it infers the types you need, and creates entity classes, data services, controllers and Vuex state management that fits your use case. 
+BootGen generates a well coded, human readable, ASP.NET 5 project with Vue 3 based on the sample JSON data you provide. From this sample data it infers the types you need, and creates entity classes, data services, controllers and Vuex state management that fits your use case. 
   
-Turn JSON into well coded application at https://bootgen.com!
-
+Try it at https://bootgen.com!
 
 ## How Does it Work?
 <p align="center">
@@ -15,6 +14,8 @@ Turn JSON into well coded application at https://bootgen.com!
 Create sample JSON data, and generate your application. Edit the JSON, and regenerate until you are satisfied with the result. Changes will be highlighted in the generated files.
 
 When you are finnished click download, and start coding!
+
+We generate code for you, not just the compiler. We intend to create code that is easy to read, understand and edit.
 
 ## A Basic Example
 
@@ -39,7 +40,7 @@ When you are finnished click download, and start coding!
 }
 ```
 
-For this example an appllication with two entity classes `User` and `Pet` will be created. The database will be seeded with entities for Jon, Garfield and Odie. [Try it online!](https://bootgen.com/editor)
+For this example, an appllication with two entity classes `User` and `Pet` will be created. The database will be seeded with entities for Jon, Garfield and Odie. [Try it online!](https://bootgen.com/editor)
 
 #### JSON conventions
    * Property and class names should be camelCase.
@@ -50,31 +51,6 @@ For this example an appllication with two entity classes `User` and `Pet` will b
 Although comments are non-standard feature in JSON, many JSON processing libraries support it. We use them as annotations. Annotations can be placed at the beginning of arrays. Possible annotations:
   * `timestamps`: Adds a `Created` and an `Updated` timestamp property to the class.
   * `manyToMany`: Declears that the given relation is a Many-To-Many relation, as opposed to the default One-To-Many relation.
-  * `class:[name]`: Substitute `[name]` with the intended name of the class. Example:
-
-### Advanced Example: Social Network
-```js
-{
-  "users": [
-    {
-      "userName": "Test User",
-      "email": "example@email.com",
-      "bio": "Hello I am a test user!",
-      "avatar": "images/avatar1.png",
-      "friends": [
-        //class:user
-        //manyToMany
-        {
-          "userName": "Test User 2",
-          "email": "example2@email.com",
-          "bio": "Hello I am also a test user!",
-          "avatar": "images/avatar2.png"
-        }
-      ]
-    }
-  ]
-}
-```
 
 ### Advanced Example: Task Management System
 
@@ -106,3 +82,9 @@ Although comments are non-standard feature in JSON, many JSON processing librari
   ]
 }
 ```
+## Known Limitations
+
+There are many limitations of this project, simply because for many things there is no single accepted way to code it. We intend to generate those parts of your project that are fairly standard. If there is multiple accepted ways to implement a certain feature, or it is too complex to generate, then we won't generate it. Please treat the generated code as a basis of your work, and not something that you can hand over to a client out of the box.
+
+There are however limitations that we do plan to overcome in the future. These are:
+ * It is currently not possible to create self referencing Many-To-Many connections.

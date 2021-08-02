@@ -78,7 +78,7 @@ namespace Editor
                                              .Accept
                                              .Add(new MediaTypeWithQualityHeaderValue("application/json"));
                                    });
-
+            services.AddMemoryCache();
             services.AddScoped<IAuthenticationService, AuthenticationService>();
             services.AddScoped<IRegistrationService, RegistrationService>();
             services.AddScoped<IProfileService, ProfileService>();
@@ -88,14 +88,7 @@ namespace Editor
             services.AddScoped<IStatisticsService, StatisticsService>();
             services.AddScoped<IGithubService, GithubService>();
             services.AddScoped<IOAuthService, OAuthService>();
-            if (Configuration["DataBaseType"] == "MySQL")
-            {
-                services.AddDbContext<ApplicationDbContext>(options => options.UseMySql(Configuration.GetConnectionString("MySQL"), ServerVersion.FromString(Configuration["DataBaseVersion"])));
-            }
-            else
-            {
-                services.AddDbContext<ApplicationDbContext>(options => options.UseSqlite(Configuration.GetConnectionString("SQLite")));
-            }
+            services.AddDbContext<ApplicationDbContext>(options => options.UseMySql(Configuration.GetConnectionString("MySQL"), ServerVersion.FromString(Configuration["DataBaseVersion"])));
             services.AddSingleton(Configuration);
         }
 

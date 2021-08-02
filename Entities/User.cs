@@ -17,6 +17,5 @@ namespace Editor
         public bool IsActive { get; set; }
         [JsonIgnore]
         public string ActivationToken { get; set; }
-        public RegistrationProvider RegistrationProvider { get; set; }
     }
 }

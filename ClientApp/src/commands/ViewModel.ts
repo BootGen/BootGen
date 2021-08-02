@@ -13,12 +13,12 @@ export class ViewModel {
     undoStack = new UndoStack();
     crc32Generated = 0;
     crc32Saved = 0;
-    activeProject: Project = {id: -1, ownerId: -1, name: 'My Project', json: '', backend: 'ASP.NET', frontend: 'Vue 2 + JS'};
+    activeProject: Project = {id: -1, ownerId: -1, name: 'My Project', json: '', backend: 'ASP.NET 5', frontend: 'Vue 3 JavaScript'};
     newProjectDialog = false;
     activeFile: GeneratedFile = {name: '', path: '', content: ''};
     jsonErrors = Array<{line: number; color: string}>();
-    backend = 'ASP.NET';
-    frontend = 'Vue 2 + JS';
+    backend = 'ASP.NET 5';
+    frontend = 'Vue 3 JavaScript';
     generateLoading = false;
     isCompare = true;
     showChanges = true;
@@ -101,7 +101,7 @@ export class ViewModel {
         this.jsonErrors = [];
         const result = validateJson(this.activeProject.json);
         if(!result.error) {
-            prettyPrint(this.activeProject.json);
+            this.activeProject.json = prettyPrint(this.activeProject.json);
             const jsonLength = getJsonLength(this.activeProject.json);
             if(jsonLength > 2000) {
                 this.setSnackbar('orange darken-2', `Exceeded character limit: ${jsonLength} / 2000`, -1);
