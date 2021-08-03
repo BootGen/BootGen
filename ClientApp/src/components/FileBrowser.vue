@@ -155,11 +155,10 @@ export default Vue.extend({
     init: function () {
       this.tree.children = [];
       this.tree.open = [];
-      const files = this.sortedFiles();
       if(this.isCompare){
         const changedFiles: {file: GeneratedFile; changes: ChangeType}[] = [];
         if(this.previousFiles.length > 0){
-          files.forEach(file => {
+          this.files.forEach(file => {
             let exists = false;
             for(let j = 0; j < this.previousFiles.length; j++){
               if(file.name === this.previousFiles[j].name && file.path === this.previousFiles[j].path){
@@ -182,15 +181,16 @@ export default Vue.extend({
             this.addToTree(node.file, node.changes);
           });
         }else{
-          files.forEach((file) => {
+          this.files.forEach((file) => {
             this.addToTree(file, ChangeType.Unchanged);
           });
-        } 
+        }
       }else{
-        files.forEach((file) => {
+        this.files.forEach((file) => {
           this.addToTree(file, ChangeType.Unchanged);
         });
       } 
+      this.tree.children = this.sortNode(this.tree.children);
       this.setOpenPath();
     },
     setDefaultNodes: function(){
@@ -248,7 +248,6 @@ export default Vue.extend({
       this.filesById[this.id] = file;
     },
     setOpenFolder: function (path: string[], node: Node[]) {
-      console.log(path)
       if (!this.tree.open) {
         this.tree.open = [];
       }
@@ -266,16 +265,22 @@ export default Vue.extend({
     getFile: function (node: Node): GeneratedFile {
       return this.filesById[node.id];
     },
-    sortedFiles: function (): Array<GeneratedFile> {
-      return [...this.files].sort(function (a: GeneratedFile, b: GeneratedFile) {
-        if (a.path === '') {
-          return b.path.localeCompare(a.path) || a.name.localeCompare(b.name);
+    sortNode: function (node: Node[]): Node[] {
+      node = node.sort((a,b) => a.name.localeCompare(b.name));
+      node = node.sort((a,b) => {
+        if(a.children){
+          a.children = this.sortNode(a.children);
+          if(b.children){
+            return a.name.localeCompare(b.name);
+          }
+          return -1;
         }
-        if (b.path === '') {
-          return b.path.localeCompare(a.path) || a.name.localeCompare(b.name);
+        if(b.children){
+          return 1;
         }
-        return a.path.localeCompare(b.path) || a.name.localeCompare(b.name);
+        return 0;
       });
+      return node;
     },
   },
 });
