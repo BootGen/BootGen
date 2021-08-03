@@ -3,7 +3,7 @@ import { Command } from './Command';
 import { CommandType } from './CommandStore';
 import { ViewModel } from './ViewModel';
 import { prettyPrint, validateJson } from '../utils/PrettyPrint';
-import { getJsonLength, toCamelCase } from '../utils/Helper';
+import { getJsonLength, toPascalCase } from '../utils/Helper';
 import store from '../store/index';
 import { GenerateResponse } from '@/models/GenerateResponse';
 
@@ -39,7 +39,7 @@ export class GenerateCommand implements Command {
 
             const generateResult: GenerateResponse = await api.generate({
               data: this.viewModel.activeProject.json,
-              nameSpace: toCamelCase(this.viewModel.activeProject.name),
+              nameSpace: toPascalCase(this.viewModel.activeProject.name),
               backend: this.viewModel.activeProject.backend,
               frontend: this.viewModel.activeProject.frontend
             });

@@ -49,6 +49,7 @@
 import Vue from 'vue';
 import { GenerateResponse } from '../models/GenerateResponse';
 import { Project } from '../models/Project';
+import { toPascalCase } from '../utils/Helper';
 import api from '../api';
 
 export default Vue.extend({
@@ -80,7 +81,7 @@ export default Vue.extend({
         this.projectInLoading = project;
         const generateResult: GenerateResponse = await api.generate({
           data: project.json,
-          nameSpace: this.toCamelCase(project.name),
+          nameSpace: toPascalCase(project.name),
           backend: project.backend,
           frontend: project.frontend
         });
@@ -100,12 +101,6 @@ export default Vue.extend({
     closeDelete () {
       this.dialog = false;
     },
-    toCamelCase: function(str: string) {
-      const nameSpace = str.replace(/(?:^\w|[A-Z]|\b\w)/g, function(word, index) {
-        return index === 0 ? word.toLowerCase() : word.toUpperCase();
-      }).replace(/\s+/g, '');
-      return `${nameSpace.charAt(0).toUpperCase()}${nameSpace.slice(1)}`;
-    }
   }
 });
 </script>

@@ -132,7 +132,7 @@ export default {
     items: function () {
       const menuItems = [
           { title: 'Home', link: '/', icon: 'mdi-home' },
-          { title: 'Getting Started', link: '/getting-started', icon: 'mdi-rocket-launch' },
+          { title: 'Advanced Features', link: '/advanced-features', icon: 'mdi-rocket-launch' },
           { title: 'Editor', link: '/editor', icon: 'mdi-cog' }
       ];
       if (this.$store.state.auth.jwt) {

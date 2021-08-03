@@ -1,8 +1,15 @@
+export function toPascalCase(str: string): string {
+    return str
+        .replace(/\s(.)/g, function($1) { return $1.toUpperCase(); })
+        .replace(/\s/g, '')
+        .replace(/^(.)/, function($1) { return $1.toUpperCase(); });
+}
+
 export function toCamelCase(str: string): string {
-    const nameSpace = str.replace(/(?:^\w|[A-Z]|\b\w)/g, function(word, index) {
-        return index === 0 ? word.toLowerCase() : word.toUpperCase();
-    }).replace(/\s+/g, '');
-    return `${nameSpace.charAt(0).toUpperCase()}${nameSpace.slice(1)}`;
+    return str
+        .replace(/\s(.)/g, function($1) { return $1.toUpperCase(); })
+        .replace(/\s/g, '')
+        .replace(/^(.)/, function($1) { return $1.toLowerCase(); });
 }
 
 export function getJsonLength (json: string): number{
