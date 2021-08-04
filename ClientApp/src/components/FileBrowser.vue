@@ -118,36 +118,35 @@ export default Vue.extend({
         html: 'mdi-code-tags',
         gitignore: 'mdi-git',
         csproj: 'mdi-rss',
-        editorconfig: 'mdi-cog'
+        editorconfig: 'mdi-cog',
       },
       ChangeType: ChangeType,
     };
   },
   watch: {
-    files(){
+    files() {
       this.init();
       this.setDefaultNodes();
     },
-    openPath(){
+    openPath() {
       this.setOpenPath();
-    }
+    },
   },
-  created: function() {
+  created: function () {
     this.init();
     this.setDefaultNodes();
   },
   methods: {
-    getIcon: function(item: Node): string {
+    getIcon: function (item: Node): string {
       const icon = (this.icons as any)[item.type];
-      if (icon)
-        return icon;
-      return 'mdi-text'
+      if (icon) return icon;
+      return 'mdi-text';
     },
     selectFile: function (node: Node[]) {
       if (node[0]) {
         const file = this.getFile(node[0]);
         this.$gtag?.event('select-file', {
-              'event_label' : file.name
+          'event_label': file.name,
         });
         this.$emit('select-file', file);
       }
@@ -155,57 +154,39 @@ export default Vue.extend({
     init: function () {
       this.tree.children = [];
       this.tree.open = [];
-      if(this.showDifferences){
-        const changedFiles = this.getFileDifferences();
-        if(this.previousFiles.length > 0){
-          changedFiles.forEach((node) => {
-            this.addToTree(node.file, node.changes);
-          });
-        }else{
-          this.files.forEach((file) => {
-            this.addToTree(file, ChangeType.Unchanged);
-          });
-        }
-      }else{
-        this.files.forEach((file) => {
+      if (this.showDifferences && this.previousFiles.length > 0) {
+        this.files.forEach((file: GeneratedFile) => {
+          this.addToTree(file, this.getFileState(file));
+        });
+      } else {
+        this.files.forEach((file: GeneratedFile) => {
           this.addToTree(file, ChangeType.Unchanged);
         });
-      } 
+      }
       this.tree.children = this.sortNodes(this.tree.children);
       this.setOpenPath();
     },
-    
-    getFileDifferences: function(): { file: GeneratedFile; changes: ChangeType }[] {
-        const changedFiles: { file: GeneratedFile; changes: ChangeType }[] = [];
-        if(this.previousFiles.length>0) {
-          this.files.forEach((file: GeneratedFile) => {
-            let exists=false;
-            for(let j=0;j<this.previousFiles.length;j++) {
-              if(file.name===this.previousFiles[j].name&&file.path===this.previousFiles[j].path) {
-                if(file.content!==this.previousFiles[j].content) {
-                  changedFiles.push({ file: file, changes: ChangeType.Edited });
-                } else {
-                  changedFiles.push({ file: file, changes: ChangeType.Unchanged });
-                }
-                exists=true;
-                break;
-              }
-            }
-            if(!exists) {
-              changedFiles.push({ file: file, changes: ChangeType.Created });
-            }
-          });
+    getFileState: function (file: GeneratedFile): ChangeType {
+      for (let j = 0; j < this.previousFiles.length; j++) {
+        const prevFile = this.previousFiles[j];
+        if (file.name === prevFile.name && file.path === prevFile.path) {
+          if (file.content !== prevFile.content) {
+            return ChangeType.Edited;
+          } else {
+            return ChangeType.Unchanged;
+          }
         }
-        return changedFiles;
+      }
+      return ChangeType.Created;
     },
-    setDefaultNodes: function(){
-      this.tree.children.forEach(node => {
+    setDefaultNodes: function () {
+      this.tree.children.forEach((node: Node) => {
         if (node.name === 'restapi.yml') {
           this.activeNodes.push(node);
         }
       });
     },
-    setOpenPath: function() {
+    setOpenPath: function () {
       if (this.openPath) {
         this.tree.open = [];
         this.setOpenFolder(this.openPath.split('/'), this.tree.children);
@@ -222,11 +203,11 @@ export default Vue.extend({
       }
       return null;
     },
-    addChildNode: function(node: Node, child: Node) {
+    addChildNode: function (node: Node, child: Node) {
       if (node.children) {
         node.children.push(child);
       } else {
-        node.children = [ child ];
+        node.children = [child];
       }
     },
     addToTree: function (file: GeneratedFile, change: ChangeType) {
@@ -236,20 +217,30 @@ export default Vue.extend({
         path.forEach((part) => {
           const childNode = this.getChild(currentNode, part);
           if (!childNode) {
-            const node: Node = { id: ++this.id, name: part, type: 'folder', change: change };
+            const node: Node = {
+              id: ++this.id,
+              name: part,
+              type: 'folder',
+              change: change,
+            };
             this.addChildNode(currentNode, node);
             currentNode = node;
           } else {
             currentNode = childNode;
           }
-          if(change !== ChangeType.Unchanged){
+          if (change !== ChangeType.Unchanged) {
             currentNode.change = ChangeType.Folder;
           }
         });
       }
       const nameParts = file.name.split('.');
-      const extension = nameParts[nameParts.length-1];
-      const newNode: Node = { id: ++this.id, name: file.name, type: extension, change: change };
+      const extension = nameParts[nameParts.length - 1];
+      const newNode: Node = {
+        id: ++this.id,
+        name: file.name,
+        type: extension,
+        change: change,
+      };
       this.addChildNode(currentNode, newNode);
       this.filesById[this.id] = file;
     },
@@ -273,17 +264,14 @@ export default Vue.extend({
     },
     sortNodes: function (nodes: Node[]): Node[] {
       nodes.sort((a: Node, b: Node): number => {
-        if (a.type === 'folder' && b.type !== 'folder')
-          return -1;
-        if (a.type !== 'folder' && b.type === 'folder')
-          return 1;
+        if (a.type === 'folder' && b.type !== 'folder') return -1;
+        if (a.type !== 'folder' && b.type === 'folder') return 1;
         return a.name.localeCompare(b.name);
       });
 
       nodes.forEach((n: Node) => {
-        if (n.children)
-          n.children = this.sortNodes(n.children);
-      })
+        if (n.children) n.children = this.sortNodes(n.children);
+      });
 
       return nodes;
     },
@@ -293,11 +281,10 @@ export default Vue.extend({
 
 <style>
 .v-treeview {
-    overflow: auto;
-    height: calc(100% - 40px);
+  overflow: auto;
+  height: calc(100% - 40px);
 }
 button.v-icon.notranslate {
   display: none;
 }
-
 </style>
