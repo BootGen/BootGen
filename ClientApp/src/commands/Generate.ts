@@ -3,10 +3,9 @@ import { Command } from './Command';
 import { CommandType } from './CommandStore';
 import { ViewModel } from './ViewModel';
 import { prettyPrint, validateJson } from '../utils/PrettyPrint';
-import { getJsonLength, toCamelCase } from '../utils/Helper';
+import { getJsonLength, toPascalCase } from '../utils/Helper';
 import store from '../store/index';
 import { GenerateResponse } from '@/models/GenerateResponse';
-import { CRC32 } from 'crc_32_ts';
 
 
 export class GenerateCommand implements Command {
@@ -29,7 +28,7 @@ export class GenerateCommand implements Command {
         this.viewModel.jsonErrors = [];
         const result = validateJson(this.viewModel.activeProject.json);
         if(!result.error) {
-            prettyPrint(this.viewModel.activeProject.json);
+          this.viewModel.activeProject.json = prettyPrint(this.viewModel.activeProject.json);
             const jsonLength = getJsonLength(this.viewModel.activeProject.json);
             if(jsonLength > 2000) {
                 this.viewModel.setSnackbar('orange darken-2', `Exceeded character limit: ${jsonLength} / 2000`, -1);
@@ -40,7 +39,7 @@ export class GenerateCommand implements Command {
 
             const generateResult: GenerateResponse = await api.generate({
               data: this.viewModel.activeProject.json,
-              nameSpace: toCamelCase(this.viewModel.activeProject.name),
+              nameSpace: toPascalCase(this.viewModel.activeProject.name),
               backend: this.viewModel.activeProject.backend,
               frontend: this.viewModel.activeProject.frontend
             });

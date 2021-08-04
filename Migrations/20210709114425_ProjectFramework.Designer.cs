@@ -88,8 +88,8 @@ namespace Editor.Migrations
                         new
                         {
                             Id = 1,
-                            Backend = "ASP.NET",
-                            Frontend = "Vue 2 + JS",
+                            Backend = "ASP.NET 5",
+                            Frontend = "Vue 3 JavaScript",
                             Json = "{'users': [{'userName': 'Test User', 'email': 'aa@bb@cc'}]}",
                             Name = "First Project",
                             OwnerId = 1

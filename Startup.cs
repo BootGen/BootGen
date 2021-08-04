@@ -78,7 +78,7 @@ namespace Editor
                                              .Accept
                                              .Add(new MediaTypeWithQualityHeaderValue("application/json"));
                                    });
-
+            services.AddMemoryCache();
             services.AddScoped<IAuthenticationService, AuthenticationService>();
             services.AddScoped<IRegistrationService, RegistrationService>();
             services.AddScoped<IProfileService, ProfileService>();

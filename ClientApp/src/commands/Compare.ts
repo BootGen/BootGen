@@ -7,13 +7,13 @@ export class CompareCommand implements Command {
     type = CommandType.Compare;
     viewModel: ViewModel;
     public get icon(): string {
-        if(!this.viewModel.isCompare){
+        if(!this.viewModel.showDifferences){
             return 'mdi-file-document';
         }
         return 'mdi-file-compare';
     }
     public get text(): string {
-        if(!this.viewModel.isCompare){
+        if(!this.viewModel.showDifferences){
             return 'Show Changes: On';
         }
         return 'Show Changes: Off';
@@ -26,12 +26,12 @@ export class CompareCommand implements Command {
     }
     
     action() {
-        if(this.viewModel.isCompare){
-            this.viewModel.isCompare = false;
+        if(this.viewModel.showDifferences){
+            this.viewModel.showDifferences = false;
             this.viewModel.showChanges = false;
             this.viewModel.highlightedDifferences = [];
         }else{
-            this.viewModel.isCompare = true;
+            this.viewModel.showDifferences = true;
             this.viewModel.showChanges = true;
             this.viewModel.setHighlightedDifferences();
         }

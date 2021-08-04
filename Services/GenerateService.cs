@@ -5,6 +5,7 @@ using System.IO.Compression;
 using System.Linq;
 using System.Text.RegularExpressions;
 using BootGen;
+using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -14,43 +15,41 @@ namespace Editor.Services
     {
         public IErrorService ErrorService { get; }
         public IStatisticsService StatisticsService { get; }
+        public IMemoryCache Cache { get; }
 
-        public GenerateService(IErrorService errorService, IStatisticsService statisticsService)
+        public GenerateService(IErrorService errorService, IStatisticsService statisticsService, IMemoryCache cache)
         {
             ErrorService = errorService;
             StatisticsService = statisticsService;
+            Cache = cache;
         }
         public GenerateResponse Generate(GenerateRequest request)
         {
             try
             {
-                var virtualDisk = new VirtualDisk();
-                
-                var templateDir = $"extracted_templates/{request.Backend}_{request.Frontend}";
-                #if DEBUG
-                templateDir = Path.Combine(Path.GetTempPath(), templateDir);
-                #endif
-                if (!Directory.Exists(templateDir))
-                    ZipFile.ExtractToDirectory($"templates/{request.Backend}_{request.Frontend}/WebProject.zip", templateDir);
-                LoadTemplateFiles(templateDir, templateDir, virtualDisk, request.NameSpace);
-                BootGen.Project project = InitProject(request, virtualDisk);
-                project.GenerateFiles(request.NameSpace, "http://localhost:5000");
+                var virtualDisk = LoadStaticFiles(request);
+                var clientDisk = new VirtualDisk();
+
+                (var serverProject, var clientProject) = InitProject(request, virtualDisk, clientDisk);
+                serverProject.GenerateFiles(request.NameSpace, "http://localhost:5000");
+                clientProject.GenerateFiles(request.NameSpace, "http://localhost:5000");
+                virtualDisk.Mount(clientDisk, "ClientApp/src");
                 var files = new List<GeneratedFile>();
                 foreach (var file in virtualDisk.Files)
                 {
                     files.Add(new GeneratedFile
                     {
                         Name = file.Name,
-                        Path = file.Path,
+                        Path = file.Path.Replace("\\", "/"),
                         Content = file.Content
                     });
                 }
-                StatisticsService.OnGenerated(project.ResourceCollection.DataModel, request.Data, StatEvent.Generate);
+                StatisticsService.OnGenerated(serverProject.ResourceCollection.DataModel, request.Data, StatEvent.Generate);
                 return new GenerateResponse
-                    {
-                        Success = true,
-                        GeneratedFiles = files
-                    };
+                {
+                    Success = true,
+                    GeneratedFiles = files
+                };
             }
             catch (Exception e)
             {
@@ -66,6 +65,61 @@ namespace Editor.Services
             }
         }
 
+        private VirtualDisk LoadStaticFiles(GenerateRequest request)
+        {
+            var backendDisk = GetServerPlugin(request).Files;
+            var frontendDisk = GetClientPlugin(request).Files;
+            var virtualDisk = SetNamespace(backendDisk, request.NameSpace);
+            Mount(virtualDisk, frontendDisk, "ClientApp");
+            return virtualDisk;
+        }
+
+        private ClientPlugin GetClientPlugin(GenerateRequest request)
+        {
+            return Cache.GetOrCreate<ClientPlugin>(request.Frontend, entry => LoadPlugin<ClientPlugin, ClientConfig>("plugins/client", request.Frontend));
+        }
+        private ServerPlugin GetServerPlugin(GenerateRequest request)
+        {
+            return Cache.GetOrCreate<ServerPlugin>(request.Backend, entry => LoadPlugin<ServerPlugin, ServerConfig>("plugins/server", request.Backend));
+        }
+
+        private static VirtualDisk LoadStaticFiles(string templateName)
+        {
+            var disk = new VirtualDisk();
+            var templateDir = Path.Combine(Path.GetTempPath(), $"extracted_templates/{templateName}");
+            if (Directory.Exists(templateDir))
+                Directory.Delete(templateDir, true);
+            ZipFile.ExtractToDirectory($"templates/{templateName}/files.zip", templateDir);
+            LoadStaticFiles(templateDir, templateDir, disk);
+            Directory.Delete(templateDir, true);
+            return disk;
+        }
+
+        private static P LoadPlugin<P, T>(string folder, string name) where P : IPlugin<T>, new() {
+            
+            var result = new P();
+            var templateDir = Path.Combine(Path.GetTempPath(), $"extracted_plugins/{name}");
+            if (Directory.Exists(templateDir))
+                Directory.Delete(templateDir, true);
+            ZipFile.ExtractToDirectory(Path.Combine(folder, $"{name}.zip"), templateDir);
+            var staticFilesDir = Path.Combine(templateDir, "files");
+            result.Files = new VirtualDisk();
+            LoadStaticFiles(staticFilesDir, staticFilesDir, result.Files);
+
+            result.Config = JObject.Parse(File.ReadAllText(Path.Combine(templateDir, "config.json"))).ToObject<T>();
+
+            result.Templates = new VirtualDisk();
+            foreach(var file in Directory.EnumerateFiles(Path.Combine(templateDir, "templates"))) {
+                result.Templates.Files.Add(new VirtualFile {
+                    Name = Path.GetFileName(file),
+                    Path = "",
+                    Content = File.ReadAllText(file)
+                });
+            }
+
+            return result;
+        }
+
         private int? GetLine(Exception e)
         {
             var lineStr = Regex.Match(Regex.Match(e.Message, @"line \d+").Value, @"\d+").Value;
@@ -74,12 +128,14 @@ namespace Editor.Services
 
         public Stream Download(GenerateRequest request)
         {
-            var tempRoot = "temp";
-            var tempFile = $"{tempRoot}/{Guid.NewGuid().ToString()}.zip";
-            var tempDir = $"{tempRoot}/{Guid.NewGuid().ToString()}";
+            var tempRoot = Path.GetTempPath();
+            if (!Directory.Exists(tempRoot))
+                Directory.CreateDirectory(tempRoot);
+            var tempFile = Path.Combine(tempRoot, $"{Guid.NewGuid().ToString()}.zip");
+            var tempDir = Path.Combine(tempRoot, $"{Guid.NewGuid().ToString()}");
             try
             {
-                return CreateDownloadStream(request, tempRoot, tempFile, tempDir);
+                return CreateDownloadStream(request, tempFile, tempDir);
             }
             catch (Exception e)
             {
@@ -112,17 +168,22 @@ namespace Editor.Services
             }
         }
 
-        private MemoryStream CreateDownloadStream(GenerateRequest request, string tempRoot, string tempFile, string tempDir)
+        private MemoryStream CreateDownloadStream(GenerateRequest request, string tempFile, string tempDir)
         {
-            if (!Directory.Exists(tempRoot))
-                Directory.CreateDirectory(tempRoot);
+            var virtualDisk = LoadStaticFiles(request);
             Directory.CreateDirectory(tempDir);
-            ZipFile.ExtractToDirectory($"templates/{request.Backend}_{request.Frontend}/WebProject.zip", tempDir);
-            File.Move(Path.Combine(tempDir, "WebProject.csproj"), Path.Combine(tempDir, $"{request.NameSpace}.csproj"));
-            var disk = new Disk(tempDir);
+            foreach( var file in virtualDisk.Files) {
+                var dir = Path.Combine(tempDir, file.Path);
+                if (!Directory.Exists(dir))
+                    Directory.CreateDirectory(dir);
+                File.WriteAllText(Path.Combine(dir, file.Name), file.Content);
+            }
+            var serverDisk = new Disk(tempDir);
+            var clientDisk = new Disk(Path.Combine(tempDir, "ClientApp/src"));
             ReplaceNamespace(tempDir, request.NameSpace);
-            BootGen.Project project = InitProject(request, disk);
-            project.GenerateFiles(request.NameSpace, "http://localhost:5000");
+            (var serverProject, var clientProject) = InitProject(request, serverDisk, clientDisk);
+            serverProject.GenerateFiles(request.NameSpace, "http://localhost:5000");
+            clientProject.GenerateFiles(request.NameSpace, "http://localhost:5000");
             ZipFile.CreateFromDirectory(tempDir, tempFile);
             var reader = new BinaryReader(File.Open(tempFile, FileMode.Open));
             const int bufferSize = 4096;
@@ -132,7 +193,7 @@ namespace Editor.Services
             while ((count = reader.Read(buffer, 0, buffer.Length)) != 0)
                 ms.Write(buffer, 0, count);
             ms.Position = 0;
-            StatisticsService.OnGenerated(project.ResourceCollection.DataModel, request.Data, StatEvent.Download);
+            StatisticsService.OnGenerated(serverProject.ResourceCollection.DataModel, request.Data, StatEvent.Download);
             return ms;
         }
 
@@ -153,17 +214,11 @@ namespace Editor.Services
         }
 
         
-        private static void LoadTemplateFiles(string rootdDir, string dir,  VirtualDisk disk, string namespce)
+        private static void LoadStaticFiles(string rootdDir, string dir,  VirtualDisk disk)
         {
             foreach( var path in Directory.GetFiles(dir)) {
                 if (path.EndsWith(".ico"))
                     continue;
-                var content = File.ReadAllText(path);
-                if (path.EndsWith(".cs") || path.EndsWith(".json"))
-                {
-                    content = content.Replace("WebProject", namespce);
-                    File.WriteAllText(path, content);
-                }
 
                 string folder = "";
                 if (rootdDir != dir)
@@ -172,11 +227,42 @@ namespace Editor.Services
             }
             foreach( var path in Directory.GetDirectories(dir))
             {
-                LoadTemplateFiles(rootdDir, path, disk, namespce);
+                LoadStaticFiles(rootdDir, path, disk);
             }
         }
 
-        private static BootGen.Project InitProject(GenerateRequest request, IDisk disk)
+        private static VirtualDisk SetNamespace(VirtualDisk disk, string namespce) {
+            var result = new VirtualDisk();
+            foreach (var file in disk.Files) {
+                string content;
+                if (file.Name.EndsWith(".cs") || file.Name.EndsWith(".json"))
+                    content = file.Content.Replace("WebProject", namespce);
+                else
+                    content = file.Content;
+                string name;
+                if (file.Name == "WebProject.csproj")
+                    name = $"{namespce}.csproj";
+                else
+                    name = file.Name;
+                result.Files.Add (new VirtualFile {
+                    Path = file.Path,
+                    Name = name,
+                    Content = content
+                });
+            }
+            return result;
+        }
+        private static void Mount(VirtualDisk main, VirtualDisk toMount, string path) {
+            foreach (var file in toMount.Files) {
+                main.Files.Add (new VirtualFile {
+                    Path = Path.Combine(path, file.Path),
+                    Name = file.Name,
+                    Content = file.Content
+                });
+            }
+        }
+
+        private Tuple<ServerProject, ClientProject> InitProject(GenerateRequest request, IDisk serverDisk, IDisk clientDisk)
         {
             DataModel dataModel = new DataModel();
             var jObject = JObject.Parse(request.Data, new JsonLoadSettings { CommentHandling = CommentHandling.Load, DuplicatePropertyNameHandling = DuplicatePropertyNameHandling.Error });
@@ -197,24 +283,25 @@ namespace Editor.Services
             });
             var seedStore = new SeedDataStore(collection);
             seedStore.Load(jObject);
-            var clientExtension = "ts";
-            if(request.Frontend.Contains("JS")){
-                clientExtension = "js";
-            }
-            var project = new BootGen.Project
+            var serverPlugin = GetServerPlugin(request);
+            var serverProject = new ServerProject
             {
-                ControllerFolder = "Controllers",
-                ServiceFolder = "Services",
-                EntityFolder = "Entities",
-                ClientFolder = "ClientApp/src",
-                ClientExtension = clientExtension,
-                ClientComponentExtension = "vue",
-                Disk = disk,
+                Config = serverPlugin.Config,
+                Disk = serverDisk,
                 ResourceCollection = collection,
                 SeedStore = seedStore,
-                TemplateRoot = $"templates/{request.Backend}_{request.Frontend}"
+                Templates = serverPlugin.Templates
             };
-            return project;
+            var clientPlugin = GetClientPlugin(request);
+            var clientProject = new ClientProject
+            {
+                Config = clientPlugin.Config,
+                Disk = clientDisk,
+                ResourceCollection = collection,
+                SeedStore = seedStore,
+                Templates = clientPlugin.Templates
+            };
+            return Tuple.Create(serverProject, clientProject);
         }
 
         private static void CheckMandatoryUserProperty(ClassModel userClass, string propertyName)

@@ -76,7 +76,7 @@
               <div class="display-1 font-weight-light pa-2">Generated Files</div>
             </div>
           </template>
-          <file-browser :files="viewModel.generatedFiles" :previousFiles="viewModel.previousFiles" :openPath="openPath" :isCompare="viewModel.showChanges" @select-file="selectFile"></file-browser>
+          <file-browser :files="viewModel.generatedFiles" :previousFiles="viewModel.previousFiles" :openPath="openPath" :showDifferences="viewModel.showChanges" @select-file="selectFile"></file-browser>
         </base-material-generator-card>
       </v-col>
     </v-row>
@@ -112,11 +112,11 @@ export default Vue.extend({
       viewModel: new ViewModel(),
       commandStore: null as (CommandStore | null),
       CommandType: CommandType,
-      newProject: {id: -1, ownerId: -1, name: 'My Project', json: '', backend: 'ASP.NET', frontend: 'Vue 2 + JS'},
+      newProject: {id: -1, ownerId: -1, name: 'My Project', json: '', backend: 'ASP.NET 5', frontend: 'Vue 3 JavaScript'},
       drawer: false,
       openPath: '',
-      backends: ['ASP.NET'],
-      frontends: ['Vue 2 + JS', 'Vue 2 + TS'],
+      backends: ['ASP.NET 5'],
+      frontends: ['Vue 3 JavaScript', 'Vue 3 TypeScript'],
     };
   },
   created: async function(){
@@ -236,7 +236,7 @@ export default Vue.extend({
     opacity: 0.6;
   }
   .select{
-    max-width: 300px;
+    max-width: 390px;
   }
   @media screen and (max-width: 600px) {
     .d-flex.select{
