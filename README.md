@@ -15,7 +15,7 @@ Create sample JSON data, and generate your application. Edit the JSON, and regen
 
 When you are finnished click download, and start coding!
 
-We generate code for you, not just the compiler. We intend to create code that is easy to read, understand and edit.
+The downloaded project will compile and run out of the box. We generate code for you, not just the compiler. We intend to create code that is easy to read, understand and edit.
 
 ## A Basic Example
 
@@ -84,7 +84,7 @@ Although comments are non-standard feature in JSON, many JSON processing librari
 ```
 ## Known Limitations
 
-There are many limitations of this project, simply because for many things there is no single accepted way to code it. We intend to generate those parts of your project that are fairly standard. If there is multiple accepted ways to implement a certain feature, or it is too complex to generate, then we won't generate it. Please treat the generated code as a basis of your work, and not something that you can hand over to a client out of the box.
+There are many limitations of this project, simply because for many things there is no single accepted way to code it. We intend to generate only those parts of your project that are fairly standard. We aim for the wide useability of the generated code, not completeness. Please treat the generated code as a basis of your work, and not something that you can hand over to a client out of the box.
 
 There are however limitations that we do plan to overcome in the future. These are:
  * It is currently not possible to create self referencing Many-To-Many connections.
