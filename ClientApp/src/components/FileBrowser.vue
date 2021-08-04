@@ -156,26 +156,7 @@ export default Vue.extend({
       this.tree.children = [];
       this.tree.open = [];
       if(this.showDifferences){
-        const changedFiles: {file: GeneratedFile; changes: ChangeType}[] = [];
-        if(this.previousFiles.length > 0){
-          this.files.forEach(file => {
-            let exists = false;
-            for(let j = 0; j < this.previousFiles.length; j++){
-              if(file.name === this.previousFiles[j].name && file.path === this.previousFiles[j].path){
-                if(file.content !== this.previousFiles[j].content){
-                  changedFiles.push({file: file, changes: ChangeType.Edited});
-                }else{
-                  changedFiles.push({file: file, changes: ChangeType.Unchanged});
-                }
-                exists = true;
-                break;
-              }
-            }
-            if(!exists){
-              changedFiles.push({file: file, changes: ChangeType.Created});
-            }
-          });
-        }
+        const changedFiles = this.getFileDifferences();
         if(this.previousFiles.length > 0){
           changedFiles.forEach((node) => {
             this.addToTree(node.file, node.changes);
@@ -190,8 +171,32 @@ export default Vue.extend({
           this.addToTree(file, ChangeType.Unchanged);
         });
       } 
-      this.tree.children = this.sortNode(this.tree.children);
+      this.tree.children = this.sortNodes(this.tree.children);
       this.setOpenPath();
+    },
+    
+    getFileDifferences: function(): { file: GeneratedFile; changes: ChangeType }[] {
+        const changedFiles: { file: GeneratedFile; changes: ChangeType }[] = [];
+        if(this.previousFiles.length>0) {
+          this.files.forEach((file: GeneratedFile) => {
+            let exists=false;
+            for(let j=0;j<this.previousFiles.length;j++) {
+              if(file.name===this.previousFiles[j].name&&file.path===this.previousFiles[j].path) {
+                if(file.content!==this.previousFiles[j].content) {
+                  changedFiles.push({ file: file, changes: ChangeType.Edited });
+                } else {
+                  changedFiles.push({ file: file, changes: ChangeType.Unchanged });
+                }
+                exists=true;
+                break;
+              }
+            }
+            if(!exists) {
+              changedFiles.push({ file: file, changes: ChangeType.Created });
+            }
+          });
+        }
+        return changedFiles;
     },
     setDefaultNodes: function(){
       this.tree.children.forEach(node => {
@@ -217,20 +222,22 @@ export default Vue.extend({
       }
       return null;
     },
+    addChildNode: function(node: Node, child: Node) {
+      if (node.children) {
+        node.children.push(child);
+      } else {
+        node.children = [ child ];
+      }
+    },
     addToTree: function (file: GeneratedFile, change: ChangeType) {
       const path = file.path.split('/');
-      const type = file.name.split('.')[file.name.split('.').length-1];
       let currentNode: Node = this.tree;
       if (path[0] !== '') {
         path.forEach((part) => {
           const childNode = this.getChild(currentNode, part);
           if (!childNode) {
             const node: Node = { id: ++this.id, name: part, type: 'folder', change: change };
-            if (!currentNode.children) {
-              currentNode.children = [node];
-            } else {
-              currentNode.children.push(node);
-            }
+            this.addChildNode(currentNode, node);
             currentNode = node;
           } else {
             currentNode = childNode;
@@ -240,11 +247,10 @@ export default Vue.extend({
           }
         });
       }
-      if (!currentNode.children) {
-        currentNode.children = [{ id: ++this.id, name: file.name, type: type, change: change }];
-      } else {
-        currentNode.children.push({ id: ++this.id, name: file.name, type: type, change: change });
-      }
+      const nameParts = file.name.split('.');
+      const extension = nameParts[nameParts.length-1];
+      const newNode: Node = { id: ++this.id, name: file.name, type: extension, change: change };
+      this.addChildNode(currentNode, newNode);
       this.filesById[this.id] = file;
     },
     setOpenFolder: function (path: string[], node: Node[]) {
@@ -265,22 +271,21 @@ export default Vue.extend({
     getFile: function (node: Node): GeneratedFile {
       return this.filesById[node.id];
     },
-    sortNode: function (node: Node[]): Node[] {
-      node = node.sort((a,b) => a.name.localeCompare(b.name));
-      node = node.sort((a,b) => {
-        if(a.children){
-          a.children = this.sortNode(a.children);
-          if(b.children){
-            return a.name.localeCompare(b.name);
-          }
+    sortNodes: function (nodes: Node[]): Node[] {
+      nodes.sort((a: Node, b: Node): number => {
+        if (a.type === 'folder' && b.type !== 'folder')
           return -1;
-        }
-        if(b.children){
+        if (a.type !== 'folder' && b.type === 'folder')
           return 1;
-        }
-        return 0;
+        return a.name.localeCompare(b.name);
       });
-      return node;
+
+      nodes.forEach((n: Node) => {
+        if (n.children)
+          n.children = this.sortNodes(n.children);
+      })
+
+      return nodes;
     },
   },
 });
@@ -294,4 +299,5 @@ export default Vue.extend({
 button.v-icon.notranslate {
   display: none;
 }
+
 </style>
