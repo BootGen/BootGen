@@ -20,7 +20,7 @@ export class ViewModel {
     backend = 'ASP.NET 5';
     frontend = 'Vue 3 JavaScript';
     generateLoading = false;
-    isCompare = true;
+    showDifferences = true;
     showChanges = true;
     highlightedDifferences: Array<{line: number; color: string}> = [];
     downLoading = false;
@@ -63,7 +63,7 @@ export class ViewModel {
 
     
     public setHighlightedDifferences(){
-        if(this.previousFiles.length > 0 && this.isCompare){
+        if(this.previousFiles.length > 0 && this.showDifferences){
             this.highlightedDifferences = [];
             if(this.showChanges){
                 for(let i = 0; i < this.previousFiles.length; i++){

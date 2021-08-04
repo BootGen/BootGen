@@ -64,7 +64,7 @@ export default Vue.extend({
       type: Array as () => GeneratedFile[],
     },
     openPath: String,
-    isCompare: Boolean,
+    showDifferences: Boolean,
   },
   data: function () {
     return {
@@ -155,7 +155,7 @@ export default Vue.extend({
     init: function () {
       this.tree.children = [];
       this.tree.open = [];
-      if(this.isCompare){
+      if(this.showDifferences){
         const changedFiles: {file: GeneratedFile; changes: ChangeType}[] = [];
         if(this.previousFiles.length > 0){
           this.files.forEach(file => {

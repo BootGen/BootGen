@@ -76,7 +76,7 @@
               <div class="display-1 font-weight-light pa-2">Generated Files</div>
             </div>
           </template>
-          <file-browser :files="viewModel.generatedFiles" :previousFiles="viewModel.previousFiles" :openPath="openPath" :isCompare="viewModel.showChanges" @select-file="selectFile"></file-browser>
+          <file-browser :files="viewModel.generatedFiles" :previousFiles="viewModel.previousFiles" :openPath="openPath" :showDifferences="viewModel.showChanges" @select-file="selectFile"></file-browser>
         </base-material-generator-card>
       </v-col>
     </v-row>
