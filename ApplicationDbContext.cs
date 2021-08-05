@@ -13,6 +13,7 @@ namespace Editor
         public DbSet<Project> Projects { get; set; }
         public DbSet<AppError> AppErrors { get; set; }
         public DbSet<Statistic> Statistics { get; set; }
+        public DbSet<GitHubEvent> GitHubEvents { get; set; }
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
