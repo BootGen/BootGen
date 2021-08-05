@@ -18,7 +18,6 @@ namespace Editor.Controllers
         [Route("hook")]
         public IActionResult Hook([FromBody] JsonElement content)
         {
-            Console.WriteLine(content.GetType().FullName);
             context.GitHubEvents.Add(new GitHubEvent {
                 TimeStamp = DateTime.Now,
                 Content = content.ToString()
