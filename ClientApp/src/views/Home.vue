@@ -16,7 +16,7 @@
         BootGen generates a well coded, human readable, ASP.NET 5 project with Vue 3 based on the sample JSON data you provide. From this sample data it infers the types you need, and creates entity classes, data services, controllers and Vuex state management that fits your use case. 
       </p>
       <div class="d-flex justify-center video">
-        <iframe width="560" height="315" src="https://www.youtube.com/embed/bdgWl8Ia7u8" title="BootGen tutorial" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        <iframe width="560" height="315" src="https://www.youtube.com/embed/0YmlGPWXDv0" title="BootGen tutorial" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
       </div>
       <p>Create sample JSON data, and generate your application. Edit the JSON, and regenerate until you are satisfied with the result. Changes will be highlighted in the generated files.</p>
       <p>When you are finnished click download, and start coding!</p>
