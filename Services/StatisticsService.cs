@@ -14,7 +14,7 @@ namespace Editor.Services
 
         private static Dictionary<string, Dictionary<string, string>> GetSample()
         {
-            string json = @"{'User':{'Id':'Int','UserName':'String','Email':'String','Tasks':'Task[]','PasswordHash':'String'},'Task':{'Id':'Int','Created':'DateTime','Updated':'DateTime','Title':'String','Description':'String','IsOpen':'Bool','DueDate':'DateTime','EstimatedHours':'Float','Priority':'Int','Tags':'Tag[]','User':'User','UserId':'Int'},'Tag':{'Id':'Int','Name':'String','Color':'String','Tasks':'Task[]'}}".Replace('\'', '"');
+            string json = @"{'User':{'Id':'Int','UserName':'String','Email':'String','Pets':'Pet[]','PasswordHash':'String'},'Pet':{'Id':'Int','Name':'String','Species':'String','User':'User','UserId':'Int'}}".Replace('\'', '"');
             return JObject.Parse(json).ToObject<Dictionary<string, Dictionary<string, string>>>();
         }
 
@@ -37,7 +37,7 @@ namespace Editor.Services
         public void OnGenerated(DataModel model, string input, StatEvent statEvent)
         {
             var dm = Parse(model);
-            string dmString = JObject.FromObject(dm).ToString();
+            string dmString = JObject.FromObject(dm).ToString(Newtonsoft.Json.Formatting.None);
             int hash = StringHash(dmString);
             var statistic = dbContext.Statistics.SingleOrDefault(s => s.Hash == hash);
             if (statistic != null)
